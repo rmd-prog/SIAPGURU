@@ -20,31 +20,87 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'login.html';
   });
 
-  // Visual V1: one compact top-level menu opens at a time.
-  const menuCards = document.querySelectorAll('.menu-expandable');
-  const toggleMenu = (card) => {
-    const willOpen = !card.classList.contains('sg-open');
-    menuCards.forEach(item => {
-      item.classList.remove('sg-open');
-      item.setAttribute('aria-expanded', 'false');
-    });
-    if (willOpen) {
-      card.classList.add('sg-open');
-      card.setAttribute('aria-expanded', 'true');
-    }
-  };
-  menuCards.forEach(card => {
-    card.addEventListener('click', (event) => {
-      if (event.target.closest('[data-view="students"]')) return;
-      toggleMenu(card);
-    });
-    card.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        toggleMenu(card);
+  // Topbar navigation: the five approved main menus live in the header.
+  const sourceGrid = document.querySelector('.main-menu-grid');
+  const topbar = document.querySelector('.topbar');
+  if (sourceGrid && topbar && !document.querySelector('.sg-topnav')) {
+    const nav = document.createElement('nav');
+    nav.className = 'sg-topnav';
+    nav.setAttribute('aria-label', 'Menu utama SIAP GURU');
+    sourceGrid.querySelectorAll('.menu-card').forEach(card => {
+      const title = card.querySelector('h3')?.textContent?.trim() || 'Menu';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sg-topnav-item';
+      button.setAttribute('aria-expanded', 'false');
+      button.innerHTML = `<span>${escapeHtml(title)}</span>${card.classList.contains('menu-expandable') ? '<b aria-hidden="true">⌄</b>' : ''}`;
+      if (card.classList.contains('menu-home')) button.classList.add('is-home');
+
+      if (card.classList.contains('menu-expandable')) {
+        const dropdown = document.createElement('div');
+        dropdown.className = 'sg-topnav-dropdown';
+        const sub = card.querySelector('.sub-menu');
+        if (sub) {
+          sub.querySelectorAll('span,button').forEach(item => {
+            const link = document.createElement('button');
+            link.type = 'button';
+            link.className = 'sg-topnav-link';
+            link.textContent = item.textContent.trim();
+            if (item.classList.contains('sub-label')) {
+              link.classList.add('is-label');
+              link.disabled = true;
+            }
+            if (item.matches('[data-view="students"]')) link.dataset.view = 'students';
+            dropdown.appendChild(link);
+          });
+        }
+        const closeOthers = () => {
+          nav.querySelectorAll('.sg-topnav-item.is-open').forEach(other => {
+            if (other !== button) {
+              other.classList.remove('is-open');
+              other.setAttribute('aria-expanded', 'false');
+            }
+          });
+        };
+        button.addEventListener('click', e => {
+          e.stopPropagation();
+          const open = !button.classList.contains('is-open');
+          closeOthers();
+          button.classList.toggle('is-open', open);
+          button.setAttribute('aria-expanded', String(open));
+        });
+        dropdown.addEventListener('click', e => e.stopPropagation());
+        dropdown.querySelectorAll('[data-view="students"]').forEach(link => {
+          link.addEventListener('click', () => openStudents());
+        });
+        const wrap = document.createElement('div');
+        wrap.className = 'sg-topnav-wrap';
+        wrap.appendChild(button);
+        wrap.appendChild(dropdown);
+        nav.appendChild(wrap);
+      } else {
+        button.addEventListener('click', () => {
+          nav.querySelectorAll('.sg-topnav-item.is-open').forEach(other => {
+            other.classList.remove('is-open');
+            other.setAttribute('aria-expanded', 'false');
+          });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        const wrap = document.createElement('div');
+        wrap.className = 'sg-topnav-wrap';
+        wrap.appendChild(button);
+        nav.appendChild(wrap);
       }
     });
-  });
+    topbar.insertBefore(nav, topbar.querySelector('.top-actions'));
+    document.addEventListener('click', () => {
+      nav.querySelectorAll('.sg-topnav-item.is-open').forEach(item => {
+        item.classList.remove('is-open');
+        item.setAttribute('aria-expanded', 'false');
+      });
+    });
+    sourceGrid.closest('.menu-section')?.classList.add('sg-hide-menu-section');
+  }
 
   const cards = document.querySelectorAll('.summary-card');
   const statIds = ['students', 'perangkat', 'nilai', 'rpm'];
@@ -110,6 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const openStudents = () => {
+    document.querySelectorAll('.sg-topnav-item.is-open').forEach(item => {
+      item.classList.remove('is-open');
+      item.setAttribute('aria-expanded', 'false');
+    });
     homeView.hidden = true;
     studentsView.hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
