@@ -1,5 +1,6 @@
 (()=>{
-const attach=()=>{const rooms=document.querySelectorAll('.sg-room-view:not([data-sg-export-ready="1"]),.inner-view:not([data-sg-export-ready="1"])');rooms.forEach(room=>{if(window.SiapGuruExport)window.SiapGuruExport.attach(room)})};
+const loadAtpPreview=()=>{const room=document.querySelector('.sg-atp-room');if(!room)return;if(!document.querySelector('link[data-atp-preview-style]')){const l=document.createElement('link');l.rel='stylesheet';l.href='assets/css/siap-guru-atp-preview.css?v=1';l.dataset.atpPreviewStyle='1';document.head.appendChild(l)}if(!document.querySelector('script[data-atp-preview-script]')){const s=document.createElement('script');s.src='assets/js/siap-guru-atp-preview.js?v=1';s.dataset.atpPreviewScript='1';document.body.appendChild(s)}};
+const attach=()=>{loadAtpPreview();const rooms=document.querySelectorAll('.sg-room-view:not([data-sg-export-ready="1"]),.inner-view:not([data-sg-export-ready="1"])');rooms.forEach(room=>{if(window.SiapGuruExport)window.SiapGuruExport.attach(room)})};
 document.addEventListener('click',()=>setTimeout(attach,120),false);
 document.addEventListener('DOMContentLoaded',()=>{setTimeout(attach,120);const root=document.querySelector('.main-content')||document.body;if(root)new MutationObserver(()=>attach()).observe(root,{childList:true,subtree:true})});
 })();
