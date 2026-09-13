@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!user?.id) { window.location.href = 'login.html'; return; }
 
   const API_BASE = 'https://siapguru.adm-sd.workers.dev/api';
+  const masterStyle = document.createElement('link'); masterStyle.rel='stylesheet'; masterStyle.href='assets/css/siap-guru-master-bab-v1.css?v=1'; document.head.appendChild(masterStyle);
+  const masterScript = document.createElement('script'); masterScript.src='assets/js/siap-guru-master-bab-v1.js?v=1'; masterScript.defer=true; document.head.appendChild(masterScript);
+  const sourceGrid = document.querySelector('.main-menu-grid');
+  const pembelajaranCard = sourceGrid ? [...sourceGrid.querySelectorAll('.menu-card')].find(card=>card.querySelector('h3')?.textContent?.trim()==='Pembelajaran') : null;
+  const pembelajaranSub = pembelajaranCard?.querySelector('.sub-menu');
+  if(pembelajaranSub && ![...pembelajaranSub.children].some(x=>x.textContent.trim()==='Master BAB / Topik')){const item=document.createElement('span');item.textContent='Master BAB / Topik';pembelajaranSub.appendChild(item)}
   const roomStyle = document.createElement('link');
   roomStyle.rel = 'stylesheet'; roomStyle.href = 'assets/siap-guru-learning-rooms.css?v=1';
   document.head.appendChild(roomStyle);
@@ -16,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setText('teacherMeta', [user.kelas ? `Kelas ${user.kelas}` : '', user.rombel ? `Rombel ${user.rombel}` : '', user.mapel || ''].filter(Boolean).join(' • ') || 'Guru');
   document.getElementById('logoutButton')?.addEventListener('click', () => { sessionStorage.removeItem('siapguru_user'); window.location.href = 'login.html'; });
 
-  const sourceGrid = document.querySelector('.main-menu-grid'); const topbar = document.querySelector('.topbar');
+  const topbar = document.querySelector('.topbar');
   if (sourceGrid && topbar && !document.querySelector('.sg-topnav')) {
     const nav = document.createElement('nav'); nav.className = 'sg-topnav'; nav.setAttribute('aria-label', 'Menu utama SIAP GURU');
     sourceGrid.querySelectorAll('.menu-card').forEach(card => {
@@ -53,5 +59,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderStudents=(students)=>{const body=document.getElementById('studentsTableBody');if(!body)return;setText('studentResultCount',`${students.length} siswa`);body.innerHTML='';if(!students.length){body.innerHTML='<tr><td colspan="7" class="empty-state">Tidak ada siswa yang cocok dengan pencarian.</td></tr>';return;}students.forEach((student,index)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${index+1}</td><td>${escapeHtml(student.nis||'-')}</td><td>${escapeHtml(student.nisn||'-')}</td><td><strong>${escapeHtml(student.nama||'-')}</strong></td><td>${escapeHtml(student.jenis_kelamin||'-')}</td><td>${escapeHtml(student.kelas??'-')}</td><td>${escapeHtml(student.rombel||'-')}</td>`;body.appendChild(tr);});};
   const loadStudents=async(search='')=>{const body=document.getElementById('studentsTableBody');if(body&&!search)body.innerHTML='<tr><td colspan="7" class="empty-state">Memuat data siswa...</td></tr>';try{const url=`${API_BASE}/students?user_id=${encodeURIComponent(user.id)}${search?`&search=${encodeURIComponent(search)}`:''}`;const response=await fetch(url,{cache:'no-store'});const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.message||'Data siswa gagal dimuat.');renderStudents(data.students||[]);setText('studentsAccessCount',`${(data.students||[]).length} siswa`);const access=data.access||[];setText('studentsAccessMeta',access.length?access.map(item=>`Kelas ${item.kelas}${item.rombel?` • ${item.rombel}`:''}`).join(' • '):'Belum ada rombel terhubung');}catch(error){if(body)body.innerHTML=`<tr><td colspan="7" class="empty-state error-state">${escapeHtml(error?.message||'Data siswa gagal dimuat.')}</td></tr>`;setText('studentResultCount','Gagal memuat');}};
   const openStudents=()=>{document.querySelectorAll('.sg-topnav-item.is-open').forEach(item=>{item.classList.remove('is-open');item.setAttribute('aria-expanded','false');});document.querySelector('.sg-room-view')?.remove();homeView.hidden=true;studentsView.hidden=false;window.scrollTo({top:0,behavior:'smooth'});searchInput?.focus();loadStudents(searchInput?.value?.trim()||'');};
-  document.querySelectorAll('[data-view="students"]').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();openStudents();}));document.getElementById('backHomeButton')?.addEventListener('click',()=>{studentsView.hidden=true;homeView.hidden=false;window.scrollTo({top:0,behavior:'smooth'});});searchInput?.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>loadStudents(searchInput.value.trim()),220);});loadDashboard();
+  document.querySelectorAll('[data-view="students"]').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();openStudents();}));document.getElementById('backHomeButton')?.addEventListener('click',()=>{studentsView.hidden=true;homeView.hidden=false;window.scrollTo({top:0,behavior:'smooth');});searchInput?.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>loadStudents(searchInput.value.trim()),220);});loadDashboard();
 });
