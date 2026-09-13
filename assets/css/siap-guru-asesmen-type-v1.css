@@ -1,0 +1,35 @@
+/* SIAP GURU — Asesmen typography standard
+   Desktop + mobile. Visual only; no data/function changes. */
+.sg-pn-shell,.sg-pnb-room,.sg-us-room,.sg-as-room,.sg-rn-room,.sg-an-room{font-size:14px;line-height:1.5}
+.sg-pn-shell h1,.sg-pnb-room h1,.sg-us-room h1,.sg-as-room h1,.sg-rn-room h1,.sg-an-room h1{font-size:22px!important;line-height:1.2!important}
+.sg-pn-shell h2,.sg-pnb-room h2,.sg-us-room h2,.sg-as-room h2,.sg-rn-room h2,.sg-an-room h2{font-size:16px!important;line-height:1.3!important}
+.sg-pn-shell h3,.sg-pnb-room h3,.sg-us-room h3,.sg-as-room h3,.sg-rn-room h3,.sg-an-room h3{font-size:14px!important}
+.sg-pn-shell p,.sg-pnb-room p,.sg-us-room p,.sg-as-room p,.sg-rn-room p,.sg-an-room p{font-size:13px}
+.sg-pn-label,.sg-pnb-eyebrow,.sg-pnb-label,.sg-us-eyebrow,.sg-us-label,.sg-as-eyebrow,.sg-as-label,.sg-rn-eyebrow,.sg-rn-label,.sg-an-label,.sg-an-eye{font-size:11px!important;line-height:1.3}
+.sg-pn-grid label,.sg-pn-item-grid label,.sg-pnb-fields label,.sg-us-fields label,.sg-as-fields label,.sg-rn-fields label{font-size:12px!important}
+.sg-pn-grid input,.sg-pn-grid select,.sg-pn-item-grid input,.sg-pn-item-grid textarea,.sg-pnb-fields input,.sg-pnb-fields select,.sg-pnb-tools input,.sg-pnb-comp input,.sg-us-fields input,.sg-us-fields select,.sg-us-tools input,.sg-us-comp input,.sg-as-fields input,.sg-as-fields select,.sg-as-tools input,.sg-as-comp input,.sg-rn-fields input,.sg-rn-fields select,.sg-rn-tools input,.sg-an-filters select,.sg-an-search{font-size:14px!important;line-height:1.35}
+.sg-pn-primary,.sg-pn-secondary,.sg-pnb-primary,.sg-pnb-secondary,.sg-us-primary,.sg-us-secondary,.sg-as-primary,.sg-as-secondary,.sg-rn-primary,.sg-rn-secondary{font-size:13px!important}
+.sg-pnb-table-wrap table,.sg-us-table-wrap table,.sg-as-table-wrap table,.sg-rn-table-wrap table,.sg-an-table{font-size:13px!important}
+.sg-pnb-table-wrap th,.sg-us-table-wrap th,.sg-as-table-wrap th,.sg-rn-table-wrap th{font-size:11px!important}
+.sg-pnb-table-wrap td,.sg-us-table-wrap td,.sg-as-table-wrap td,.sg-rn-table-wrap td,.sg-an-table td{font-size:13px!important}
+.sg-pnb-score,.sg-us-score,.sg-as-score{font-size:13px!important}
+.sg-rn-stats span,.sg-rn-source small,.sg-rn-hint,.sg-us-hint,.sg-as-hint,.sg-an-note{font-size:12px!important}
+.sg-rn-stats strong,.sg-an-stat strong{font-size:22px!important;line-height:1.15}
+.sg-an-status,.sg-pnb-status,.sg-us-status,.sg-as-status,.sg-rn-status{font-size:11px!important}
+.sg-an-filters label{font-size:12px!important}
+.sg-an-table th{font-size:11px!important}
+@media(max-width:760px){
+ .sg-pn-shell,.sg-pnb-room,.sg-us-room,.sg-as-room,.sg-rn-room,.sg-an-room{font-size:14px}
+ .sg-pn-shell h1,.sg-pnb-room h1,.sg-us-room h1,.sg-as-room h1,.sg-rn-room h1,.sg-an-room h1{font-size:20px!important}
+ .sg-pn-shell h2,.sg-pnb-room h2,.sg-us-room h2,.sg-as-room h2,.sg-rn-room h2,.sg-an-room h2{font-size:15px!important}
+ .sg-pn-shell p,.sg-pnb-room p,.sg-us-room p,.sg-as-room p,.sg-rn-room p,.sg-an-room p{font-size:12px}
+ .sg-pn-grid input,.sg-pn-grid select,.sg-pn-item-grid input,.sg-pn-item-grid textarea,.sg-pnb-fields input,.sg-pnb-fields select,.sg-pnb-tools input,.sg-pnb-comp input,.sg-us-fields input,.sg-us-fields select,.sg-us-tools input,.sg-us-comp input,.sg-as-fields input,.sg-as-fields select,.sg-as-tools input,.sg-as-comp input,.sg-rn-fields input,.sg-rn-fields select,.sg-rn-tools input,.sg-an-filters select,.sg-an-search{font-size:13px!important}
+ .sg-pnb-table-wrap table,.sg-us-table-wrap table,.sg-as-table-wrap table,.sg-rn-table-wrap table,.sg-an-table{font-size:12px!important}
+ .sg-pnb-table-wrap td,.sg-us-table-wrap td,.sg-as-table-wrap td,.sg-rn-table-wrap td,.sg-an-table td{font-size:12px!important}
+ .sg-rn-stats strong,.sg-an-stat strong{font-size:20px!important}
+}
+@media(max-width:460px){
+ .sg-pn-label,.sg-pnb-eyebrow,.sg-pnb-label,.sg-us-eyebrow,.sg-us-label,.sg-as-eyebrow,.sg-as-label,.sg-rn-eyebrow,.sg-rn-label,.sg-an-label,.sg-an-eye{font-size:10px!important}
+ .sg-pn-shell h1,.sg-pnb-room h1,.sg-us-room h1,.sg-as-room h1,.sg-rn-room h1,.sg-an-room h1{font-size:19px!important}
+ .sg-pn-shell h2,.sg-pnb-room h2,.sg-us-room h2,.sg-as-room h2,.sg-rn-room h2,.sg-an-room h2{font-size:14px!important}
+}
