@@ -6,8 +6,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "REPLACE_WITH_EXISTING_D1_NAME",
-      "database_id": "REPLACE_WITH_EXISTING_D1_ID"
+      "database_name": "SI-NILAI-V8",
+      "database_id": "6cdfc967-09b1-4b69-8d3e-aa3d1ef341af"
     }
   ]
 }
