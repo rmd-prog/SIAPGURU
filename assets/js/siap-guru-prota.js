@@ -22,7 +22,9 @@ const boot=()=>{
  $('sgProtaSave').onclick=()=>{sync();if(!state.items.length){show('Tambahkan atau ambil minimal satu TP.');return}localStorage.setItem(KEY,JSON.stringify({...state,savedAt:new Date().toISOString(),version:'PROTA-1'}));show('PROTA tersimpan di perangkat ini.')};
  $('sgProtaYear').addEventListener('input',sync);
  room.querySelector('.sg-room-back').onclick=()=>{room.remove();window.__sgProtaBoot=0;if(home)home.hidden=false;window.scrollTo({top:0,behavior:'smooth'})};
- load();window.scrollTo({top:0,behavior:'smooth'});
+ load();
+ if(window.SiapGuruExport?.attach)window.SiapGuruExport.attach(room);
+ window.scrollTo({top:0,behavior:'smooth'});
 };
 document.addEventListener('click',e=>{const l=e.target.closest('.sg-topnav-link');if(l&&l.textContent.trim()==='PROTA'){e.preventDefault();e.stopImmediatePropagation();boot()}},true);
 })();
