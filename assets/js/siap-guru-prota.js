@@ -24,5 +24,5 @@ const boot=()=>{
  room.querySelector('.sg-room-back').onclick=()=>{room.remove();window.__sgProtaBoot=0;if(home)home.hidden=false;window.scrollTo({top:0,behavior:'smooth'})};
  load();window.scrollTo({top:0,behavior:'smooth'});
 };
-document.addEventListener('click',e=>{const l=e.target.closest('.sg-topnav-link');if(l&&l.textContent.trim()==='Perencanaan'){e.preventDefault();e.stopImmediatePropagation();boot()}},true);
+document.addEventListener('click',e=>{const l=e.target.closest('.sg-topnav-link');if(l&&l.textContent.trim()==='PROTA'){e.preventDefault();e.stopImmediatePropagation();boot()}},true);
 })();
