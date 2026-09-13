@@ -1,21 +1,16 @@
-/* SIAP GURU — Master BAB/Topik v3
+/* SIAP GURU — Master BAB/Topik v4
    Bank kelas 1-6. Generator lokal, tanpa token/API AI.
-   Judul Bahasa Indonesia diisi dari judul BAB buku SIBI yang terverifikasi.
-   Mapel lain yang belum diverifikasi langsung tetap memakai nomor BAB.
+   Judul yang sudah diverifikasi dari buku SIBI dipasang sebagai judul asli.
+   Mapel yang belum diverifikasi langsung tetap memakai nomor BAB agar tidak mengarang.
 */
 (()=>{const KEY='siapguru_master_bab_v1';
 const makeSeed=()=>{
  const out=[],add=(mapel,kelas,count,source,jp=8,titles=null)=>{const fase=kelas<=2?'A':kelas<=4?'B':'C';for(let n=1;n<=count;n++)out.push({id:`seed-${mapel.replace(/\W/g,'').toLowerCase()}-${kelas}-${n}`,mapel,fase,kelas,semester:n<=Math.ceil(count/2)?1:2,bab:titles?.[n-1]||`Bab ${n}`,subtopik:[],jp,source,sourceUrl:'https://buku.kemendikdasmen.go.id/katalog'});};
- const bi={
-  1:['Bunyi Apa?','Ayo Bermain!','Awas Kuman!','Aku Bisa!','Teman Baru','Temanku Berbeda','Aku Ingin','Di Sekitar Rumah'],
-  2:['Mengenal Perasaan','Menjaga Kesehatan','Berhati-hati di Mana Saja','Keluargaku Unik','Berteman dalam Keragaman','Bijak Memakai Uang','Sayang Lingkungan','Hobi yang Jadi Prestasi'],
-  3:['Ayo, Main!','Kawan Seiring','Pengobar Semangat','Senyum di Sekitarku','Bola-Bola Cokelat','Tersesat','Aku dan Si Merah','Sahabat dari Seberang'],
-  4:['Sudah Besar','Di Bawah Atap','Lihat Sekitar','Meliuk dan Menerjang','Bertukar dan Membayar','Satu Titik','Asal-Usul','Sehatlah Ragaku'],
-  5:['Aku yang Unik','Buku Jendela Dunia','Ekspresi Diri Melalui Hobi','Belajar Berwirausaha','Cinta Indonesia','Sayangi Bumi'],
-  6:['Bangga Menjadi Anak Indonesia','Musisi Indonesia di Pentas Dunia','Taman Nasional dan Situs Warisan Dunia','Jeda untuk Iklim','Anak-Anak yang Mengubah Dunia','Liburan Perpisahan Kelas','Aku Bisa Berempati','Aman di Dunia Maya']
- };
- const general=[['Pendidikan Pancasila',4,'Pendidikan Pancasila — SIBI'],['Matematika',8,'Matematika — SIBI'],['PJOK',8,'Pendidikan Jasmani, Olahraga, dan Kesehatan — SIBI'],['Seni Musik',6,'Seni Musik — SIBI'],['Seni Rupa',6,'Seni Rupa — SIBI']];
- for(let k=1;k<=6;k++){add('Bahasa Indonesia',k,bi[k].length,'Bahasa Indonesia — SIBI',8,bi[k]);general.forEach(([m,c,s])=>add(m,k,c,s));}
+ const bi={1:['Bunyi Apa?','Ayo Bermain!','Awas Kuman!','Aku Bisa!','Teman Baru','Temanku Berbeda','Aku Ingin','Di Sekitar Rumah'],2:['Mengenal Perasaan','Menjaga Kesehatan','Berhati-hati di Mana Saja','Keluargaku Unik','Berteman dalam Keragaman','Bijak Memakai Uang','Sayang Lingkungan','Hobi yang Jadi Prestasi'],3:['Ayo, Main!','Kawan Seiring','Pengobar Semangat','Senyum di Sekitarku','Bola-Bola Cokelat','Tersesat','Aku dan Si Merah','Sahabat dari Seberang'],4:['Sudah Besar','Di Bawah Atap','Lihat Sekitar','Meliuk dan Menerjang','Bertukar dan Membayar','Satu Titik','Asal-Usul','Sehatlah Ragaku'],5:['Aku yang Unik','Buku Jendela Dunia','Ekspresi Diri Melalui Hobi','Belajar Berwirausaha','Cinta Indonesia','Sayangi Bumi'],6:['Bangga Menjadi Anak Indonesia','Musisi Indonesia di Pentas Dunia','Taman Nasional dan Situs Warisan Dunia','Jeda untuk Iklim','Anak-Anak yang Mengubah Dunia','Liburan Perpisahan Kelas','Aku Bisa Berempati','Aman di Dunia Maya']};
+ const pp={1:['Aku dan Teman-Temanku','Aku Patuh Pada Aturan','Aku Mengenal Indonesia','Aku dan Lingkunganku'],2:['Aku Patuh Aturan','Aku Berperilaku Pancasila','Aku dan Teman-Temanku','Aku Peduli Lingkungan'],3:['Aku Anak Indonesia','Aku Patuh Aturan','Berbeda Itu Indah','Ayo Mengenal Pancasila'],4:['Mengenal Lingkungan Sekitar','Aku Anak yang Disiplin','Kerja Sama di Lingkunganku','Pancasila dalam Diriku'],5:['Pancasila dalam Kehidupanku','Norma dalam Kehidupanku','Keragaman Budaya Indonesiaku','Aku dan Lingkungan Sekitarku'],6:['Belajar Pancasila dengan Menyenangkan','Mengamalkan Pancasila untuk Kebahagiaan Bersama','Mengenal Norma, Hak, dan Kewajiban dalam Kehidupan Berbangsa dan Bernegara','Belajar Bermusyawarah','Menghormati Perbedaan Budaya dan Agama dalam Kehidupan Sehari-hari','Provinsiku Bagian dari Wilayah Negara Kesatuan Republik Indonesia','Menjaga Persatuan dan Kesatuan dengan Gotong Royong']};
+ for(let k=1;k<=6;k++){add('Bahasa Indonesia',k,bi[k].length,'Bahasa Indonesia — SIBI',8,bi[k]);add('Pendidikan Pancasila',k,pp[k].length,'Pendidikan Pancasila — SIBI',8,pp[k]);}
+ const general=[['Matematika',8,'Matematika — SIBI'],['PJOK',8,'Pendidikan Jasmani, Olahraga, dan Kesehatan — SIBI'],['Seni Musik',6,'Seni Musik — SIBI'],['Seni Rupa',6,'Seni Rupa — SIBI']];
+ for(let k=1;k<=6;k++)general.forEach(([m,c,s])=>add(m,k,c,s));
  for(let k=3;k<=6;k++)add('IPAS',k,8,'Ilmu Pengetahuan Alam dan Sosial — SIBI');
  ['Pendidikan Agama Islam dan Budi Pekerti','Pendidikan Agama Kristen dan Budi Pekerti','Pendidikan Agama Katolik dan Budi Pekerti','Pendidikan Agama Hindu dan Budi Pekerti','Pendidikan Agama Buddha dan Budi Pekerti','Pendidikan Agama Khonghucu dan Budi Pekerti'].forEach(m=>{for(let k=1;k<=6;k++)add(m,k,10,`SIBI — ${m}`,6)});
  return out;
