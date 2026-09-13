@@ -22,16 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const cards = document.querySelectorAll('.summary-card');
   const statIds = ['students', 'perangkat', 'nilai', 'rpm'];
-  cards.forEach((card, index) => {
-    if (statIds[index]) card.setAttribute('data-stat-card', statIds[index]);
-  });
+  cards.forEach((card, index) => { if (statIds[index]) card.setAttribute('data-stat-card', statIds[index]); });
 
   const loadDashboard = async () => {
     try {
       const response = await fetch(`${API_BASE}/dashboard?user_id=${encodeURIComponent(user.id)}`, { cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.message || 'Data dashboard gagal dimuat.');
-
       const stats = data.stats || {};
       const values = [stats.students ?? 0, stats.perangkat ?? 0, stats.nilai ?? 0, stats.rpm ?? 0];
       cards.forEach((card, index) => {
@@ -42,26 +39,80 @@ document.addEventListener('DOMContentLoaded', () => {
         value.textContent = values[index];
         card.appendChild(value);
       });
-
       const list = document.getElementById('studentPreview');
       if (list) {
         list.innerHTML = '';
-        if (!data.students?.length) {
-          list.innerHTML = '<div class="empty-state">Belum ada data siswa untuk akses guru ini.</div>';
-        } else {
-          data.students.forEach(student => {
-            const row = document.createElement('div');
-            row.className = 'student-row';
-            row.innerHTML = `<div><strong>${escapeHtml(student.nama || '-')}</strong><span>${escapeHtml([student.nis ? `NIS ${student.nis}` : '', student.rombel || (student.kelas ? `Kelas ${student.kelas}` : '')].filter(Boolean).join(' • '))}</span></div>`;
-            list.appendChild(row);
-          });
-        }
+        if (!data.students?.length) list.innerHTML = '<div class="empty-state">Belum ada data siswa untuk akses guru ini.</div>';
+        else data.students.forEach(student => {
+          const row = document.createElement('div');
+          row.className = 'student-row';
+          row.innerHTML = `<div><strong>${escapeHtml(student.nama || '-')}</strong><span>${escapeHtml([student.nis ? `NIS ${student.nis}` : '', student.rombel || (student.kelas ? `Kelas ${student.kelas}` : '')].filter(Boolean).join(' • '))}</span></div>`;
+          list.appendChild(row);
+        });
       }
     } catch (error) {
       const list = document.getElementById('studentPreview');
       if (list) list.innerHTML = `<div class="empty-state error-state">${escapeHtml(error?.message || 'Data dashboard gagal dimuat.')}</div>`;
     }
   };
+
+  const homeView = document.getElementById('homeView');
+  const studentsView = document.getElementById('studentsView');
+  const searchInput = document.getElementById('studentSearch');
+  let searchTimer;
+
+  const renderStudents = (students) => {
+    const body = document.getElementById('studentsTableBody');
+    if (!body) return;
+    setText('studentResultCount', `${students.length} siswa`);
+    body.innerHTML = '';
+    if (!students.length) {
+      body.innerHTML = '<tr><td colspan="7" class="empty-state">Tidak ada siswa yang cocok dengan pencarian.</td></tr>';
+      return;
+    }
+    students.forEach((student, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${index + 1}</td><td>${escapeHtml(student.nis || '-')}</td><td>${escapeHtml(student.nisn || '-')}</td><td><strong>${escapeHtml(student.nama || '-')}</strong></td><td>${escapeHtml(student.jenis_kelamin || '-')}</td><td>${escapeHtml(student.kelas ?? '-')}</td><td>${escapeHtml(student.rombel || '-')}</td>`;
+      body.appendChild(tr);
+    });
+  };
+
+  const loadStudents = async (search = '') => {
+    const body = document.getElementById('studentsTableBody');
+    if (body && !search) body.innerHTML = '<tr><td colspan="7" class="empty-state">Memuat data siswa...</td></tr>';
+    try {
+      const url = `${API_BASE}/students?user_id=${encodeURIComponent(user.id)}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
+      const response = await fetch(url, { cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || 'Data siswa gagal dimuat.');
+      renderStudents(data.students || []);
+      setText('studentsAccessCount', `${(data.students || []).length} siswa`);
+      const access = data.access || [];
+      setText('studentsAccessMeta', access.length ? access.map(item => `Kelas ${item.kelas}${item.rombel ? ` • ${item.rombel}` : ''}`).join(' • ') : 'Belum ada rombel terhubung');
+    } catch (error) {
+      if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state error-state">${escapeHtml(error?.message || 'Data siswa gagal dimuat.')}</td></tr>`;
+      setText('studentResultCount', 'Gagal memuat');
+    }
+  };
+
+  const openStudents = () => {
+    homeView.hidden = true;
+    studentsView.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    searchInput?.focus();
+    loadStudents(searchInput?.value?.trim() || '');
+  };
+
+  document.querySelectorAll('[data-view="students"]').forEach(button => button.addEventListener('click', openStudents));
+  document.getElementById('backHomeButton')?.addEventListener('click', () => {
+    studentsView.hidden = true;
+    homeView.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadStudents(searchInput.value.trim()), 220);
+  });
 
   loadDashboard();
 });
