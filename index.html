@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="SIAP GURU — platform administrasi dan pembelajaran guru SD.">
-  <title>SIAP GURU</title>
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="description" content="SIAP GURU — ruang kerja administrasi dan pembelajaran guru SD.">
+  <title>Beranda — SIAP GURU</title>
   <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
@@ -18,72 +18,74 @@
           <div class="brand-subtitle">Administrasi Guru SD</div>
         </div>
       </div>
-      <a class="login-link" href="login.html">Login Guru</a>
+      <div class="top-actions">
+        <span id="userNameTop" class="user-name-top">Guru</span>
+        <button id="logoutButton" class="login-link" type="button">Keluar</button>
+      </div>
     </header>
 
-    <main class="main-content">
-      <section class="hero-card" aria-labelledby="welcome-title">
-        <div class="eyebrow">PLATFORM GURU SD</div>
-        <h1 id="welcome-title">SIAP GURU</h1>
-        <p>Ruang kerja guru yang sederhana, rapi, dan terstruktur untuk pembelajaran, asesmen, peserta didik, dan dokumen.</p>
+    <main class="main-content dashboard-content">
+      <section class="dashboard-welcome">
+        <div>
+          <span class="eyebrow">BERANDA</span>
+          <h1 id="welcomeTitle">Selamat datang</h1>
+          <p id="welcomeText">Ruang kerja guru untuk pembelajaran, asesmen, peserta didik, dan dokumen.</p>
+        </div>
+        <div class="teacher-chip">
+          <strong id="teacherName">Guru</strong>
+          <span id="teacherMeta">Memuat profil...</span>
+        </div>
       </section>
 
-      <section class="menu-section" aria-label="Struktur utama SIAP GURU">
+      <section class="dashboard-section" aria-label="Ringkasan guru">
         <div class="section-heading">
-          <div>
-            <span class="eyebrow">MENU UTAMA</span>
-            <h2>Ruang kerja guru</h2>
-          </div>
+          <div><span class="eyebrow">RINGKASAN</span><h2>Ruang kerja Anda</h2></div>
+        </div>
+        <div class="summary-grid">
+          <article class="summary-card"><span class="summary-icon">S</span><div><strong>Peserta Didik</strong><span>Kelola data siswa dan profil.</span></div></article>
+          <article class="summary-card"><span class="summary-icon">P</span><div><strong>Pembelajaran</strong><span>CP, ATP, TP, perangkat dan RPM.</span></div></article>
+          <article class="summary-card"><span class="summary-icon">N</span><div><strong>Asesmen</strong><span>Nilai, rekap dan analisis.</span></div></article>
+          <article class="summary-card"><span class="summary-icon">D</span><div><strong>Dokumen</strong><span>Draft, template dan riwayat.</span></div></article>
+        </div>
+      </section>
+
+      <section class="menu-section" aria-label="Menu utama SIAP GURU">
+        <div class="section-heading">
+          <div><span class="eyebrow">MENU UTAMA</span><h2>Ruang kerja guru</h2></div>
           <span class="structure-note">5 menu utama</span>
         </div>
 
         <div class="main-menu-grid">
-          <article class="menu-card menu-home">
+          <article class="menu-card menu-home active-menu">
             <div class="menu-icon">⌂</div>
-            <div><h3>Beranda</h3><p>Beranda</p></div>
+            <div><h3>Beranda</h3><p>Ringkasan ruang kerja guru.</p></div>
           </article>
 
           <article class="menu-card">
             <div class="menu-icon">▦</div>
-            <div class="menu-card-body">
-              <h3>Pembelajaran</h3>
-              <div class="sub-menu"><span class="sub-label">Perencanaan</span><span>CP</span><span>ATP</span><span>TP</span><span>Perangkat</span><span>RPM Deep Learning</span><span>LKPD</span><span>Materi</span><span>AI Generate</span></div>
-            </div>
+            <div class="menu-card-body"><h3>Pembelajaran</h3><div class="sub-menu"><span class="sub-label">Perencanaan</span><span>CP</span><span>ATP</span><span>TP</span><span>Perangkat</span><span>RPM Deep Learning</span><span>LKPD</span><span>Materi</span><span>AI Generate</span></div></div>
           </article>
 
           <article class="menu-card">
             <div class="menu-icon">✓</div>
-            <div class="menu-card-body">
-              <h3>Asesmen</h3>
-              <div class="sub-menu"><span>Penilaian</span><span>Penilaian per Bab</span><span>Ulangan Semester</span><span>Akhir Semester</span><span>Rekap Nilai</span><span>Analisis</span></div>
-            </div>
+            <div class="menu-card-body"><h3>Asesmen</h3><div class="sub-menu"><span>Penilaian</span><span>Penilaian per Bab</span><span>Ulangan Semester</span><span>Akhir Semester</span><span>Rekap Nilai</span><span>Analisis</span></div></div>
           </article>
 
           <article class="menu-card">
             <div class="menu-icon">◎</div>
-            <div class="menu-card-body">
-              <h3>Peserta Didik</h3>
-              <div class="sub-menu"><span>Data Siswa</span><span>Rombel</span><span>Profil</span><span>Perkembangan</span></div>
-            </div>
+            <div class="menu-card-body"><h3>Peserta Didik</h3><div class="sub-menu"><span>Data Siswa</span><span>Rombel</span><span>Profil</span><span>Perkembangan</span></div></div>
           </article>
 
           <article class="menu-card">
             <div class="menu-icon">□</div>
-            <div class="menu-card-body">
-              <h3>Dokumen</h3>
-              <div class="sub-menu"><span>Draft</span><span>Selesai</span><span>Template</span><span>Riwayat</span></div>
-            </div>
+            <div class="menu-card-body"><h3>Dokumen</h3><div class="sub-menu"><span>Draft</span><span>Selesai</span><span>Template</span><span>Riwayat</span></div></div>
           </article>
         </div>
       </section>
-
-      <section class="build-note">
-        <strong>Struktur utama sudah ditetapkan.</strong>
-        <span>Menu di atas adalah kerangka UI; fungsi tiap modul dipasang bertahap tanpa mengubah struktur yang sudah disepakati.</span>
-      </section>
     </main>
 
-    <footer class="footer">SIAP GURU • Struktur sederhana • Dibangun bertahap</footer>
+    <footer class="footer">SIAP GURU • Ruang kerja guru SD</footer>
   </div>
+  <script src="assets/js/app.js" defer></script>
 </body>
 </html>
