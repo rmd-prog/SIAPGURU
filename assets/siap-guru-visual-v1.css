@@ -5,43 +5,42 @@ body{background:#f6f8fb}
 .brand-mark{width:36px!important;height:36px!important;border-radius:10px!important;background:#25364a!important}
 .brand-name{font-size:13px!important}.brand-subtitle{font-size:10px!important}
 .main-content{margin-top:6px!important}
-.dashboard-welcome{padding:20px!important;border-radius:16px!important;box-shadow:0 8px 24px rgba(31,55,80,.035)!important}
-.dashboard-welcome h1{font-size:clamp(23px,3.4vw,32px)!important;letter-spacing:-.035em!important}
-.dashboard-welcome p{font-size:12px!important;color:#748196!important}
-.teacher-chip{min-width:165px!important;padding:10px 12px!important;border-radius:11px!important}
-.dashboard-section,.menu-section{margin-top:15px!important}
-.section-heading{margin-bottom:8px!important}.section-heading h2{font-size:15px!important;margin:3px 0!important}
-.eyebrow{font-size:8px!important;color:#8a97a8!important}
-.summary-grid{gap:8px!important}
-.summary-card{min-height:76px!important;padding:11px!important;border-radius:12px!important;border-color:var(--sg-line)!important;box-shadow:none!important}
-.summary-icon{width:27px!important;height:27px!important;border-radius:8px!important;background:#fff!important;color:#68788c!important;font-size:10px!important}
-.summary-card strong{font-size:11px!important;color:var(--sg-text)}
-.summary-card div span{font-size:9.5px!important;color:#8995a5!important}
-.summary-value{font-size:17px!important;color:var(--sg-text)}
-/* Home menu: top-level only; submenus are collapsed until the card is opened. */
-.main-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
-.menu-card{min-height:72px!important;padding:12px!important;border-radius:13px!important;border-color:var(--sg-line)!important;box-shadow:none!important;cursor:pointer;transition:border-color .16s ease,background .16s ease,box-shadow .16s ease}
-.menu-card.menu-home{min-height:72px!important}
-.menu-card:hover{border-color:#c9d9eb!important;background:#fbfdff!important}
-.menu-card.sg-open{border-color:#c5d9ee!important;background:#fbfdff!important;box-shadow:0 5px 16px rgba(35,91,145,.045)!important}
-.menu-icon{width:30px!important;height:30px!important;flex:0 0 30px!important;border-radius:8px!important;background:#fff!important;color:#64758a!important;border-color:#e0e7ef!important;font-size:14px!important}
-.menu-card h3{font-size:12.5px!important;color:var(--sg-text)!important;margin:2px 0 2px!important}
-.menu-card p{font-size:9.5px!important;color:#8a96a6!important}
+.dashboard-welcome{padding:18px 20px!important;border-radius:15px!important;border:1px solid #e4eaf1!important;box-shadow:0 6px 20px rgba(31,55,80,.035)!important;background:#fff!important}
+.dashboard-welcome h1{font-size:clamp(22px,3.2vw,29px)!important;letter-spacing:-.035em!important}
+.dashboard-welcome p{font-size:11.5px!important;color:#748196!important}
+.teacher-chip{min-width:165px!important;padding:9px 11px!important;border-radius:10px!important;border:1px solid #e5eaf0!important;background:#fafbfd!important}
+.dashboard-section,.menu-section{margin-top:14px!important}
+.section-heading{margin-bottom:8px!important}.section-heading h2{font-size:14px!important;margin:3px 0!important}
+.eyebrow{font-size:8px!important;color:#8a97a8!important;letter-spacing:.08em!important}
+.summary-grid{gap:7px!important}
+.summary-card{min-height:72px!important;padding:10px!important;border-radius:11px!important;border-color:#e1e7ee!important;box-shadow:none!important;background:#fff!important}
+.summary-icon{width:26px!important;height:26px!important;border-radius:8px!important;background:#f8fafc!important;color:#627388!important;font-size:10px!important}
+.summary-card strong{font-size:10.5px!important;color:var(--sg-text)}
+.summary-card div span{font-size:9px!important;color:#8995a5!important}
+.summary-value{font-size:16px!important;color:var(--sg-text)}
+.main-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+.menu-card{min-height:70px!important;padding:11px!important;border-radius:11px!important;border-color:#e0e6ed!important;background:#fff!important;box-shadow:none!important;cursor:pointer;transition:border-color .16s ease,background .16s ease,box-shadow .16s ease,transform .16s ease!important}
+.menu-card.menu-home{min-height:70px!important}
+.menu-card:hover{border-color:#c8d8e8!important;background:#fbfdff!important;transform:translateY(-1px)}
+.menu-card.sg-open{border-color:#bfd4e9!important;background:#fbfdff!important;box-shadow:0 5px 15px rgba(35,91,145,.05)!important}
+.menu-icon{width:29px!important;height:29px!important;flex:0 0 29px!important;border-radius:8px!important;background:#f8fafc!important;color:#5f7085!important;border:1px solid #e2e8ef!important;font-size:13px!important}
+.menu-card h3{font-size:12px!important;color:var(--sg-text)!important;margin:2px 0 2px!important;font-weight:650!important}
+.menu-card p{font-size:9px!important;color:#8a96a6!important}
 .menu-card-body{min-width:0!important}
 .sub-menu{display:none!important;margin-top:8px!important;padding-top:7px!important;border-top:1px solid #edf1f5!important;gap:4px!important}
 .menu-card.sg-open .sub-menu{display:flex!important}
-.sub-menu span,.sub-menu-button{padding:5px 7px!important;border-radius:7px!important;background:#fff!important;border:1px solid #e7edf3!important;color:#69788b!important;font-size:9.5px!important}
+.sub-menu span,.sub-menu-button{padding:5px 7px!important;border-radius:7px!important;background:#fff!important;border:1px solid #e7edf3!important;color:#69788b!important;font-size:9px!important}
 .sub-menu .sub-label{color:#46586d!important;background:#f4f7fa!important}
 .menu-section .structure-note{font-size:9px!important}
-/* Homepage intentionally has no student preview; students live in Peserta Didik. */
+.menu-card::after{content:'›';margin-left:auto;color:#a0adbb;font-size:17px;line-height:1;align-self:center;transition:transform .16s ease,color .16s ease}
+.menu-card.menu-home::after{content:''}
+.menu-card.sg-open::after{transform:rotate(90deg);color:#5f7892}
 .student-panel{display:none!important}
-.footer{margin-top:20px!important}
+.footer{margin-top:18px!important;font-size:9px!important;color:#9aa6b4!important}
 @media(max-width:650px){
  .main-menu-grid{grid-template-columns:1fr!important}
- .menu-card{min-height:66px!important}
- .menu-card.sg-open{padding-bottom:11px!important}
+ .menu-card{min-height:64px!important}
+ .menu-card.sg-open{padding-bottom:10px!important}
+ .dashboard-welcome{padding:16px!important}
 }
-@media(max-width:430px){
- .dashboard-welcome{padding:17px!important}
- .summary-card{min-height:72px!important}
-}
+@media(max-width:430px){.summary-card{min-height:70px!important}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
