@@ -19,4 +19,14 @@
     ['anSub','anPhase','anClass','anSem'].forEach(id=>$(id).addEventListener('change',render));$('anSearch').addEventListener('input',render);room.querySelector('.sg-an-back').onclick=()=>{room.remove();window.__sgAnalisisBoot=0;if(home)home.hidden=false;window.scrollTo({top:0,behavior:'smooth'})};load();
   };
   window.__openSiapGuruAnalisis=boot;
+  document.addEventListener('click',event=>{
+    const target=event.target?.closest?.('[data-view="analisis"], .sg-topnav-link');
+    if(!target)return;
+    const isAnalisis=target.dataset.view==='analisis'||target.textContent.trim()==='Analisis';
+    if(!isAnalisis)return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    boot();
+  },true);
 })();
