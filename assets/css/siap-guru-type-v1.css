@@ -1,0 +1,148 @@
+:root{
+  --sg-font-body:14px;
+  --sg-font-body-lg:16px;
+  --sg-font-title:22px;
+  --sg-font-section:16px;
+  --sg-font-label:12px;
+  --sg-font-small:12px;
+  --sg-font-table:13px;
+  --sg-line-body:1.5;
+}
+
+/* Global app typography: compact, readable, and consistent on desktop + mobile. */
+.main-content{
+  font-size:var(--sg-font-body);
+  line-height:var(--sg-line-body);
+}
+
+.main-content :where(h1){
+  font-size:var(--sg-font-title) !important;
+  line-height:1.25 !important;
+  letter-spacing:-.02em !important;
+}
+
+.main-content :where(h2){
+  font-size:var(--sg-font-section) !important;
+  line-height:1.35 !important;
+  letter-spacing:-.01em !important;
+}
+
+.main-content :where(h3){
+  font-size:14px !important;
+  line-height:1.4 !important;
+}
+
+.main-content :where(p){
+  font-size:14px !important;
+  line-height:1.5 !important;
+}
+
+.main-content :where(label){
+  font-size:var(--sg-font-label) !important;
+  line-height:1.35 !important;
+}
+
+.main-content :where(input,select,textarea){
+  font-size:14px !important;
+  line-height:1.4 !important;
+}
+
+.main-content :where(button){
+  font-size:13px !important;
+  line-height:1.35 !important;
+}
+
+.main-content :where(table){
+  font-size:var(--sg-font-table) !important;
+}
+
+.main-content :where(th,td){
+  font-size:var(--sg-font-table) !important;
+  line-height:1.4 !important;
+}
+
+.main-content :where(small,.caption,.note,.hint,.helper,.status,.eyebrow,.structure-note){
+  font-size:var(--sg-font-small) !important;
+  line-height:1.4 !important;
+}
+
+/* Existing dashboard headings were intentionally larger than the application scale. */
+.dashboard-welcome h1,
+.inner-view-head h1{
+  font-size:22px !important;
+  line-height:1.25 !important;
+}
+
+/* Preserve compact controls and badges. */
+.teacher-chip strong,
+.summary-card strong,
+.menu-card h3{
+  font-size:14px !important;
+}
+
+.teacher-chip span,
+.summary-card div span,
+.menu-card p{
+  font-size:12px !important;
+}
+
+.sub-menu :where(span,.sub-menu-button){
+  font-size:12px !important;
+}
+
+@media(max-width:800px){
+  .main-content{
+    font-size:14px;
+  }
+  .main-content :where(h1),
+  .dashboard-welcome h1,
+  .inner-view-head h1{
+    font-size:20px !important;
+  }
+  .main-content :where(h2){
+    font-size:15px !important;
+  }
+  .main-content :where(h3){
+    font-size:14px !important;
+  }
+  .main-content :where(p){
+    font-size:14px !important;
+  }
+  .main-content :where(input,select,textarea){
+    font-size:14px !important;
+  }
+  .main-content :where(button){
+    font-size:13px !important;
+  }
+  .main-content :where(th,td){
+    font-size:12px !important;
+  }
+}
+
+@media(max-width:460px){
+  .main-content :where(h1),
+  .dashboard-welcome h1,
+  .inner-view-head h1{
+    font-size:20px !important;
+  }
+  .main-content :where(h2){
+    font-size:15px !important;
+  }
+  .main-content :where(h3){
+    font-size:14px !important;
+  }
+  .main-content :where(p){
+    font-size:14px !important;
+  }
+  .teacher-chip strong,
+  .summary-card strong,
+  .menu-card h3{
+    font-size:14px !important;
+  }
+  .teacher-chip span,
+  .summary-card div span,
+  .menu-card p,
+  .sub-menu :where(span,.sub-menu-button){
+    font-size:12px !important;
+  }
+}
