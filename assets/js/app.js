@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const API_BASE = 'https://siapguru.adm-sd.workers.dev/api';
   const masterStyle = document.createElement('link'); masterStyle.rel='stylesheet'; masterStyle.href='assets/css/siap-guru-master-bab-v1.css?v=2'; document.head.appendChild(masterStyle);
-  const masterScript = document.createElement('script'); masterScript.src='assets/js/siap-guru-master-bab-v1.js?v=6'; masterScript.defer=true; document.head.appendChild(masterScript);
+  const masterScript = document.createElement('script'); masterScript.src='assets/js/siap-guru-master-bab-v1.js?v=7'; masterScript.defer=true; document.head.appendChild(masterScript);
   const sourceGrid = document.querySelector('.main-menu-grid');
   const pembelajaranCard = sourceGrid ? [...sourceGrid.querySelectorAll('.menu-card')].find(card=>card.querySelector('h3')?.textContent?.trim()==='Pembelajaran') : null;
   const pembelajaranSub = pembelajaranCard?.querySelector('.sub-menu');
