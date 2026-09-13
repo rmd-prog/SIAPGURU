@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  form?.addEventListener('submit', (event) => {
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const nip = nipInput.value.trim();
     const password = passwordInput.value;
@@ -26,7 +26,37 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    loginMessage.textContent = 'Form login siap diproses. Autentikasi server dipasang pada tahap berikutnya.';
+    loginMessage.textContent = 'Memeriksa akun guru...';
     loginMessage.className = 'login-message info';
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ nip, password })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'NIP atau kata sandi tidak valid.');
+      }
+
+      if (data.token) {
+        sessionStorage.setItem('siap_guru_token', data.token);
+      }
+      if (data.user) {
+        sessionStorage.setItem('siap_guru_user', JSON.stringify(data.user));
+      }
+
+      loginMessage.textContent = 'Login berhasil. Membuka ruang kerja guru...';
+      loginMessage.className = 'login-message success';
+
+      window.location.href = 'index.html';
+    } catch (error) {
+      loginMessage.textContent = error.message || 'Login gagal. Periksa koneksi atau akun guru.';
+      loginMessage.className = 'login-message error';
+    }
   });
 });
