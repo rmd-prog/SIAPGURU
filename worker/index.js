@@ -41,27 +41,46 @@ async function getUser(env, userId) {
   return env.DB.prepare("SELECT id, username, nama, role, kelas, rombel, mapel FROM users WHERE id = ? LIMIT 1").bind(userId).first();
 }
 
+async function teacherStudentScope(env, user) {
+  const links = await env.DB.prepare("SELECT kelas, rombel FROM guru_rombel WHERE user_id = ? ORDER BY kelas, rombel").bind(user.id).all();
+  const access = links?.results || [];
+  if (access.length) return access;
+  if (user.kelas !== null && user.kelas !== undefined && user.kelas !== "") {
+    return [{ kelas: user.kelas, rombel: user.rombel || null }];
+  }
+  return [];
+}
+
+function studentWhere(access, search = "") {
+  const params = [];
+  const groups = access.map(item => {
+    const parts = ["kelas = ?"];
+    params.push(item.kelas);
+    if (item.rombel) { parts.push("rombel = ?"); params.push(item.rombel); }
+    return `(${parts.join(" AND ")})`;
+  });
+  const where = groups.length ? `(${groups.join(" OR ")})` : "1 = 0";
+  const q = String(search || "").trim();
+  if (q) {
+    const like = `%${q}%`;
+    return { where: `${where} AND (nama LIKE ? OR nis LIKE ? OR nisn LIKE ? OR rombel LIKE ?)`, params: [...params, like, like, like, like] };
+  }
+  return { where, params };
+}
+
 async function dashboard(env, userId) {
   const user = await getUser(env, userId);
   if (!user) return json({ ok: false, error: "USER_NOT_FOUND", message: "Sesi guru tidak ditemukan." }, 401);
 
-  const params = [];
-  let where = "";
-  if (user.kelas !== null && user.kelas !== undefined && user.kelas !== "") {
-    where = "kelas = ?";
-    params.push(user.kelas);
-  }
-  if (user.rombel) {
-    where += where ? " AND rombel = ?" : "rombel = ?";
-    params.push(user.rombel);
-  }
+  const access = await teacherStudentScope(env, user);
+  const scoped = studentWhere(access);
+  const count = await env.DB.prepare(`SELECT COUNT(*) AS total FROM siswa WHERE ${scoped.where}`).bind(...scoped.params).first();
+  const students = await env.DB.prepare(`SELECT id, nis, nisn, nama, kelas, jenis_kelamin, rombel FROM siswa WHERE ${scoped.where} ORDER BY nama LIMIT 8`).bind(...scoped.params).all();
 
-  const count = await env.DB.prepare(`SELECT COUNT(*) AS total FROM siswa${where ? ` WHERE ${where}` : ""}`).bind(...params).first();
-  const students = await env.DB.prepare(`SELECT id, nis, nisn, nama, kelas, jenis_kelamin, rombel FROM siswa${where ? ` WHERE ${where}` : ""} ORDER BY nama LIMIT 8`).bind(...params).all();
-
-  const nilaiCount = await env.DB.prepare(`SELECT COUNT(*) AS total FROM nilai${where ? ` WHERE siswa_id IN (SELECT id FROM siswa WHERE ${where})` : ""}`).bind(...params).first();
-  const perangkatCount = await env.DB.prepare("SELECT COUNT(*) AS total FROM perangkat WHERE (? IS NULL OR kelas = ?)").bind(user.kelas ?? null, user.kelas ?? null).first();
-  const rpmCount = await env.DB.prepare("SELECT COUNT(*) AS total FROM rpm WHERE (? IS NULL OR kelas = ?)").bind(user.kelas ?? null, user.kelas ?? null).first();
+  const nilaiCount = await env.DB.prepare(`SELECT COUNT(*) AS total FROM nilai WHERE siswa_id IN (SELECT id FROM siswa WHERE ${scoped.where})`).bind(...scoped.params).first();
+  const kelasList = [...new Set(access.map(x => Number(x.kelas)).filter(Number.isFinite))];
+  const perangkatCount = kelasList.length ? await env.DB.prepare(`SELECT COUNT(*) AS total FROM perangkat WHERE kelas IN (${kelasList.map(() => "?").join(",")})`).bind(...kelasList).first() : { total: 0 };
+  const rpmCount = kelasList.length ? await env.DB.prepare(`SELECT COUNT(*) AS total FROM rpm WHERE kelas IN (${kelasList.map(() => "?").join(",")})`).bind(...kelasList).first() : { total: 0 };
 
   return json({
     ok: true,
@@ -69,6 +88,15 @@ async function dashboard(env, userId) {
     stats: { students: Number(count?.total || 0), nilai: Number(nilaiCount?.total || 0), perangkat: Number(perangkatCount?.total || 0), rpm: Number(rpmCount?.total || 0) },
     students: students?.results || [],
   });
+}
+
+async function students(env, userId, search = "") {
+  const user = await getUser(env, userId);
+  if (!user) return json({ ok: false, error: "USER_NOT_FOUND", message: "Sesi guru tidak ditemukan." }, 401);
+  const access = await teacherStudentScope(env, user);
+  const scoped = studentWhere(access, search);
+  const result = await env.DB.prepare(`SELECT id, nis, nisn, nama, jenis_kelamin, kelas, rombel FROM siswa WHERE ${scoped.where} ORDER BY kelas, rombel, nama`).bind(...scoped.params).all();
+  return json({ ok: true, students: result?.results || [], access });
 }
 
 export default {
@@ -101,6 +129,12 @@ export default {
       if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
       try { return await dashboard(env, url.searchParams.get("user_id")); }
       catch (_) { return json({ ok: false, error: "DASHBOARD_DATABASE_ERROR", message: "Data dashboard gagal dimuat." }, 500); }
+    }
+
+    if (url.pathname === "/api/students" && request.method === "GET") {
+      if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
+      try { return await students(env, url.searchParams.get("user_id"), url.searchParams.get("search")); }
+      catch (_) { return json({ ok: false, error: "STUDENTS_DATABASE_ERROR", message: "Data siswa gagal dimuat." }, 500); }
     }
 
     return json({ ok: false, error: "NOT_FOUND" }, 404);
