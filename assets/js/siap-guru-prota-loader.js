@@ -1,0 +1,1 @@
+(()=>{document.addEventListener('click',e=>{const l=e.target.closest('.sg-topnav-link');if(!l||l.textContent.trim()!=='Perencanaan')return;},true)})();
