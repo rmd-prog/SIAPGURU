@@ -1,12 +1,14 @@
 /* SIAP GURU — navigation stability layer
-   Only clears stale in-memory room boot guards before Pembelajaran/Asesmen navigation.
+   Clears stale in-memory room boot guards before Pembelajaran/Asesmen navigation.
    No data, D1, Worker, login, or room content is changed. */
 (()=>{
-  const learning = new Set(['CP','ATP','TP','Perangkat','RPM Deep Learning','LKPD','Materi','AI Generate']);
+  const learning = new Set(['CP','ATP','TP','PROTA','PROSEM','Perangkat','RPM Deep Learning','LKPD','Materi','AI Generate']);
   const assessment = new Set(['Penilaian','Penilaian per Bab','Ulangan Semester','Akhir Semester','Rekap Nilai','Analisis']);
   const resetRoomBoots=()=>{
     window.__sgAtpBoot=0;
     window.__sgTpBoot=0;
+    window.__sgProtaBoot=0;
+    window.__sgProsemBoot=0;
     window.__sgPerangkatBoot=0;
     window.__sgRpmBoot=0;
     window.__sgPenilaianBoot=0;
