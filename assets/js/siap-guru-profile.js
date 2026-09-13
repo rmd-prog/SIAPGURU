@@ -1,6 +1,4 @@
 (() => {
-  const API_BASE = 'https://siapguru.adm-sd.workers.dev/api';
-
   const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (c) => ({
     '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
   }[c]));
@@ -8,6 +6,20 @@
   function getUser() {
     try { return JSON.parse(sessionStorage.getItem('siapguru_user') || 'null'); }
     catch { return null; }
+  }
+
+  function goHome() {
+    document.getElementById('profileView').hidden = true;
+    document.getElementById('studentsView').hidden = true;
+    document.getElementById('homeView').hidden = false;
+    document.querySelector('.sg-room-view')?.remove();
+    document.querySelectorAll('.sg-topnav-item.is-open').forEach((el) => {
+      el.classList.remove('is-open');
+      el.setAttribute('aria-expanded', 'false');
+    });
+    document.querySelectorAll('.active-menu').forEach((el) => el.classList.remove('active-menu'));
+    document.querySelector('.menu-home')?.classList.add('active-menu');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function renderProfile() {
@@ -47,17 +59,12 @@
           </section>
         </div>
       </div>`;
-
-    view.querySelector('.profile-back')?.addEventListener('click', () => {
-      document.getElementById('profileView').hidden = true;
-      document.getElementById('homeView').hidden = false;
-      document.querySelectorAll('.active-menu').forEach((el) => el.classList.remove('active-menu'));
-      document.querySelector('.menu-home')?.classList.add('active-menu');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    view.querySelector('.profile-back')?.addEventListener('click', goHome);
   }
 
-  function showProfile() {
+  function showProfile(event) {
+    event?.preventDefault();
+    event?.stopPropagation();
     const home = document.getElementById('homeView');
     const students = document.getElementById('studentsView');
     const rombel = document.getElementById('rombelView');
@@ -66,9 +73,23 @@
     if (home) home.hidden = true;
     if (students) students.hidden = true;
     if (rombel) rombel.hidden = true;
+    document.querySelector('.sg-room-view')?.remove();
     profile.hidden = false;
+    document.querySelectorAll('.sg-topnav-item.is-open').forEach((el) => {
+      el.classList.remove('is-open');
+      el.setAttribute('aria-expanded', 'false');
+    });
     renderProfile();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function bindProfileButtons() {
+    const buttons = document.querySelectorAll('[data-view="profile"]');
+    buttons.forEach((button) => {
+      if (button.dataset.profileBound === '1') return;
+      button.dataset.profileBound = '1';
+      button.addEventListener('click', showProfile);
+    });
   }
 
   function injectStyles() {
@@ -91,12 +112,6 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     injectStyles();
-    document.addEventListener('click', (event) => {
-      const target = event.target.closest('[data-view="profile"]');
-      if (!target) return;
-      event.preventDefault();
-      event.stopPropagation();
-      showProfile();
-    });
+    bindProfileButtons();
   });
 })();
