@@ -1,7 +1,6 @@
 (()=>{
 const KEY='siapguru_prosem_draft';
 const boot=()=>{
- if(window.__sgProsemBoot && document.querySelector('.sg-prosem-room'))return;
  window.__sgProsemBoot=1;
  document.querySelectorAll('.sg-room-view,.inner-view').forEach(x=>x.remove());
  const home=document.getElementById('homeView'),students=document.getElementById('studentsView');
