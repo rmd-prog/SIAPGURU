@@ -9,9 +9,12 @@
   }
 
   function goHome() {
-    document.getElementById('profileView').hidden = true;
-    document.getElementById('studentsView').hidden = true;
-    document.getElementById('homeView').hidden = false;
+    const profile = document.getElementById('profileView');
+    const students = document.getElementById('studentsView');
+    const home = document.getElementById('homeView');
+    if (profile) profile.hidden = true;
+    if (students) students.hidden = true;
+    if (home) home.hidden = false;
     document.querySelector('.sg-room-view')?.remove();
     document.querySelectorAll('.sg-topnav-item.is-open').forEach((el) => {
       el.classList.remove('is-open');
@@ -84,8 +87,7 @@
   }
 
   function bindProfileButtons() {
-    const buttons = document.querySelectorAll('[data-view="profile"]');
-    buttons.forEach((button) => {
+    document.querySelectorAll('[data-view="profile"]').forEach((button) => {
       if (button.dataset.profileBound === '1') return;
       button.dataset.profileBound = '1';
       button.addEventListener('click', showProfile);
@@ -109,6 +111,14 @@
     `;
     document.head.appendChild(style);
   }
+
+  // Capture-phase delegation: the top-nav dropdown stops bubbling, so Profil
+  // must be caught before that handler can stop propagation.
+  document.addEventListener('click', (event) => {
+    const button = event.target?.closest?.('[data-view="profile"]');
+    if (!button) return;
+    showProfile(event);
+  }, true);
 
   document.addEventListener('DOMContentLoaded', () => {
     injectStyles();
