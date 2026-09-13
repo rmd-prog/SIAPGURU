@@ -20,13 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'login.html';
   });
 
-  // Visual V1: top-level menu stays compact; only one submenu opens at a time.
-  document.querySelectorAll('[data-menu-toggle]').forEach(card => {
+  // Visual V1: one compact top-level menu opens at a time.
+  const menuCards = document.querySelectorAll('.menu-expandable');
+  const toggleMenu = (card) => {
+    const willOpen = !card.classList.contains('sg-open');
+    menuCards.forEach(item => {
+      item.classList.remove('sg-open');
+      item.setAttribute('aria-expanded', 'false');
+    });
+    if (willOpen) {
+      card.classList.add('sg-open');
+      card.setAttribute('aria-expanded', 'true');
+    }
+  };
+  menuCards.forEach(card => {
     card.addEventListener('click', (event) => {
       if (event.target.closest('[data-view="students"]')) return;
-      const wasOpen = card.classList.contains('sg-open');
-      document.querySelectorAll('[data-menu-toggle].sg-open').forEach(item => item.classList.remove('sg-open'));
-      if (!wasOpen) card.classList.add('sg-open');
+      toggleMenu(card);
+    });
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleMenu(card);
+      }
     });
   });
 
