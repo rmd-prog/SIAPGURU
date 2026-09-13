@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const style = document.createElement('style');
   style.textContent = `
-    .sg-draft-view{padding:28px 0 42px}.sg-draft-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.sg-draft-back{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer;margin-bottom:10px}.sg-draft-eyebrow{display:block;font-size:.72rem;letter-spacing:.12em;font-weight:700;opacity:.65}.sg-draft-head h1{margin:5px 0 7px}.sg-draft-head p{margin:0;opacity:.72}.sg-draft-card{border:1px solid rgba(15,23,42,.08);background:var(--sg-surface,#fff);border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(15,23,42,.04)}.sg-draft-toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:16px}.sg-draft-toolbar h2{margin:0;font-size:1rem}.sg-draft-note{padding:34px 20px;text-align:center;border:1px dashed rgba(15,23,42,.14);border-radius:14px;opacity:.72}.sg-draft-note strong{display:block;color:inherit;opacity:1;margin-bottom:6px}.sg-draft-note span{display:block;font-size:.9rem}.sg-draft-badge{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:rgba(15,23,42,.05);font-size:.78rem;font-weight:700}.sg-draft-info{margin-top:14px;font-size:.86rem;opacity:.62}.sg-selesai-view{padding:28px 0 42px}.sg-selesai-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.sg-selesai-back{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer;margin-bottom:10px}.sg-selesai-eyebrow{display:block;font-size:.72rem;letter-spacing:.12em;font-weight:700;opacity:.65}.sg-selesai-head h1{margin:5px 0 7px}.sg-selesai-head p{margin:0;opacity:.72}.sg-selesai-count{padding:12px 15px;border-radius:14px;background:var(--sg-surface,#fff);border:1px solid rgba(15,23,42,.08);white-space:nowrap}.sg-selesai-card{border:1px solid rgba(15,23,42,.08);background:var(--sg-surface,#fff);border-radius:18px;padding:22px}.sg-selesai-note{padding:34px 20px;text-align:center;border:1px dashed rgba(15,23,42,.14);border-radius:14px;opacity:.72}.sg-selesai-note strong{display:block;opacity:1;margin-bottom:6px}.sg-selesai-note span{display:block;font-size:.9rem}.sg-selesai-info{margin-top:14px;font-size:.86rem;opacity:.62}@media(max-width:700px){.sg-draft-head,.sg-selesai-head{display:block}.sg-draft-card,.sg-selesai-card{padding:16px}.sg-selesai-count{display:inline-block;margin-top:14px}}
+    .sg-draft-view{padding:28px 0 42px}.sg-draft-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.sg-draft-back{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer;margin-bottom:10px}.sg-draft-eyebrow{display:block;font-size:.72rem;letter-spacing:.12em;font-weight:700;opacity:.65}.sg-draft-head h1{margin:5px 0 7px}.sg-draft-head p{margin:0;opacity:.72}.sg-draft-card{border:1px solid rgba(15,23,42,.08);background:var(--sg-surface,#fff);border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(15,23,42,.04)}.sg-draft-toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:16px}.sg-draft-toolbar h2{margin:0;font-size:1rem}.sg-draft-note{padding:34px 20px;text-align:center;border:1px dashed rgba(15,23,42,.14);border-radius:14px;opacity:.72}.sg-draft-note strong{display:block;color:inherit;opacity:1;margin-bottom:6px}.sg-draft-note span{display:block;font-size:.9rem}.sg-draft-badge{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:rgba(15,23,42,.05);font-size:.78rem;font-weight:700}.sg-draft-info{margin-top:14px;font-size:.86rem;opacity:.62}.sg-selesai-view{padding:28px 0 42px}.sg-selesai-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.sg-selesai-back{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer;margin-bottom:10px}.sg-selesai-eyebrow{display:block;font-size:.72rem;letter-spacing:.12em;font-weight:700;opacity:.65}.sg-selesai-head h1{margin:5px 0 7px}.sg-selesai-head p{margin:0;opacity:.72}.sg-selesai-count{padding:12px 15px;border-radius:14px;background:var(--sg-surface,#fff);border:1px solid rgba(15,23,42,.08);white-space:nowrap}.sg-selesai-card{border:1px solid rgba(15,23,42,.08);background:var(--sg-surface,#fff);border-radius:18px;padding:22px}.sg-selesai-note{padding:34px 20px;text-align:center;border:1px dashed rgba(15,23,42,.14);border-radius:14px;opacity:.72}.sg-selesai-note strong{display:block;opacity:1;margin-bottom:6px}.sg-selesai-note span{display:block;font-size:.9rem}.sg-selesai-info{margin-top:14px;font-size:.86rem;opacity:.62}.sg-template-view{padding:28px 0 42px}.sg-template-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.sg-template-back{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer;margin-bottom:10px}.sg-template-eyebrow{display:block;font-size:.72rem;letter-spacing:.12em;font-weight:700;opacity:.65}.sg-template-head h1{margin:5px 0 7px}.sg-template-head p{margin:0;opacity:.72}.sg-template-badge{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:rgba(15,23,42,.05);font-size:.78rem;font-weight:700}.sg-template-card{border:1px solid rgba(15,23,42,.08);background:var(--sg-surface,#fff);border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(15,23,42,.04)}.sg-template-note{padding:34px 20px;text-align:center;border:1px dashed rgba(15,23,42,.14);border-radius:14px;opacity:.72}.sg-template-note strong{display:block;opacity:1;margin-bottom:6px}.sg-template-note span{display:block;font-size:.9rem}.sg-template-info{margin-top:14px;font-size:.86rem;opacity:.62}@media(max-width:700px){.sg-draft-head,.sg-selesai-head,.sg-template-head{display:block}.sg-draft-card,.sg-selesai-card,.sg-template-card{padding:16px}.sg-selesai-count{display:inline-block;margin-top:14px}}
   `;
   document.head.appendChild(style);
 
@@ -29,6 +29,16 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="sg-selesai-card"><div class="sg-draft-toolbar"><h2>Dokumen selesai</h2><span class="structure-note">Belum ada data</span></div><div class="sg-selesai-note"><strong>Belum ada dokumen selesai</strong><span>Modul tampilan sudah disiapkan. Data final akan ditampilkan setelah sumber dokumen tersedia.</span></div><div class="sg-selesai-info">Tidak ada perubahan pada D1 atau Worker. Repo saat ini belum memiliki API penyimpanan dokumen.</div></div>`;
   mainContent.appendChild(selesaiView);
 
+  const templateView = document.createElement('section');
+  templateView.id = 'templateView';
+  templateView.className = 'inner-view sg-template-view';
+  templateView.hidden = true;
+  templateView.setAttribute('aria-label', 'Dokumen Template');
+  templateView.innerHTML = `
+    <div class="sg-template-head"><div><button type="button" class="sg-template-back">← Beranda</button><span class="sg-template-eyebrow">DOKUMEN</span><h1>Template</h1><p>Kumpulan pola dokumen yang nantinya dapat digunakan sebagai dasar pembuatan dokumen.</p></div><span class="sg-template-badge">Template</span></div>
+    <div class="sg-template-card"><div class="sg-draft-toolbar"><h2>Template dokumen</h2><span class="structure-note">Belum ada template</span></div><div class="sg-template-note"><strong>Belum ada template terhubung</strong><span>Tampilan Template sudah disiapkan. Daftar template akan ditampilkan setelah sumber template resmi tersedia.</span></div><div class="sg-template-info">Tidak membuat data palsu dan tidak mengubah D1 atau Worker. Repo saat ini belum memiliki API template dokumen.</div></div>`;
+  mainContent.appendChild(templateView);
+
   const closeMenus = () => document.querySelectorAll('.sg-topnav-item.is-open').forEach(item => {
     item.classList.remove('is-open'); item.setAttribute('aria-expanded', 'false');
   });
@@ -40,21 +50,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.sg-rombel-view')?.setAttribute('hidden','');
     view.hidden = true;
     selesaiView.hidden = true;
+    templateView.hidden = true;
   };
   const openDraft = () => { closeMenus(); hideViews(); view.hidden=false; window.scrollTo({top:0,behavior:'smooth'}); };
   const openSelesai = () => { closeMenus(); hideViews(); selesaiView.hidden=false; window.scrollTo({top:0,behavior:'smooth'}); };
+  const openTemplate = () => { closeMenus(); hideViews(); templateView.hidden=false; window.scrollTo({top:0,behavior:'smooth'}); };
   const backHome = (target) => { target.hidden=true; homeView.hidden=false; window.scrollTo({top:0,behavior:'smooth'}); };
 
   view.querySelector('.sg-draft-back')?.addEventListener('click', () => backHome(view));
   selesaiView.querySelector('.sg-selesai-back')?.addEventListener('click', () => backHome(selesaiView));
+  templateView.querySelector('.sg-template-back')?.addEventListener('click', () => backHome(templateView));
 
   document.querySelectorAll('.sg-topnav-link').forEach(link => {
     const text = link.textContent.trim();
     if (text === 'Draft' && !link.dataset.sgDraftBound) { link.dataset.sgDraftBound='1'; link.addEventListener('click', event => { event.preventDefault(); openDraft(); }); }
     if (text === 'Selesai' && !link.dataset.sgSelesaiBound) { link.dataset.sgSelesaiBound='1'; link.addEventListener('click', event => { event.preventDefault(); openSelesai(); }); }
+    if (text === 'Template' && !link.dataset.sgTemplateBound) { link.dataset.sgTemplateBound='1'; link.addEventListener('click', event => { event.preventDefault(); openTemplate(); }); }
   });
   document.querySelectorAll('.sub-menu span').forEach(item => {
     const text=item.textContent.trim();
     if (text==='Selesai' && !item.dataset.sgSelesaiBound) { item.dataset.sgSelesaiBound='1'; item.style.cursor='pointer'; item.addEventListener('click', event => { event.stopPropagation(); openSelesai(); }); }
+    if (text==='Template' && !item.dataset.sgTemplateBound) { item.dataset.sgTemplateBound='1'; item.style.cursor='pointer'; item.addEventListener('click', event => { event.stopPropagation(); openTemplate(); }); }
   });
 });
