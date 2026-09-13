@@ -20,6 +20,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'login.html';
   });
 
+  // Visual V1: top-level menu stays compact; only one submenu opens at a time.
+  document.querySelectorAll('[data-menu-toggle]').forEach(card => {
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('[data-view="students"]')) return;
+      const wasOpen = card.classList.contains('sg-open');
+      document.querySelectorAll('[data-menu-toggle].sg-open').forEach(item => item.classList.remove('sg-open'));
+      if (!wasOpen) card.classList.add('sg-open');
+    });
+  });
+
   const cards = document.querySelectorAll('.summary-card');
   const statIds = ['students', 'perangkat', 'nilai', 'rpm'];
   cards.forEach((card, index) => { if (statIds[index]) card.setAttribute('data-stat-card', statIds[index]); });
@@ -39,20 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         value.textContent = values[index];
         card.appendChild(value);
       });
-      const list = document.getElementById('studentPreview');
-      if (list) {
-        list.innerHTML = '';
-        if (!data.students?.length) list.innerHTML = '<div class="empty-state">Belum ada data siswa untuk akses guru ini.</div>';
-        else data.students.forEach(student => {
-          const row = document.createElement('div');
-          row.className = 'student-row';
-          row.innerHTML = `<div><strong>${escapeHtml(student.nama || '-')}</strong><span>${escapeHtml([student.nis ? `NIS ${student.nis}` : '', student.rombel || (student.kelas ? `Kelas ${student.kelas}` : '')].filter(Boolean).join(' • '))}</span></div>`;
-          list.appendChild(row);
-        });
-      }
     } catch (error) {
-      const list = document.getElementById('studentPreview');
-      if (list) list.innerHTML = `<div class="empty-state error-state">${escapeHtml(error?.message || 'Data dashboard gagal dimuat.')}</div>`;
+      console.error('Dashboard:', error);
     }
   };
 
@@ -103,7 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStudents(searchInput?.value?.trim() || '');
   };
 
-  document.querySelectorAll('[data-view="students"]').forEach(button => button.addEventListener('click', openStudents));
+  document.querySelectorAll('[data-view="students"]').forEach(button => button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openStudents();
+  }));
   document.getElementById('backHomeButton')?.addEventListener('click', () => {
     studentsView.hidden = true;
     homeView.hidden = false;
