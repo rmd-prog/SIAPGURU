@@ -1,6 +1,6 @@
 (() => {
-  const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (c) => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
+  const esc = (value) => String(value ?? '').replace(/[&<>'\"]/g, (c) => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'
   }[c]));
 
   function getUser() {
@@ -112,13 +112,19 @@
     document.head.appendChild(style);
   }
 
-  // Capture-phase delegation: the top-nav dropdown stops bubbling, so Profil
-  // must be caught before that handler can stop propagation.
-  document.addEventListener('click', (event) => {
+  // Robust delegation: catch the generated top-nav Profil button at window level,
+  // including mobile pointer activation, before any dropdown handler can stop it.
+  let lastProfileActivation = 0;
+  const handleProfileActivation = (event) => {
     const button = event.target?.closest?.('[data-view="profile"]');
     if (!button) return;
+    const now = Date.now();
+    if (now - lastProfileActivation < 300) return;
+    lastProfileActivation = now;
     showProfile(event);
-  }, true);
+  };
+  window.addEventListener('pointerup', handleProfileActivation, true);
+  window.addEventListener('click', handleProfileActivation, true);
 
   document.addEventListener('DOMContentLoaded', () => {
     injectStyles();
