@@ -32,70 +32,75 @@ async function passwordMatches(password, stored) {
   return false;
 }
 
+function userPayload(user) {
+  return { id: user.id, username: user.username, nama: user.nama, role: user.role, kelas: user.kelas, rombel: user.rombel, mapel: user.mapel };
+}
+
+async function getUser(env, userId) {
+  if (!userId) return null;
+  return env.DB.prepare("SELECT id, username, nama, role, kelas, rombel, mapel FROM users WHERE id = ? LIMIT 1").bind(userId).first();
+}
+
+async function dashboard(env, userId) {
+  const user = await getUser(env, userId);
+  if (!user) return json({ ok: false, error: "USER_NOT_FOUND", message: "Sesi guru tidak ditemukan." }, 401);
+
+  const params = [];
+  let where = "";
+  if (user.kelas !== null && user.kelas !== undefined && user.kelas !== "") {
+    where = "kelas = ?";
+    params.push(user.kelas);
+  }
+  if (user.rombel) {
+    where += where ? " AND rombel = ?" : "rombel = ?";
+    params.push(user.rombel);
+  }
+
+  const count = await env.DB.prepare(`SELECT COUNT(*) AS total FROM siswa${where ? ` WHERE ${where}` : ""}`).bind(...params).first();
+  const students = await env.DB.prepare(`SELECT id, nis, nisn, nama, kelas, jenis_kelamin, rombel FROM siswa${where ? ` WHERE ${where}` : ""} ORDER BY nama LIMIT 8`).bind(...params).all();
+
+  const nilaiCount = await env.DB.prepare(`SELECT COUNT(*) AS total FROM nilai${where ? ` WHERE siswa_id IN (SELECT id FROM siswa WHERE ${where})` : ""}`).bind(...params).first();
+  const perangkatCount = await env.DB.prepare("SELECT COUNT(*) AS total FROM perangkat WHERE (? IS NULL OR kelas = ?)").bind(user.kelas ?? null, user.kelas ?? null).first();
+  const rpmCount = await env.DB.prepare("SELECT COUNT(*) AS total FROM rpm WHERE (? IS NULL OR kelas = ?)").bind(user.kelas ?? null, user.kelas ?? null).first();
+
+  return json({
+    ok: true,
+    user: userPayload(user),
+    stats: { students: Number(count?.total || 0), nilai: Number(nilaiCount?.total || 0), perangkat: Number(perangkatCount?.total || 0), rpm: Number(rpmCount?.total || 0) },
+    students: students?.results || [],
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (request.method === "OPTIONS") return new Response(null, {
-      status: 204,
-      headers: {
-        "access-control-allow-origin": "*",
-        "access-control-allow-headers": "Content-Type, Authorization",
-        "access-control-allow-methods": "GET, POST, OPTIONS",
-      },
-    });
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { "access-control-allow-origin": "*", "access-control-allow-headers": "Content-Type, Authorization", "access-control-allow-methods": "GET, POST, OPTIONS" } });
 
     if (url.pathname === "/api/health") {
       let db = false;
-      if (env.DB) {
-        try {
-          await env.DB.prepare("SELECT 1").first();
-          db = true;
-        } catch (_) {}
-      }
+      if (env.DB) { try { await env.DB.prepare("SELECT 1").first(); db = true; } catch (_) {} }
       return json({ ok: true, service: "SIAP GURU", worker: true, d1: db });
     }
 
     if (url.pathname === "/api/auth/login" && request.method === "POST") {
       if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
-
       let body;
-      try {
-        body = await request.json();
-      } catch (_) {
-        return json({ ok: false, error: "INVALID_JSON", message: "Data login tidak valid." }, 400);
-      }
-
+      try { body = await request.json(); } catch (_) { return json({ ok: false, error: "INVALID_JSON", message: "Data login tidak valid." }, 400); }
       const nip = String(body?.nip ?? "").trim();
       const password = String(body?.password ?? "");
-      if (!nip || !password) {
-        return json({ ok: false, error: "MISSING_CREDENTIALS", message: "NIP dan kata sandi wajib diisi." }, 400);
-      }
-
+      if (!nip || !password) return json({ ok: false, error: "MISSING_CREDENTIALS", message: "NIP dan kata sandi wajib diisi." }, 400);
       try {
-        const user = await env.DB.prepare(
-          "SELECT id, username, password, nama, role, kelas, rombel, mapel FROM users WHERE username = ? LIMIT 1"
-        ).bind(nip).first();
+        const user = await env.DB.prepare("SELECT id, username, password, nama, role, kelas, rombel, mapel FROM users WHERE username = ? LIMIT 1").bind(nip).first();
+        if (!user || !(await passwordMatches(password, String(user.password ?? "")))) return json({ ok: false, error: "INVALID_CREDENTIALS", message: "NIP atau kata sandi salah." }, 401);
+        return json({ ok: true, user: userPayload(user) });
+      } catch (_) { return json({ ok: false, error: "AUTH_DATABASE_ERROR", message: "Autentikasi gagal diproses." }, 500); }
+    }
 
-        if (!user || !(await passwordMatches(password, String(user.password ?? "")))) {
-          return json({ ok: false, error: "INVALID_CREDENTIALS", message: "NIP atau kata sandi salah." }, 401);
-        }
-
-        return json({
-          ok: true,
-          user: {
-            id: user.id,
-            username: user.username,
-            nama: user.nama,
-            role: user.role,
-            kelas: user.kelas,
-            rombel: user.rombel,
-            mapel: user.mapel,
-          },
-        });
-      } catch (_) {
-        return json({ ok: false, error: "AUTH_DATABASE_ERROR", message: "Autentikasi gagal diproses." }, 500);
-      }
+    if (url.pathname === "/api/dashboard" && request.method === "GET") {
+      if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
+      try { return await dashboard(env, url.searchParams.get("user_id")); }
+      catch (_) { return json({ ok: false, error: "DASHBOARD_DATABASE_ERROR", message: "Data dashboard gagal dimuat." }, 500); }
     }
 
     return json({ ok: false, error: "NOT_FOUND" }, 404);
