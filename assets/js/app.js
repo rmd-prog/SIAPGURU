@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const API_BASE = 'https://siapguru.adm-sd.workers.dev/api';
   const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
-  const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const escapeHtml = (value) => String(value ?? '').replace(/[&<>'\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));
 
   const name = user.nama || 'Guru';
   setText('userNameTop', name);
@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'login.html';
   });
 
-  // Topbar navigation: the five approved main menus live in the header.
   const sourceGrid = document.querySelector('.main-menu-grid');
   const topbar = document.querySelector('.topbar');
   if (sourceGrid && topbar && !document.querySelector('.sg-topnav')) {
@@ -46,66 +45,62 @@ document.addEventListener('DOMContentLoaded', () => {
             link.type = 'button';
             link.className = 'sg-topnav-link';
             link.textContent = item.textContent.trim();
-            if (item.classList.contains('sub-label')) {
-              link.classList.add('is-label');
-              link.disabled = true;
-            }
+            if (item.classList.contains('sub-label')) { link.classList.add('is-label'); link.disabled = true; }
             if (item.matches('[data-view="students"]')) link.dataset.view = 'students';
             dropdown.appendChild(link);
           });
         }
-        const closeOthers = () => {
-          nav.querySelectorAll('.sg-topnav-item.is-open').forEach(other => {
-            if (other !== button) {
-              other.classList.remove('is-open');
-              other.setAttribute('aria-expanded', 'false');
-            }
-          });
-        };
-        button.addEventListener('click', e => {
-          e.stopPropagation();
-          const open = !button.classList.contains('is-open');
-          closeOthers();
-          button.classList.toggle('is-open', open);
-          button.setAttribute('aria-expanded', String(open));
-        });
+        const closeOthers = () => nav.querySelectorAll('.sg-topnav-item.is-open').forEach(other => { if (other !== button) { other.classList.remove('is-open'); other.setAttribute('aria-expanded', 'false'); } });
+        button.addEventListener('click', e => { e.stopPropagation(); const open = !button.classList.contains('is-open'); closeOthers(); button.classList.toggle('is-open', open); button.setAttribute('aria-expanded', String(open)); });
         dropdown.addEventListener('click', e => e.stopPropagation());
-        dropdown.querySelectorAll('[data-view="students"]').forEach(link => {
-          link.addEventListener('click', () => openStudents());
-        });
         const wrap = document.createElement('div');
         wrap.className = 'sg-topnav-wrap';
-        wrap.appendChild(button);
-        wrap.appendChild(dropdown);
-        nav.appendChild(wrap);
+        wrap.appendChild(button); wrap.appendChild(dropdown); nav.appendChild(wrap);
       } else {
-        button.addEventListener('click', () => {
-          nav.querySelectorAll('.sg-topnav-item.is-open').forEach(other => {
-            other.classList.remove('is-open');
-            other.setAttribute('aria-expanded', 'false');
-          });
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        const wrap = document.createElement('div');
-        wrap.className = 'sg-topnav-wrap';
-        wrap.appendChild(button);
-        nav.appendChild(wrap);
+        button.addEventListener('click', () => { nav.querySelectorAll('.sg-topnav-item.is-open').forEach(other => { other.classList.remove('is-open'); other.setAttribute('aria-expanded', 'false'); }); document.getElementById('studentsView').hidden = true; document.getElementById('homeView').hidden = false; document.querySelector('.sg-room-view')?.remove(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        const wrap = document.createElement('div'); wrap.className = 'sg-topnav-wrap'; wrap.appendChild(button); nav.appendChild(wrap);
       }
     });
     topbar.insertBefore(nav, topbar.querySelector('.top-actions'));
-    document.addEventListener('click', () => {
-      nav.querySelectorAll('.sg-topnav-item.is-open').forEach(item => {
-        item.classList.remove('is-open');
-        item.setAttribute('aria-expanded', 'false');
-      });
-    });
-    sourceGrid.closest('.menu-section')?.classList.add('sg-hide-menu-section');
+    document.addEventListener('click', () => nav.querySelectorAll('.sg-topnav-item.is-open').forEach(item => { item.classList.remove('is-open'); item.setAttribute('aria-expanded', 'false'); }));
   }
+
+  const learningRooms = {
+    'CP': { eyebrow:'PEMBELAJARAN / PERENCANAAN', title:'Capaian Pembelajaran', desc:'Ruang khusus untuk menyusun dan mengelola CP sesuai fase dan mata pelajaran.', icon:'CP' },
+    'ATP': { eyebrow:'PEMBELAJARAN / PERENCANAAN', title:'Alur Tujuan Pembelajaran', desc:'Ruang khusus untuk menyusun ATP secara terstruktur dari tujuan sampai urutan pembelajaran.', icon:'ATP' },
+    'TP': { eyebrow:'PEMBELAJARAN / PERENCANAAN', title:'Tujuan Pembelajaran', desc:'Ruang khusus untuk membuat, mengembangkan, dan meninjau tujuan pembelajaran.', icon:'TP' },
+    'Perangkat': { eyebrow:'PEMBELAJARAN', title:'Perangkat Pembelajaran', desc:'Ruang kerja terpisah untuk perangkat pembelajaran agar tidak bercampur dengan menu lainnya.', icon:'PP' },
+    'RPM Deep Learning': { eyebrow:'PEMBELAJARAN', title:'RPM Deep Learning', desc:'Ruang khusus untuk rencana pembelajaran mendalam dan komponennya.', icon:'RPM' },
+    'LKPD': { eyebrow:'PEMBELAJARAN', title:'LKPD', desc:'Ruang khusus untuk membuat dan mengelola Lembar Kerja Peserta Didik.', icon:'LK' },
+    'Materi': { eyebrow:'PEMBELAJARAN', title:'Materi Pembelajaran', desc:'Ruang khusus untuk menyimpan dan mengelola materi pembelajaran per kelas, bab, dan topik.', icon:'MT' },
+    'AI Generate': { eyebrow:'PEMBELAJARAN', title:'AI Generate', desc:'Ruang khusus untuk membantu menghasilkan perangkat pembelajaran secara terarah.', icon:'AI' }
+  };
+
+  const openLearningRoom = (key) => {
+    const cfg = learningRooms[key];
+    if (!cfg) return;
+    document.getElementById('homeView').hidden = true;
+    document.getElementById('studentsView').hidden = true;
+    document.querySelectorAll('.sg-topnav-item.is-open').forEach(item => { item.classList.remove('is-open'); item.setAttribute('aria-expanded','false'); });
+    let room = document.querySelector('.sg-room-view');
+    if (!room) { room = document.createElement('section'); room.className = 'sg-room-view'; document.querySelector('.main-content')?.appendChild(room); }
+    room.innerHTML = `<div class="sg-room-head"><div><button type="button" class="sg-room-back">← Kembali ke Beranda</button><span class="sg-room-eyebrow">${escapeHtml(cfg.eyebrow)}</span><div class="sg-room-title-row"><span class="sg-room-icon">${escapeHtml(cfg.icon)}</span><div><h1>${escapeHtml(cfg.title)}</h1><p>${escapeHtml(cfg.desc)}</p></div></div></div><span class="sg-room-status">Ruang terpisah</span></div><div class="sg-room-body"><div class="sg-room-card"><span class="sg-room-card-label">RUANG KERJA</span><h2>${escapeHtml(cfg.title)}</h2><p>Semua komponen untuk <strong>${escapeHtml(cfg.title)}</strong> akan dikelola di halaman ini. Tidak ditumpuk di dashboard utama.</p><div class="sg-room-actions"><button type="button" class="sg-primary-action">+ Tambah ${escapeHtml(cfg.title)}</button><button type="button" class="sg-secondary-action">Import</button></div></div><div class="sg-room-card sg-room-info"><span class="sg-room-card-label">STRUKTUR</span><div class="sg-room-pills"><span>Data tersimpan terpisah</span><span>Filter & pencarian</span><span>Siap dikembangkan</span></div></div></div>`;
+    room.querySelector('.sg-room-back')?.addEventListener('click', () => { room.remove(); document.getElementById('homeView').hidden = false; window.scrollTo({top:0,behavior:'smooth'}); });
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  document.querySelectorAll('.sg-topnav-wrap').forEach(wrap => {
+    const main = wrap.querySelector('.sg-topnav-item span')?.textContent?.trim();
+    if (main !== 'Pembelajaran') return;
+    wrap.querySelectorAll('.sg-topnav-link').forEach(link => {
+      const key = link.textContent.trim();
+      if (learningRooms[key]) link.addEventListener('click', () => openLearningRoom(key));
+    });
+  });
 
   const cards = document.querySelectorAll('.summary-card');
   const statIds = ['students', 'perangkat', 'nilai', 'rpm'];
   cards.forEach((card, index) => { if (statIds[index]) card.setAttribute('data-stat-card', statIds[index]); });
-
   const loadDashboard = async () => {
     try {
       const response = await fetch(`${API_BASE}/dashboard?user_id=${encodeURIComponent(user.id)}`, { cache: 'no-store' });
@@ -113,83 +108,36 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok || !data.ok) throw new Error(data.message || 'Data dashboard gagal dimuat.');
       const stats = data.stats || {};
       const values = [stats.students ?? 0, stats.perangkat ?? 0, stats.nilai ?? 0, stats.rpm ?? 0];
-      cards.forEach((card, index) => {
-        const old = card.querySelector('.summary-value');
-        if (old) old.remove();
-        const value = document.createElement('strong');
-        value.className = 'summary-value';
-        value.textContent = values[index];
-        card.appendChild(value);
-      });
-    } catch (error) {
-      console.error('Dashboard:', error);
-    }
+      cards.forEach((card, index) => { const old = card.querySelector('.summary-value'); if (old) old.remove(); const value = document.createElement('strong'); value.className = 'summary-value'; value.textContent = values[index]; card.appendChild(value); });
+    } catch (error) { console.error('Dashboard:', error); }
   };
 
   const homeView = document.getElementById('homeView');
   const studentsView = document.getElementById('studentsView');
   const searchInput = document.getElementById('studentSearch');
   let searchTimer;
-
   const renderStudents = (students) => {
-    const body = document.getElementById('studentsTableBody');
-    if (!body) return;
-    setText('studentResultCount', `${students.length} siswa`);
-    body.innerHTML = '';
-    if (!students.length) {
-      body.innerHTML = '<tr><td colspan="7" class="empty-state">Tidak ada siswa yang cocok dengan pencarian.</td></tr>';
-      return;
-    }
-    students.forEach((student, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${index + 1}</td><td>${escapeHtml(student.nis || '-')}</td><td>${escapeHtml(student.nisn || '-')}</td><td><strong>${escapeHtml(student.nama || '-')}</strong></td><td>${escapeHtml(student.jenis_kelamin || '-')}</td><td>${escapeHtml(student.kelas ?? '-')}</td><td>${escapeHtml(student.rombel || '-')}</td>`;
-      body.appendChild(tr);
-    });
+    const body = document.getElementById('studentsTableBody'); if (!body) return;
+    setText('studentResultCount', `${students.length} siswa`); body.innerHTML = '';
+    if (!students.length) { body.innerHTML = '<tr><td colspan="7" class="empty-state">Tidak ada siswa yang cocok dengan pencarian.</td></tr>'; return; }
+    students.forEach((student, index) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${index + 1}</td><td>${escapeHtml(student.nis || '-')}</td><td>${escapeHtml(student.nisn || '-')}</td><td><strong>${escapeHtml(student.nama || '-')}</strong></td><td>${escapeHtml(student.jenis_kelamin || '-')}</td><td>${escapeHtml(student.kelas ?? '-')}</td><td>${escapeHtml(student.rombel || '-')}</td>`; body.appendChild(tr); });
   };
-
   const loadStudents = async (search = '') => {
-    const body = document.getElementById('studentsTableBody');
-    if (body && !search) body.innerHTML = '<tr><td colspan="7" class="empty-state">Memuat data siswa...</td></tr>';
+    const body = document.getElementById('studentsTableBody'); if (body && !search) body.innerHTML = '<tr><td colspan="7" class="empty-state">Memuat data siswa...</td></tr>';
     try {
       const url = `${API_BASE}/students?user_id=${encodeURIComponent(user.id)}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
-      const response = await fetch(url, { cache: 'no-store' });
-      const data = await response.json().catch(() => ({}));
+      const response = await fetch(url, { cache: 'no-store' }); const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.message || 'Data siswa gagal dimuat.');
-      renderStudents(data.students || []);
-      setText('studentsAccessCount', `${(data.students || []).length} siswa`);
-      const access = data.access || [];
-      setText('studentsAccessMeta', access.length ? access.map(item => `Kelas ${item.kelas}${item.rombel ? ` • ${item.rombel}` : ''}`).join(' • ') : 'Belum ada rombel terhubung');
-    } catch (error) {
-      if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state error-state">${escapeHtml(error?.message || 'Data siswa gagal dimuat.')}</td></tr>`;
-      setText('studentResultCount', 'Gagal memuat');
-    }
+      renderStudents(data.students || []); setText('studentsAccessCount', `${(data.students || []).length} siswa`);
+      const access = data.access || []; setText('studentsAccessMeta', access.length ? access.map(item => `Kelas ${item.kelas}${item.rombel ? ` • ${item.rombel}` : ''}`).join(' • ') : 'Belum ada rombel terhubung');
+    } catch (error) { if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state error-state">${escapeHtml(error?.message || 'Data siswa gagal dimuat.')}</td></tr>`; setText('studentResultCount', 'Gagal memuat'); }
   };
-
   const openStudents = () => {
-    document.querySelectorAll('.sg-topnav-item.is-open').forEach(item => {
-      item.classList.remove('is-open');
-      item.setAttribute('aria-expanded', 'false');
-    });
-    homeView.hidden = true;
-    studentsView.hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    searchInput?.focus();
-    loadStudents(searchInput?.value?.trim() || '');
+    document.querySelectorAll('.sg-topnav-item.is-open').forEach(item => { item.classList.remove('is-open'); item.setAttribute('aria-expanded', 'false'); });
+    document.querySelector('.sg-room-view')?.remove(); homeView.hidden = true; studentsView.hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' }); searchInput?.focus(); loadStudents(searchInput?.value?.trim() || '');
   };
-
-  document.querySelectorAll('[data-view="students"]').forEach(button => button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    openStudents();
-  }));
-  document.getElementById('backHomeButton')?.addEventListener('click', () => {
-    studentsView.hidden = true;
-    homeView.hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-  searchInput?.addEventListener('input', () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => loadStudents(searchInput.value.trim()), 220);
-  });
-
+  document.querySelectorAll('[data-view="students"]').forEach(button => button.addEventListener('click', (event) => { event.stopPropagation(); openStudents(); }));
+  document.getElementById('backHomeButton')?.addEventListener('click', () => { studentsView.hidden = true; homeView.hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  searchInput?.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadStudents(searchInput.value.trim()), 220); });
   loadDashboard();
 });
