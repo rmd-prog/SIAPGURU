@@ -1,0 +1,119 @@
+name: SIAP GURU Change Guard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  change-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate change-control policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .github/siap-guru-change-policy.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('.github/siap-guru-change-policy.json').read_text())
+          required=['version','workflow','protected','sourceOfTruth','protectedChangeMarker','requiredAuditSections']
+          missing=[x for x in required if x not in p]
+          if missing:
+              raise SystemExit('Policy missing: '+', '.join(missing))
+          for name,path in p['sourceOfTruth'].items():
+              if not Path(path).is_file():
+                  raise SystemExit(f'Source-of-truth missing for {name}: {path}')
+          print('Change-control policy OK.')
+          PY
+
+      - name: Audit changed files and protected zones
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" > /tmp/changed.txt
+          else
+            git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" > /tmp/changed.txt
+          fi
+          echo 'Changed files:'
+          cat /tmp/changed.txt || true
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          policy=json.loads(Path('.github/siap-guru-change-policy.json').read_text())
+          changed={x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()}
+          protected=set(policy['protected'])
+          touched=sorted(changed & protected)
+          marker=policy['protectedChangeMarker']
+          event=os.environ.get('EVENT_NAME','')
+          message=os.environ.get('COMMIT_MESSAGE','')
+          if touched:
+              print('PROTECTED FILES TOUCHED:')
+              print('\n'.join(touched))
+              if marker not in message:
+                  raise SystemExit(f'Protected change requires commit marker {marker}')
+          else:
+              print('No protected files touched.')
+          if event=='pull_request':
+              body=os.environ.get('PR_BODY','')
+              missing=[x for x in policy['requiredAuditSections'] if x.lower() not in body.lower()]
+              if missing:
+                  raise SystemExit('PR audit record missing sections: '+', '.join(missing))
+              print('PR audit record contains AUDIT/PATCH/CHECK/TEST sections.')
+          PY
+
+      - name: Verify source-of-truth references are explicit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=json.loads(Path('.github/siap-guru-change-policy.json').read_text())
+          html=Path('index.html').read_text(encoding='utf-8')
+          refs={x.split('?',1)[0] for x in re.findall(r'<script[^>]+src=["\']([^"\']+)["\']',html)}
+          for name,path in p['sourceOfTruth'].items():
+              if path.startswith('assets/') and path not in refs and name not in {'MasterBAB'}:
+                  print(f'REVIEW: source-of-truth {name} is not directly referenced by index.html: {path}')
+          print('Source-of-truth audit completed.')
+          PY
+
+      - name: Create audit report
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .audit
+          {
+            echo '# SIAP GURU Change Guard'
+            echo
+            echo "Commit: $GITHUB_SHA"
+            echo "Event: $GITHUB_EVENT_NAME"
+            echo
+            echo '## Changed files'
+            cat /tmp/changed.txt || true
+            echo
+            echo '## Workflow'
+            echo 'AUDIT -> PATCH -> CHECK -> TEST -> LANJUT'
+          } > .audit/change-guard.md
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: siap-guru-change-audit
+          path: .audit/change-guard.md
+          retention-days: 14
