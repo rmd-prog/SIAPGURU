@@ -20,8 +20,12 @@
   };
   const loadBridges=()=>{
     loadScript('assets/js/siap-guru-rpm-cp-final-v1.js?v=1','rpmCpFinal');
-    loadScript('assets/js/siap-guru-atp-auto-v1.js?v=1','atpAutoFinal');
+    loadScript('assets/js/siap-guru-atp-auto-v1.js?v=2','atpAutoFinal');
   };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadBridges,{once:true});
-  else loadBridges();
+  const boot=()=>{
+    loadBridges();
+    setTimeout(loadBridges,300);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
