@@ -1,8 +1,4 @@
-/* SIAP GURU — ATP AUTO FINAL
-   CP -> ATP otomatis -> TP -> RPM.
-   JP memakai alokasi intrakurikuler SD sesuai Permendikdasmen 13/2025.
-   Tidak menyentuh D1, Worker, login, Dashboard, atau RPM FINAL.
-*/
+/* SIAP GURU — ATP AUTO FINAL */
 (()=>{
   const build=()=>{
     const room=document.querySelector('.sg-atp-room');
@@ -12,9 +8,7 @@
     const subject=room.querySelector('#sgAtpSubject'),phase=room.querySelector('#sgAtpPhase'),klass=room.querySelector('#sgAtpClass');
     const element=room.querySelector('#sgAtpElement'),list=room.querySelector('#sgAtpList'),name=room.querySelector('#sgAtpName'),total=room.querySelector('#sgAtpTotalJp'),notice=room.querySelector('#sgAtpNotice');
     if(!footer||!btnHost||!subject||!phase||!klass||!element||!list)return;
-    const btn=document.createElement('button');
-    btn.id='sgAtpAuto';btn.type='button';btn.className='sg-atp-primary';btn.textContent='⚡ Isi ATP Otomatis';
-    footer.insertBefore(btn,footer.firstChild);
+    const btn=document.createElement('button');btn.id='sgAtpAuto';btn.type='button';btn.className='sg-atp-primary';btn.textContent='⚡ Isi ATP Otomatis';footer.insertBefore(btn,footer.firstChild);
     const show=m=>{if(notice){notice.textContent=m;notice.classList.add('is-show');clearTimeout(show.t);show.t=setTimeout(()=>notice.classList.remove('is-show'),3200)}};
     const JP={'Pendidikan Agama Islam dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Kristen dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Katolik dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Hindu dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Buddha dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Khonghucu dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Pancasila':{1:144,2:144,3:144,4:144,5:144,6:128},'Bahasa Indonesia':{1:252,2:288,3:216,4:216,5:216,6:192},'Matematika':{1:144,2:180,3:180,4:180,5:180,6:160},'IPAS':{1:0,2:0,3:180,4:180,5:180,6:160},'Ilmu Pengetahuan Alam dan Sosial':{1:0,2:0,3:180,4:180,5:180,6:160},'Pendidikan Jasmani Olahraga dan Kesehatan':{1:108,2:108,3:108,4:108,5:108,6:96},'PJOK':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Musik':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Rupa':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Tari':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Teater':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni dan Budaya':{1:108,2:108,3:108,4:108,5:108,6:96},'Bahasa Inggris':{1:0,2:0,3:72,4:72,5:72,6:64},'Koding dan Kecerdasan Artifisial':{1:0,2:0,3:0,4:0,5:72,6:64},'Informatika':{1:0,2:0,3:0,4:0,5:0,6:0}};
     const refAnnual=()=>Number(JP[subject.value]?.[klass.value]||0),weeks=()=>klass.value==='6'?32:36,semesterWeeks=()=>room.querySelector('#sgAtpSemester')?.value==='2'?(klass.value==='6'?14:18):18,refSemester=()=>{const annual=refAnnual();return annual?Math.round(annual/weeks()*semesterWeeks()):0};
@@ -26,5 +20,7 @@
     btn.addEventListener('click',make);
     [subject,phase,klass,room.querySelector('#sgAtpSemester')].filter(Boolean).forEach(el=>el.addEventListener('change',()=>show('Pilihan berubah. Klik “Isi ATP Otomatis” agar CP, TP, dan JP dihitung ulang.')));
   };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else setTimeout(build,0);
+  window.addEventListener('sg:atp-room-ready',build,{once:false});
+  document.addEventListener('click',e=>{const l=e.target.closest?.('.sg-topnav-link');if(l&&l.textContent.trim()==='ATP')setTimeout(build,50)},true);
+  if(document.querySelector('.sg-atp-room'))build();
 })();
