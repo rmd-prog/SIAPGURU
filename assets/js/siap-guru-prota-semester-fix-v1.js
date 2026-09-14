@@ -20,10 +20,12 @@ const splitAnnualSemesters=()=>{
  rows[rows.length-1].dispatchEvent(new Event('change',{bubbles:true}));
  return true;
 };
-const watch=()=>{
+const attach=()=>{
  const room=document.querySelector('.sg-prota-room');
- if(room){setTimeout(splitAnnualSemesters,0);return}
- requestAnimationFrame(watch);
+ if(!room){requestAnimationFrame(attach);return}
+ const run=()=>setTimeout(splitAnnualSemesters,0);
+ run();
+ new MutationObserver(run).observe(room,{childList:true,subtree:true});
 };
-watch();
+attach();
 })();
