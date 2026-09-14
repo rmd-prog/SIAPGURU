@@ -37,17 +37,20 @@ jobs:
               raise SystemExit('RPM reflection syntax marker not found; refusing deployment')
           text = text.replace(broken, fixed, 1)
           needle = 'const boot=()=>{'
-          replacement = 'window.__openSiapGuruRPM=()=>{'
+          replacement = 'const boot=window.__openSiapGuruRPM=()=>{'
           if needle not in text:
               raise SystemExit('RPM boot marker not found; refusing deployment')
           text = text.replace(needle, replacement, 1)
           rpm.write_text(text, encoding='utf-8')
           index = Path('index.html')
           html = index.read_text(encoding='utf-8')
-          tag = '<script src="assets/js/siap-guru-rpm-route-bridge.js?v=1" defer></script>'
-          if tag not in html:
+          tag = '<script src="assets/js/siap-guru-rpm-route-bridge.js?v=2" defer></script>'
+          if 'assets/js/siap-guru-rpm-route-bridge.js?' not in html:
               html = html.replace('</body>', tag + '</body>', 1)
-              index.write_text(html, encoding='utf-8')
+          else:
+              import re
+              html = re.sub(r'<script src="assets/js/siap-guru-rpm-route-bridge\.js\?v=\d+" defer></script>', tag, html, count=1)
+          index.write_text(html, encoding='utf-8')
           PY
           node --check assets/js/siap-guru-rpm.js
       - name: Setup Pages
