@@ -1,54 +1,20 @@
 (()=>{
-  const KEY='siapguru_tp_draft';
-  const norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9\u00C0-\u024F]+/g,' ').trim().replace(/\s+/g,' ');
-  const parse=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}};
-  const text=v=>String(v??'').trim();
-  const sameTopic=(a,b)=>{a=norm(a);b=norm(b);if(!a||!b)return true;return a===b||a.includes(b)||b.includes(a)};
-  const syncFields=(room,p)=>{
-    const set=(id,v)=>{const el=room.querySelector(id);if(el&&v!=null&&String(v).trim())el.value=String(v)};
-    set('#sgRSubject',p.subject);set('#sgRPhase',p.phase);set('#sgRClass',p.class);set('#sgRSemester',p.semester||'1');set('#sgRTopic',p.topic);set('#sgRJP',p.jp||p.totalJp||2);
-  };
-  const importTP=(room,announce=true)=>{
-    const p=parse();
-    const list=room.querySelector('#sgRTpList');
-    if(!p||!Array.isArray(p.items)||!p.items.length){announce&&alertNotice(room,'Belum ada TP tersimpan. Buat dan simpan TP terlebih dahulu.');return false}
-    const current=text(room.querySelector('#sgRTopic')?.value);
-    const saved=text(p.topic);
-    if(current&&saved&&!sameTopic(current,saved)){
-      alertNotice(room,`TP tersimpan untuk BAB “${saved}”, bukan BAB “${current}”.`);return false;
-    }
-    syncFields(room,p);
-    const items=p.items.map((x,i)=>({text:text(x?.text??x?.tp),element:text(x?.element)||'-',jp:Number(x?.jp)||2})).filter(x=>x.text);
-    if(!items.length){announce&&alertNotice(room,'Data TP tersimpan tidak berisi tujuan pembelajaran yang valid.');return false}
-    list.innerHTML=items.map((x,i)=>`<label class="sg-rpm-tp"><input type="checkbox" checked data-tp="${i}"><div><strong>TP ${i+1}. ${escapeHtml(x.text)}</strong><small>Elemen CP: ${escapeHtml(x.element)} • ${x.jp} JP</small></div></label>`).join('');
-    room.__sgRpmFixItems=items;
-    room.querySelector('#sgRConscious')?.dispatchEvent(new Event('input',{bubbles:true}));
-    announce&&alertNotice(room,`${items.length} TP berhasil diambil dari TP.`);
-    return true;
-  };
-  const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const alertNotice=(room,msg)=>{
-    const n=room.querySelector('#sgRNotice');if(!n)return;
-    n.textContent=msg;n.hidden=false;clearTimeout(room.__sgRpmFixTimer);room.__sgRpmFixTimer=setTimeout(()=>n.hidden=true,3000);
-  };
-  const patch=room=>{
-    if(!room||room.dataset.sgRpmFix==='1')return;
-    room.dataset.sgRpmFix='1';
-    const btn=room.querySelector('#sgRLoad');
-    if(btn){
-      btn.onclick=e=>{e?.preventDefault();e?.stopPropagation();importTP(room,true)};
-    }
-    const topic=room.querySelector('#sgRTopic');
-    topic?.addEventListener('change',()=>{if(text(topic.value))importTP(room,false)});
-    topic?.addEventListener('blur',()=>{if(text(topic.value))importTP(room,false)});
-    if(text(topic?.value))importTP(room,false);
-  };
-  const scan=()=>document.querySelectorAll('.sg-rpm-room').forEach(patch);
-  new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
-  document.addEventListener('siapguru:topic-selected',()=>setTimeout(scan,30));
-  document.addEventListener('click',e=>{
-    const b=e.target.closest('#sgRLoad');
-    if(b){const room=b.closest('.sg-rpm-room');if(room){e.preventDefault();e.stopImmediatePropagation();importTP(room,true)}}
-  },true);
-  scan();
+const TP='siapguru_tp_draft',TOP='siapguru_selected_topic',MASTER='siapguru_master_bab_v1';
+const norm=v=>String(v??'').toLowerCase().replace(/[^a-z0-9\u00C0-\u024F]+/g,' ').trim().replace(/\s+/g,' ');
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const read=(k)=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}};
+const selected=()=>{try{return JSON.parse(sessionStorage.getItem(TOP)||'null')}catch(_){return null}};
+const topicMatch=(a,b)=>{a=norm(a);b=norm(b);return !!a&&!!b&&(a===b||a.includes(b)||b.includes(a))};
+const masterFor=(x)=>{if(!x)return null;const d=read(MASTER);if(!Array.isArray(d))return x;return d.find(r=>(x.id&&r.id===x.id)||(x.bab&&topicMatch(r.bab,x.bab)&&String(r.mapel||'')===String(x.mapel||'' )&&String(r.kelas||'')===String(x.kelas||'')))||x};
+const notice=(room,msg)=>{const n=room.querySelector('#sgRNotice');if(!n)return;n.textContent=msg;n.hidden=false;clearTimeout(room.__sgRpmFixTimer);room.__sgRpmFixTimer=setTimeout(()=>n.hidden=true,3200)};
+const setFields=(room,x)=>{if(!x)return;const set=(id,v)=>{const e=room.querySelector(id);if(e&&v!=null&&String(v).trim())e.value=String(v)};set('#sgRSubject',x.mapel||x.subject);set('#sgRPhase',x.fase||x.phase);set('#sgRClass',x.kelas||x.class);set('#sgRSemester',x.semester||'1');set('#sgRTopic',x.bab||x.topic);set('#sgRJP',x.jp||x.totalJp||2)};
+const current=room=>{const s=selected();if(s?.bab)return masterFor(s);return {mapel:room.querySelector('#sgRSubject')?.value,fase:room.querySelector('#sgRPhase')?.value,kelas:room.querySelector('#sgRClass')?.value,semester:room.querySelector('#sgRSemester')?.value,bab:room.querySelector('#sgRTopic')?.value,jp:room.querySelector('#sgRJP')?.value}};
+const candidate=cur=>{const p=read(TP);const pool=[p,...(Array.isArray(read('siapguru_tp_drafts'))?read('siapguru_tp_drafts'):[])].filter(Boolean);return pool.find(x=>Array.isArray(x.items)&&x.items.length&&((cur?.id&&x.acdId&&String(x.acdId)===String(cur.id))||(cur?.bab&&topicMatch(x.topic,cur.bab))))||null};
+const importTP=(room,announce=true)=>{const cur=current(room);if(cur?.bab)setFields(room,cur);const p=candidate(cur);if(!p){announce&&notice(room,`Belum ada TP tersimpan untuk BAB “${cur?.bab||'-'}”. Buka TP, pilih BAB yang sama, lalu Simpan TP.`);room.__sgRpmFixItems=[];room.querySelector('#sgRTpList').innerHTML='<div class="sg-rpm-empty">TP untuk BAB ini belum tersedia.</div>';return false}const items=p.items.map((x,i)=>({text:String(x?.text??x?.tp??'').trim(),element:String(x?.element||'-').trim(),jp:Number(x?.jp)||2})).filter(x=>x.text);if(!items.length){announce&&notice(room,'TP tersimpan tidak berisi tujuan pembelajaran yang valid.');return false}const list=room.querySelector('#sgRTpList');list.innerHTML=items.map((x,i)=>`<label class="sg-rpm-tp"><input type="checkbox" checked data-tp="${i}"><div><strong>TP ${i+1}. ${esc(x.text)}</strong><small>Elemen CP: ${esc(x.element)} • ${x.jp} JP</small></div></label>`).join('');room.__sgRpmFixItems=items;room.querySelector('#sgRConscious')?.dispatchEvent(new Event('input',{bubbles:true}));announce&&notice(room,`${items.length} TP berhasil disinkronkan dari TP.`);return true};
+const patch=room=>{if(!room||room.dataset.sgRpmFix==='2')return;room.dataset.sgRpmFix='2';const s=selected();if(s?.bab)setFields(room,masterFor(s));const b=room.querySelector('#sgRLoad');if(b)b.onclick=e=>{e.preventDefault();e.stopImmediatePropagation();importTP(room,true)};const topic=room.querySelector('#sgRTopic');topic?.addEventListener('change',()=>{const s=selected();if(s?.bab&&topicMatch(topic.value,s.bab))setFields(room,masterFor(s));importTP(room,false)});topic?.addEventListener('blur',()=>{if(topic.value.trim())importTP(room,false)});if(s?.bab)importTP(room,false)};
+const scan=()=>document.querySelectorAll('.sg-rpm-room').forEach(patch);
+new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+document.addEventListener('siapguru:topic-selected',e=>{const x=masterFor(e.detail);try{sessionStorage.setItem(TOP,JSON.stringify(x))}catch(_){}setTimeout(scan,30);setTimeout(()=>document.querySelectorAll('.sg-rpm-room').forEach(r=>{setFields(r,x);importTP(r,false)}),80)});
+document.addEventListener('click',e=>{const b=e.target.closest('#sgRLoad');if(b){const r=b.closest('.sg-rpm-room');if(r){e.preventDefault();e.stopImmediatePropagation();importTP(r,true)}}},true);
+scan();
 })();
