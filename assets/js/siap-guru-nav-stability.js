@@ -15,6 +15,7 @@
   };
   const loadTpBridges=()=>{
     loadScript('assets/js/siap-guru-tp-auto-v1.js?v=1','tpAutoV1');
+    loadScript('assets/js/siap-guru-tp-master-bridge-v1.js?v=1','tpMasterBridgeV1');
   };
   document.addEventListener('click',e=>{
     const target=e.target instanceof Element?e.target:null;
