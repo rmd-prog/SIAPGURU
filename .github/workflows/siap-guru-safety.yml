@@ -1,0 +1,78 @@
+name: SIAP GURU Safety Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required protected files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            index.html
+            assets/js/app.js
+            assets/js/siap-guru-nav-stability.js
+            assets/js/siap-guru-atp.js
+            assets/js/siap-guru-rpm-final-v1.js
+            assets/js/siap-guru-safety-layer-v1.js
+          )
+          for f in "${required[@]}"; do
+            test -f "$f" || { echo "MISSING: $f"; exit 1; }
+          done
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=$(find assets/js -type f -name '*.js' -print)
+          test -n "$files"
+          while IFS= read -r f; do
+            node --check "$f"
+          done <<< "$files"
+
+      - name: Check index references
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('index.html').read_text(encoding='utf-8')
+          refs=re.findall(r'<script[^>]+src=["\']([^"\']+)["\']',html)
+          bad=[]
+          for ref in refs:
+              path=ref.split('?',1)[0]
+              if path.startswith('http'):
+                  continue
+              if not Path(path).is_file():
+                  bad.append(path)
+          if bad:
+              print('BROKEN SCRIPT REFERENCES:')
+              print('\n'.join(sorted(set(bad))))
+              raise SystemExit(1)
+          print(f'Checked {len(refs)} local script references.')
+          PY
+
+      - name: Protect critical files from accidental deletion
+        shell: bash
+        run: |
+          set -euo pipefail
+          git ls-files --error-unmatch \
+            index.html \
+            assets/js/app.js \
+            assets/js/siap-guru-atp.js \
+            assets/js/siap-guru-rpm-final-v1.js \
+            assets/js/siap-guru-safety-layer-v1.js >/dev/null
+          echo "Protected-file baseline is present."
