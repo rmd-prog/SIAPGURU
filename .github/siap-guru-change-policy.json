@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "workflow": "AUDIT -> PATCH -> CHECK -> TEST -> LANJUT",
+  "protected": [
+    "login.html",
+    "index.html",
+    "assets/js/app.js",
+    "assets/js/siap-guru-nav-stability.js",
+    "assets/js/siap-guru-atp.js",
+    "assets/js/siap-guru-rpm-final-v1.js",
+    "worker/index.js"
+  ],
+  "sourceOfTruth": {
+    "PROTA": "assets/js/siap-guru-prota.js",
+    "TP": "assets/js/siap-guru-tp.js",
+    "MasterBAB": "assets/js/siap-guru-master-bab-v1.js",
+    "LearningChain": "assets/js/siap-guru-learning-chain-v1.js",
+    "RPMFinal": "assets/js/siap-guru-rpm-final-v1.js",
+    "Safety": "assets/js/siap-guru-safety-layer-v1.js"
+  },
+  "protectedChangeMarker": "[protected-change]",
+  "requiredAuditSections": ["AUDIT", "PATCH", "CHECK", "TEST"]
+}
