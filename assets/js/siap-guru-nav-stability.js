@@ -1,6 +1,6 @@
 /* SIAP GURU — navigation stability
-   ATP bridges are lazy-loaded only when ATP is opened.
-   The Beranda stays lightweight; ATP work starts only inside ATP.
+   Feature bridges are lazy-loaded only when their menu is opened.
+   The Beranda stays lightweight; feature work starts inside its own room.
 */
 (()=>{
   const resetRpmGuard=(event)=>{const target=event.target instanceof Element?event.target:null;const link=target?.closest('.sg-topnav-link');if(link&&link.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
@@ -13,5 +13,15 @@
     loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
     loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=5','atpDocumentPreviewSync');
   };
-  document.addEventListener('click',e=>{const target=e.target instanceof Element?e.target:null;const link=target?.closest('.sg-topnav-link');if(link&&link.textContent.trim()==='ATP')loadAtpBridges()},true);
+  const loadTpBridges=()=>{
+    loadScript('assets/js/siap-guru-tp-auto-v1.js?v=1','tpAutoV1');
+  };
+  document.addEventListener('click',e=>{
+    const target=e.target instanceof Element?e.target:null;
+    const link=target?.closest('.sg-topnav-link');
+    if(!link)return;
+    const label=link.textContent.trim();
+    if(label==='ATP')loadAtpBridges();
+    if(label==='TP')loadTpBridges();
+  },true);
 })();
