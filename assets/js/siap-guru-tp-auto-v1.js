@@ -1,10 +1,10 @@
-/* SIAP GURU — TP AUTO FINAL v3
+/* SIAP GURU — TP AUTO FINAL v4
    Generator TP berbasis substansi BAB/Topik.
    Scoped only to TP flow. Does not touch ATP, RPM, Dashboard, Login, D1/Worker, or student data.
 */
 (()=>{
-  if(window.__sgTpAutoV3)return;
-  window.__sgTpAutoV3=1;
+  if(window.__sgTpAutoV4)return;
+  window.__sgTpAutoV4=1;
   const getJSON=(key,store=localStorage)=>{try{return JSON.parse(store.getItem(key)||'null')}catch(_){return null}};
   const esc=s=>String(s??'').trim();
   const selected=()=>getJSON('siapguru_selected_topic',sessionStorage)||{};
@@ -140,7 +140,12 @@
     const room=document.querySelector('.sg-tp-room');
     if(!room)return;
     const sel=selected(), old=saved(), a=atp();
-    const topic=resolveTopic(room.querySelector('#sgTpTopic')?.value,sel)||resolveTopic(sel.bab,sel)||resolveTopic(old.topic,old)||'Topik pembelajaran';
+    /* Source priority is deliberate: current TP room/selected BAB first,
+       explicit ATP topic second. Never resurrect an unrelated old TP draft topic. */
+    const roomTopic=esc(room.querySelector('#sgTpTopic')?.value);
+    const selectedTopic=resolveTopic(sel.bab,sel);
+    const atpTopic=resolveTopic(a.topic,a);
+    const topic=resolveTopic(roomTopic,sel)||selectedTopic||atpTopic||'Topik pembelajaran';
     const subject=esc(room.querySelector('#sgTpSubject')?.value)||esc(sel.mapel)||esc(old.subject)||esc(a.subject)||'mata pelajaran';
     const phase=esc(room.querySelector('#sgTpPhase')?.value)||esc(sel.fase)||esc(old.phase);
     const klass=esc(room.querySelector('#sgTpClass')?.value)||esc(sel.kelas)||esc(old.class);
