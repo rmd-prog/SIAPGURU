@@ -13,14 +13,15 @@
   document.addEventListener('pointerdown',resetRpmGuard,true);
   document.addEventListener('click',resetRpmGuard,true);
 
-  // RPM CP bridge: load after the existing navigation guard, before RPM Generate is clicked.
-  const loadRpmCpBridge=()=>{
-    if(document.querySelector('script[data-rpm-cp-final]'))return;
+  const loadScript=(src,marker)=>{
+    if(document.querySelector(`script[data-${marker}]`))return;
     const s=document.createElement('script');
-    s.src='assets/js/siap-guru-rpm-cp-final-v1.js?v=1';
-    s.dataset.rpmCpFinal='1';
-    document.head.appendChild(s);
+    s.src=src;s.dataset[marker]='1';document.head.appendChild(s);
   };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadRpmCpBridge,{once:true});
-  else loadRpmCpBridge();
+  const loadBridges=()=>{
+    loadScript('assets/js/siap-guru-rpm-cp-final-v1.js?v=1','rpmCpFinal');
+    loadScript('assets/js/siap-guru-atp-auto-v1.js?v=1','atpAutoFinal');
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadBridges,{once:true});
+  else loadBridges();
 })();
