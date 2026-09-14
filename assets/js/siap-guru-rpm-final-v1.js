@@ -3,20 +3,58 @@
   const clean=x=>String(x||'').replace(/^\s*(?:TP\s*)?\d+[.)\-:]?\s*/i,'').replace(/\s+/g,' ').trim().replace(/[.!?]+$/,'');
   const verbs=['mengidentifikasi','menjelaskan','menyebutkan','menguraikan','membandingkan','mengelompokkan','menganalisis','menentukan','menggunakan','menerapkan','mempraktikkan','membuat','menyusun','merancang','menunjukkan','menyajikan','mengomunikasikan','menyimpulkan','mengevaluasi','merefleksikan'];
   const syncPreview=(room,s)=>{
-    const preview=room.querySelector('.sg-doc-preview');
+    const preview=room?.querySelector('.sg-doc-preview');
     const paper=preview?.querySelector('.sg-doc-preview-paper');
-    if(!paper)return;
+    const result=document.getElementById('sgRResult');
+    if(!paper||!result)return;
     const val=id=>room.querySelector(id)?.value?.trim()||'-';
-    const sections=[...document.getElementById('sgRResult').querySelectorAll('article')];
-    const rows=sections.map(a=>{
+    const meta=[
+      ['Satuan Pendidikan','SD'],
+      ['Mata Pelajaran',val('#sgRSubject')],
+      ['Fase',val('#sgRPhase')],
+      ['Kelas',val('#sgRClass')],
+      ['Semester',val('#sgRSemester')],
+      ['Topik / BAB',s.topic||val('#sgRTopic')],
+      ['Alokasi Waktu',`${s.jp||val('#sgRJP')||'-'} JP`],
+      ['Model Pembelajaran',s.model||val('#sgRModel')],
+      ['Moda',s.mode||val('#sgRMode')],
+      ['Tahun Pelajaran','2026/2027']
+    ];
+    const metaRows=meta.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('');
+    const articles=[...result.querySelectorAll('article')];
+    const bodyRows=[];
+    articles.forEach(a=>{
       const h=(a.querySelector('h3')?.textContent||'').trim();
       const p=(a.querySelector('p')?.textContent||'').trim();
-      if(!h||!p)return '';
-      return `<tr><th>${esc(h)}</th><td>${esc(p)}</td></tr>`;
-    }).filter(Boolean).join('');
-    const ident=`<div class="sg-doc-ident"><div><b>Satuan Pendidikan</b><span>SD</span></div><div><b>Mata Pelajaran</b><span>${esc(val('#sgRSubject'))}</span></div><div><b>Fase / Kelas</b><span>${esc(val('#sgRPhase'))} / ${esc(val('#sgRClass'))}</span></div><div><b>Tahun Pelajaran</b><span>2026/2027</span></div><div><b>Semester</b><span>${esc(val('#sgRSemester'))}</span></div></div>`;
-    paper.innerHTML=ident+`<h3>RPM Deep Learning — Hasil Generate</h3><table class="sg-rpm-flat-table"><tbody>${rows}</tbody></table>`;
-    preview.dataset.sgRpmGeneratedSync='1';
+      if(!h)return;
+      if(/^Sintaks\s/i.test(h))return;
+      if(/^A\.\s*IDENTIFIKASI/i.test(h))return;
+      if(/^B\.\s*DESAIN PEMBELAJARAN/i.test(h))return;
+      if(/^[A-G]\.\s/i.test(h)){
+        bodyRows.push(`<tr class="sg-rpm-section-row"><th colspan="2">${esc(h)}</th></tr>`);
+        if(p)bodyRows.push(`<tr class="sg-rpm-section-note"><td colspan="2">${esc(p)}</td></tr>`);
+        return;
+      }
+      if(p)bodyRows.push(`<tr><th class="sg-rpm-subhead">${esc(h)}</th><td>${esc(p)}</td></tr>`);
+    });
+    const desainRows=[
+      ['Topik / BAB',s.topic||val('#sgRTopic')],
+      ['Model Pembelajaran',s.model||val('#sgRModel')],
+      ['Alokasi Waktu',`${s.jp||val('#sgRJP')||'-'} JP`],
+      ['Moda',s.mode||val('#sgRMode')]
+    ].map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('');
+    paper.innerHTML=`
+      <h3 class="sg-rpm-preview-title">RPM Deep Learning — Hasil Generate</h3>
+      <section class="sg-rpm-preview-block">
+        <div class="sg-rpm-preview-block-title">A. IDENTIFIKASI</div>
+        <table class="sg-rpm-identity-table"><tbody>${metaRows}</tbody></table>
+      </section>
+      <section class="sg-rpm-preview-block">
+        <div class="sg-rpm-preview-block-title">B. DESAIN PEMBELAJARAN</div>
+        <table class="sg-rpm-design-table"><tbody>${desainRows}</tbody></table>
+      </section>
+      <table class="sg-rpm-flat-table"><tbody>${bodyRows.join('')}</tbody></table>`;
+    preview.dataset.sgRpmGeneratedSync='2';
   };
   const run=()=>{
     const r=document.getElementById('sgRResult'); if(!r)return;
