@@ -1,5 +1,5 @@
 /* SIAP GURU — navigation stability layer
-   Only clears stale in-memory room boot guards before Pembelajaran/Asesmen navigation.
+   Clears stale in-memory room boot guards before Pembelajaran/Asesmen navigation.
    No data, D1, Worker, login, or room content is changed. */
 (()=>{
   const learning = new Set(['CP','ATP','TP','Perangkat','RPM Deep Learning','LKPD','Materi','AI Generate']);
@@ -15,10 +15,12 @@
     window.__sgAkhirSemesterBoot=false;
     window.__sgRekapNilaiBoot=0;
   };
-  document.addEventListener('click',event=>{
+  const resetFromEvent=event=>{
     const link=event.target.closest?.('.sg-topnav-link');
     if(!link)return;
     const text=link.textContent.trim();
     if(learning.has(text)||assessment.has(text)) resetRoomBoots();
-  },true);
+  };
+  document.addEventListener('pointerdown',resetFromEvent,true);
+  document.addEventListener('click',resetFromEvent,true);
 })();
