@@ -1,25 +1,14 @@
 (()=>{
-/* SIAP GURU — TP Subtopic Bridge v3
-   Menurunkan BAB -> submateri -> TP yang berbeda dan menjaga total JP BAB. */
-const read=(k,s=localStorage)=>{try{return JSON.parse(s.getItem(k)||'null')}catch(_){return null}};
-const norm=v=>String(v??'').trim().toLowerCase();
-const subtopics=(r)=>{
-  const b=String(r?.bab||'').trim(),m=norm(r?.mapel);
-  if(!b)return ['Pengenalan materi','Pemahaman konsep','Latihan dan penerapan','Penguatan','Refleksi dan asesmen'];
-  if(m==='matematika'){
-    const x=norm(b);
-    if(x.includes('bilangan cacah')&&x.includes('100.000'))return ['Membaca dan menulis bilangan sampai 100.000','Nilai tempat dan bentuk panjang bilangan','Membandingkan dan mengurutkan bilangan','Komposisi dan dekomposisi bilangan','Penerapan bilangan dalam masalah sehari-hari','Latihan, penguatan, dan asesmen'];
-    if(x.includes('kpk')||x.includes('fpb'))return ['Faktor dan kelipatan bilangan','Menentukan KPK','Menentukan FPB','Penerapan KPK dan FPB','Pemecahan masalah kontekstual','Latihan, penguatan, dan asesmen'];
-    if(x.includes('pecahan'))return ['Mengenal dan merepresentasikan pecahan','Membandingkan dan mengurutkan pecahan','Operasi pada pecahan','Penerapan pecahan dalam kehidupan','Pemecahan masalah kontekstual','Latihan, penguatan, dan asesmen'];
-    if(x.includes('data')||x.includes('diagram'))return ['Mengumpulkan dan mengelompokkan data','Membaca tabel dan diagram','Menyajikan data','Menafsirkan data','Menarik kesimpulan dari data','Latihan, penguatan, dan asesmen'];
-  }
-  const words=b.replace(/^bab\s*\d+\s*[—:-]?\s*/i,'').trim();
-  return ['Mengenal '+words,'Memahami konsep dan unsur penting '+words,'Menggunakan pengetahuan tentang '+words,'Menerapkan '+words+' dalam konteks nyata','Mengomunikasikan hasil belajar tentang '+words,'Latihan, penguatan, dan asesmen'];
-};
-const build=rows=>{const out=[];rows.forEach((r,bi)=>{const ss=subtopics(r),sem=String(r.semester)==='2'?'2':'1',base=Math.max(1,Number(r.jp)||8),q=Math.floor(base/ss.length),rem=base%ss.length;ss.forEach((materi,i)=>{const verb=i===0?'mengenali dan menjelaskan':i===1?'mengidentifikasi dan memahami':i===2?'menggunakan':i===3?'menerapkan':i===4?'mengomunikasikan':'merefleksikan dan memperbaiki pemahaman';out.push({id:`chain-sub-${r.id||bi}-${i}`,text:`Peserta didik mampu ${verb} ${materi.toLowerCase()} melalui kegiatan belajar yang kontekstual dan bermakna.`,element:'',cp:'',jp:Math.max(1,q+(i<rem?1:0)),semester:sem,topic:String(r.bab||`Bab ${bi+1}`),materi,subtopik:materi,acdId:r.id||'',period:''})})});return out};
-const buildAnnual=()=>{const draft=read('siapguru_tp_draft')||{};if(draft.topic!=='SEMUA BAB / 1 TAHUN')return;const rows=read('siapguru_master_bab_v1')||[];if(!rows.length)return;const subject=norm(draft.subject),klass=String(draft.class||'').trim(),phase=norm(draft.phase);const filtered=rows.filter(r=>norm(r.mapel)===subject&&String(r.kelas).trim()===klass&&(!phase||!r.fase||norm(r.fase)===phase));if(filtered.length<2)return;const items=build(filtered);if(!items.length)return;localStorage.setItem('siapguru_tp_draft',JSON.stringify({...draft,items,totalJp:items.reduce((n,x)=>n+(Number(x.jp)||0),0)}));};
-const buildSingle=()=>{const room=document.querySelector('.sg-tp-room');if(!room)return;const draft=read('siapguru_tp_draft')||{};const topic=room.querySelector('#sgTpTopic')?.value?.trim();const subject=room.querySelector('#sgTpSubject')?.value?.trim();const klass=room.querySelector('#sgTpClass')?.value?.trim();const phase=room.querySelector('#sgTpPhase')?.value?.trim();if(!topic||!subject||!klass||topic==='SEMUA BAB / 1 TAHUN')return;const rows=(read('siapguru_master_bab_v1')||[]).filter(r=>norm(r.mapel)===norm(subject)&&String(r.kelas).trim()===String(klass).trim()&&(!phase||!r.fase||norm(r.fase)===norm(phase))&&norm(r.bab)===norm(topic));if(!rows.length)return;const items=build(rows);localStorage.setItem('siapguru_tp_draft',JSON.stringify({...draft,subject,phase,class:klass,semester:room.querySelector('#sgTpSemester')?.value||draft.semester||'1',topic,items,totalJp:items.reduce((n,x)=>n+(Number(x.jp)||0),0)}));const list=room.querySelector('#sgTpList');if(!list)return;let articles=[...list.querySelectorAll('.sg-tp-item')];while(articles.length<items.length&&articles.length){const clone=articles[articles.length-1].cloneNode(true);list.appendChild(clone);articles=[...list.querySelectorAll('.sg-tp-item')];}items.forEach((it,i)=>{const a=articles[i];if(!a)return;a.dataset.index=i;a.dataset.id=it.id;const p=a.querySelector('.sg-tp-text'),ta=a.querySelector('.sg-tp-edit');if(p)p.textContent=it.text;if(ta){ta.value=it.text;ta.hidden=true}const jp=a.querySelector('.sg-tp-jp');if(jp)jp.value=it.jp;});};
-let lastRoom=null,lastGenerate=null,lastSave=null;
-const hook=()=>{const room=document.querySelector('.sg-tp-room');if(!room)return;if(room!==lastRoom){lastRoom=room;lastGenerate=null;lastSave=null;}const gen=room.querySelector('#sgTpGenerate');if(gen&&gen.onclick!==lastGenerate){const original=gen.onclick;if(typeof original==='function'){const wrapped=function(e){const r=original.call(this,e);setTimeout(buildSingle,80);return r};gen.onclick=wrapped;lastGenerate=wrapped;}}const save=room.querySelector('#sgTpSave');if(save&&save.onclick!==lastSave){const original=save.onclick;if(typeof original==='function'){const wrapped=function(e){const r=original.call(this,e);setTimeout(buildSingle,80);setTimeout(buildAnnual,80);return r};save.onclick=wrapped;lastSave=wrapped;}}};
-const run=()=>{try{buildAnnual();hook();}catch(_){}};[250,700,1400,2500,4000].forEach(ms=>setTimeout(run,ms));new MutationObserver(()=>setTimeout(run,100)).observe(document.body,{childList:true,subtree:true});document.addEventListener('click',()=>setTimeout(run,120),true);document.addEventListener('siapguru:topic-selected',()=>setTimeout(run,120));
+/* SIAP GURU — TP compatibility loader
+   Restore the previously working TP AUTO FINAL v4 generator.
+   No subtopic workaround, no duplicate TP generation. */
+if(window.__sgTpAutoV4)return;
+if(document.querySelector('script[data-sg-tp-auto-v4]'))return;
+const s=document.createElement('script');
+s.src='assets/js/siap-guru-tp-auto-v1.js?v=4';
+s.dataset.sgTpAutoV4='1';
+s.defer=true;
+s.onload=()=>{};
+s.onerror=()=>{};
+document.head.appendChild(s);
 })();
