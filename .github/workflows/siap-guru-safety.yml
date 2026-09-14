@@ -27,6 +27,7 @@ jobs:
             assets/js/siap-guru-atp.js
             assets/js/siap-guru-rpm-final-v1.js
             assets/js/siap-guru-safety-layer-v1.js
+            worker/index.js
           )
           for f in "${required[@]}"; do
             test -f "$f" || { echo "MISSING: $f"; exit 1; }
@@ -36,7 +37,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          files=$(find assets/js -type f -name '*.js' -print)
+          files=$(find assets/js worker -type f -name '*.js' -print)
           test -n "$files"
           while IFS= read -r f; do
             node --check "$f"
@@ -52,17 +53,51 @@ jobs:
           html=Path('index.html').read_text(encoding='utf-8')
           refs=re.findall(r'<script[^>]+src=["\']([^"\']+)["\']',html)
           bad=[]
+          seen=set()
+          dup=[]
           for ref in refs:
               path=ref.split('?',1)[0]
               if path.startswith('http'):
                   continue
               if not Path(path).is_file():
                   bad.append(path)
+              if path in seen:
+                  dup.append(path)
+              seen.add(path)
           if bad:
               print('BROKEN SCRIPT REFERENCES:')
               print('\n'.join(sorted(set(bad))))
               raise SystemExit(1)
-          print(f'Checked {len(refs)} local script references.')
+          if dup:
+              print('DUPLICATE SCRIPT REFERENCES:')
+              print('\n'.join(sorted(set(dup))))
+              raise SystemExit(1)
+          print(f'Checked {len(refs)} local script references; no broken or duplicate references.')
+          PY
+
+      - name: Stability anti-loop audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          files=list(Path('assets/js').glob('*.js'))
+          findings=[]
+          for p in files:
+              s=p.read_text(encoding='utf-8',errors='ignore')
+              if 'new MutationObserver' in s and '.observe(' in s and '.disconnect(' not in s:
+                  findings.append(f'{p}: MutationObserver has observe() but no disconnect() guard')
+              if 'setInterval(' in s and 'clearInterval(' not in s:
+                  findings.append(f'{p}: setInterval() has no clearInterval()')
+              if re.search(r'setTimeout\s*\(\s*\(?\s*\(?.*=>',s,re.S) and 'clearTimeout' not in s and 'setTimeout' in s:
+                  findings.append(f'{p}: timer usage has no visible clearTimeout() guard; review for repeated scheduling')
+          print('Stability audit:')
+          if findings:
+              for x in findings: print('  REVIEW:',x)
+              print('Review findings are non-blocking; new risky code must be hardened before merge.')
+          else:
+              print('  OK: no obvious unbounded observer/timer pattern detected.')
           PY
 
       - name: Protect critical files from accidental deletion
@@ -74,5 +109,6 @@ jobs:
             assets/js/app.js \
             assets/js/siap-guru-atp.js \
             assets/js/siap-guru-rpm-final-v1.js \
-            assets/js/siap-guru-safety-layer-v1.js >/dev/null
+            assets/js/siap-guru-safety-layer-v1.js \
+            worker/index.js >/dev/null
           echo "Protected-file baseline is present."
