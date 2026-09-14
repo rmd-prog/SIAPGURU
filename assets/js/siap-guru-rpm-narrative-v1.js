@@ -38,23 +38,28 @@
     const penutup=`Guru bersama peserta didik menyimpulkan inti pembelajaran, menegaskan keterkaitan hasil belajar dengan kehidupan nyata, dan melakukan refleksi singkat. Guru menyampaikan tindak lanjut berupa penguatan, remedial, atau pengayaan sesuai bukti belajar, kemudian menutup pembelajaran.`;
     const dpl=saved.dpl?.length?saved.dpl.join(' • '):'Belum dipilih';
     const assessment=saved.principles?.assessment||'Asesmen awal, proses, hasil kerja, dan refleksi digunakan untuk memperoleh bukti ketercapaian tujuan serta memberikan umpan balik.';
+    const tpSource=saved.selectedTP.map((x,i)=>`${i+1}. ${clean(x.text)}${x.element&&x.element!=='-'?` (Elemen: ${clean(x.element)})`:''}`).join(' ');
     const cards=[
+      ['A. IDENTIFIKASI',`Mata Pelajaran: ${saved.subject||'-'} • Fase: ${saved.phase||'-'} • Kelas: ${saved.class||'-'} • Semester: ${saved.semester==='2'?'2':'1'} • Topik/BAB: ${topic} • Alokasi waktu: ${jp} JP • Moda: ${saved.mode||mode}.`],
+      ['B. DESAIN PEMBELAJARAN',`Topik pembelajaran: ${topic}. Model pembelajaran: ${model}. Tujuan pembelajaran yang digunakan sebagai sumber perancangan kegiatan telah diolah menjadi narasi, bukan ditampilkan sebagai daftar TP mentah.`],
       ['Tujuan Pembelajaran dalam Narasi',goal],
-      ['Kegiatan Awal',awal],
-      ['Kegiatan Inti — Memahami',memahami],
-      ['Kegiatan Inti — Mengaplikasi',mengaplikasi],
-      ['Kegiatan Inti — Merefleksi',refleksi],
-      ['Kegiatan Penutup',penutup],
-      ['Prinsip Berkesadaran',saved.principles?.conscious||'Peserta didik memahami tujuan, kriteria keberhasilan, dan memantau proses belajarnya.'],
-      ['Prinsip Bermakna',saved.principles?.meaning||`Pembelajaran ${topic} dikaitkan dengan pengalaman dan konteks nyata peserta didik.`],
-      ['Prinsip Menggembirakan',saved.principles?.joy||'Pembelajaran berlangsung aktif, aman, interaktif, dan memberi ruang kolaborasi serta pilihan yang sesuai.'],
+      ['Sumber TP Terpilih',tpSource],
+      ['C. PRINSIP PEMBELAJARAN — Berkesadaran',saved.principles?.conscious||'Peserta didik memahami tujuan, kriteria keberhasilan, dan memantau proses belajarnya.'],
+      ['C. PRINSIP PEMBELAJARAN — Bermakna',saved.principles?.meaning||`Pembelajaran ${topic} dikaitkan dengan pengalaman dan konteks nyata peserta didik.`],
+      ['C. PRINSIP PEMBELAJARAN — Menggembirakan',saved.principles?.joy||'Pembelajaran berlangsung aktif, aman, interaktif, dan memberi ruang kolaborasi serta pilihan yang sesuai.'],
+      ['D. PENGALAMAN BELAJAR — Kegiatan Awal',awal],
+      ['D. PENGALAMAN BELAJAR — Kegiatan Inti: Memahami',memahami],
+      ['D. PENGALAMAN BELAJAR — Kegiatan Inti: Mengaplikasi',mengaplikasi],
+      ['D. PENGALAMAN BELAJAR — Kegiatan Inti: Merefleksi',refleksi],
+      ['D. PENGALAMAN BELAJAR — Kegiatan Penutup',penutup],
+      ['E. KERANGKA PEMBELAJARAN',`Praktik pedagogis menggunakan ${model}. Kemitraan pembelajaran dikembangkan melalui interaksi guru-peserta didik dan kolaborasi antarpeserta didik sesuai kebutuhan. Lingkungan pembelajaran diarahkan aman, nyaman, inklusif, dan kontekstual. Pemanfaatan digital digunakan bila relevan dengan tujuan, sumber belajar, dan moda ${saved.mode||mode}.`],
       ['Profil Lulusan',dpl],
-      ['Asesmen',assessment],
-      ['Diferensiasi & Tindak Lanjut',`Peserta didik yang telah mencapai tujuan memperoleh pengayaan atau tantangan lanjutan, sedangkan peserta didik yang belum mencapai tujuan memperoleh umpan balik, pendampingan, pembelajaran ulang, dan kesempatan memperbaiki bukti belajar.`]
+      ['F. ASESMEN',assessment],
+      ['G. DIFERENSIASI, REFLEKSI & TINDAK LANJUT',`Guru menggunakan bukti belajar untuk memberi umpan balik. Peserta didik yang telah mencapai tujuan memperoleh pengayaan atau tantangan lanjutan, sedangkan peserta didik yang belum mencapai tujuan memperoleh pendampingan, pembelajaran ulang, dan kesempatan memperbaiki bukti belajar.`]
     ];
     r.innerHTML=cards.map(([h,p])=>`<article data-rpm-narrative="1"><h3>${esc(h)}</h3><p>${esc(p)}</p></article>`).join('');
     r.dataset.rpmNarrativeV1='1';
-    const next={...saved,rpmNarrative:{goal,awal,memahami,mengaplikasi,refleksi,penutup,model,syntax:steps},version:'RPM-SUPER-NARRATIVE-1'};
+    const next={...saved,rpmNarrative:{goal,awal,memahami,mengaplikasi,refleksi,penutup,model,syntax:steps,structure:'IDENTIFIKASI-DESAIN-PRINSIP-PENGALAMAN-KERANGKA-ASESMEN-TINDAKLANJUT'},version:'RPM-SUPER-NARRATIVE-2'};
     sessionStorage.setItem('siapguru_rpm_generated',JSON.stringify(next));
   };
   document.addEventListener('click',e=>{
