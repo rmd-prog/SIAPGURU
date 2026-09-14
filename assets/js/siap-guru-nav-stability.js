@@ -7,7 +7,6 @@
   document.addEventListener('pointerdown',resetRpmGuard,true);
   document.addEventListener('click',resetRpmGuard,true);
   const loadScript=(src,marker)=>{if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src=src;s.dataset[marker]='1';document.head.appendChild(s)};
-  loadScript('assets/js/siap-guru-rpm-cp-final-v1.js?v=1','rpmCpFinal');
   const loadAtpBridges=()=>{
     loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal');
     loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
@@ -19,6 +18,7 @@
     loadScript('assets/js/siap-guru-tp-master-select-bridge-v1.js?v=1','tpMasterSelectBridgeV1');
     loadScript('assets/js/siap-guru-tp-topic-dropdown-v1.js?v=1','tpTopicDropdownV1');
     loadScript('assets/js/siap-guru-tp-topic-smart-v2.js?v=2','tpTopicSmartV2');
+    loadScript('assets/js/siap-guru-tp-atp-import-sync-v1.js?v=1','tpAtpImportSyncV1');
   };
   document.addEventListener('click',e=>{
     const target=e.target instanceof Element?e.target:null;
