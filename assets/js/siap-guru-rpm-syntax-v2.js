@@ -9,15 +9,31 @@
   };
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const getModel=room=>room?.querySelector('#sgRModel')?.value||'Problem Based Learning';
+  const updateDocumentPreview=(room,model,steps)=>{
+    const tbody=room?.querySelector('.sg-doc-preview .sg-rpm-flat-table tbody');
+    if(!tbody)return;
+    tbody.querySelector('[data-rpm-syntax-preview]')?.remove();
+    const tr=document.createElement('tr');
+    tr.dataset.rpmSyntaxPreview='1';
+    const th=document.createElement('th');
+    th.colSpan=2;
+    th.className='sg-rpm-section-row';
+    th.textContent=`Sintaks ${model}`;
+    tr.appendChild(th); tbody.appendChild(tr);
+    steps.forEach((step,i)=>{
+      const row=document.createElement('tr');
+      row.dataset.rpmSyntaxPreview='1';
+      row.innerHTML=`<th>Tahap ${i+1}</th><td>${esc(step)}</td>`;
+      tbody.appendChild(row);
+    });
+  };
   const addSyntax=room=>{
-    if(!room||room.dataset.sgRpmSyntaxV2==='1')return;
+    if(!room)return;
     const result=room.querySelector('#sgRResult');
     if(!result||!result.children.length)return;
-    const model=getModel(room);
-    const steps=SYNTAX[model]||[];
+    const model=getModel(room),steps=SYNTAX[model]||[];
     if(!steps.length)return;
-    const old=result.querySelector('[data-rpm-syntax-v2]');
-    if(old)old.remove();
+    result.querySelector('[data-rpm-syntax-v2]')?.remove();
     const article=document.createElement('article');
     article.dataset.rpmSyntaxV2='1';
     article.innerHTML=`<h3>Sintaks ${esc(model)}</h3><ol>${steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
@@ -27,6 +43,7 @@
       const saved=JSON.parse(sessionStorage.getItem('siapguru_rpm_generated')||'null');
       if(saved){saved.syntax={model,steps};sessionStorage.setItem('siapguru_rpm_generated',JSON.stringify(saved));}
     }catch(_){ }
+    updateDocumentPreview(room,model,steps);
   };
   document.addEventListener('click',e=>{
     const b=e.target.closest?.('#sgRBuild');
@@ -38,6 +55,6 @@
   document.addEventListener('change',e=>{
     if(e.target?.id!=='sgRModel')return;
     const room=e.target.closest('.sg-rpm-room');
-    if(room){room.dataset.sgRpmSyntaxV2='';}
+    if(room)room.dataset.sgRpmSyntaxV2='';
   },false);
 })();
