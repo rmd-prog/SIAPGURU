@@ -31,6 +31,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Prepare RPM route bridge
+        run: |
+          set -e
+          python3 - <<'PY'
+          from pathlib import Path
+          rpm = Path('assets/js/siap-guru-rpm.js')
+          text = rpm.read_text(encoding='utf-8')
+          needle = 'const boot=()=>{'
+          replacement = 'window.__openSiapGuruRPM=()=>{'
+          if needle not in text:
+              raise SystemExit('RPM boot marker not found; refusing deployment')
+          rpm.write_text(text.replace(needle, replacement, 1), encoding='utf-8')
+          index = Path('index.html')
+          html = index.read_text(encoding='utf-8')
+          tag = '<script src="assets/js/siap-guru-rpm-route-bridge.js?v=1" defer></script>'
+          if tag not in html:
+              html = html.replace('</body>', tag + '</body>', 1)
+              index.write_text(html, encoding='utf-8')
+          PY
+          node --check assets/js/siap-guru-rpm.js
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
