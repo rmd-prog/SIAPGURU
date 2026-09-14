@@ -6,14 +6,16 @@
   const assessment=(x,i,total,sem)=>{
     const t=pick(x.text,x.element);
     if(/sumatif|asesmen akhir|ujian|sas|akhir semester/.test(t))return 'Sumatif — tes tertulis/praktik sesuai tujuan';
-    if(/proyek|projek|produk|karya/.test(t))return 'Sumatif proyek — produk & presentasi';
-    if(/presentasi|menyajikan|poster|infografis/.test(t))return 'Formatif — presentasi/produk & rubrik';
-    if(/praktik|simulasi|unjuk kerja|gerak|percobaan|eksperimen/.test(t))return 'Formatif — observasi & unjuk kerja';
-    if(/menulis|membaca|menyimak|berbicara|teks|cerita/.test(t))return 'Formatif — tanya jawab, LKPD & produk';
-    if(/bilangan|pecahan|operasi|aljabar|pengukuran|geometri|data|diagram|matematika/.test(t))return 'Formatif — latihan soal & pemecahan masalah';
+    if(/proyek|projek|produk|karya/.test(t))return 'Sumatif proyek — produk, proses & presentasi';
+    if(/presentasi|menyajikan|poster|infografis|mengomunikasikan/.test(t))return 'Formatif — presentasi/produk dengan rubrik';
+    if(/praktik|simulasi|unjuk kerja|gerak|percobaan|eksperimen|melakukan/.test(t))return 'Formatif — observasi, praktik & catatan kinerja';
+    if(/menulis|membaca|menyimak|berbicara|teks|cerita|mengidentifikasi|menentukan/.test(t))return 'Formatif — LKPD, tanya jawab & cek pemahaman';
+    if(/menganalisis|membandingkan|menjelaskan|hubungan/.test(t))return 'Formatif — soal analisis, diskusi & alasan';
+    if(/merefleksikan|refleksi/.test(t))return 'Formatif — refleksi diri & umpan balik';
+    if(/bilangan|pecahan|operasi|aljabar|pengukuran|geometri|data|diagram|matematika/.test(t))return 'Formatif — latihan soal bertahap & pemecahan masalah';
     if(i===0)return 'Diagnostik awal + formatif — tanya jawab/LKPD';
     if(i>=Math.max(0,total-2))return sem==='Semester 2'?'Sumatif/penguatan — tes atau unjuk kerja':'Sumatif lingkup materi — tes tertulis/praktik';
-    return 'Formatif — observasi, tanya jawab & LKPD';
+    return `Formatif — aktivitas ${i+1}, observasi & umpan balik`;
   };
   const activity=(x,i,total,sem)=>{
     const t=pick(x.text,x.element),s=subject();
@@ -25,6 +27,12 @@
     else if(/pjok|gerak|olahraga|kebugaran|permainan/.test(t)||/pjok/.test(s))a='Pemanasan, demonstrasi gerak, latihan bertahap, praktik berpasangan/kelompok, umpan balik, dan refleksi.';
     else if(/seni|musik|rupa|tari|teater|karya/.test(t)||/seni/.test(s))a='Mengamati karya, mengeksplorasi teknik, mencoba dan mencipta karya, memberi apresiasi, mempresentasikan, dan refleksi.';
     else if(/bahasa inggris|english|speaking|reading|listening|writing/.test(t)||/bahasa inggris/.test(s))a='Mengamati contoh bahasa, latihan terpandu, praktik berpasangan/kelompok, penggunaan dalam konteks nyata, dan refleksi.';
+    if(/mengidentifikasi/.test(t))a='Mengamati contoh atau sumber belajar, mengelompokkan temuan, menandai ciri penting, lalu menyampaikan hasil awal.';
+    if(/menentukan|membandingkan/.test(t))a='Menggunakan contoh dan media konkret, mencoba beberapa strategi, membandingkan hasil, berdiskusi, lalu menarik kesimpulan.';
+    if(/menganalisis/.test(t))a='Mengolah data/informasi, membandingkan bukti, berdiskusi dalam kelompok, menyusun alasan, dan mempresentasikan temuan.';
+    if(/menerapkan|menggunakan/.test(t))a='Mengerjakan latihan kontekstual, memilih strategi yang tepat, mencoba secara mandiri/berkelompok, dan mendapat umpan balik.';
+    if(/menyajikan|mengomunikasikan/.test(t))a='Menyiapkan hasil kerja, memilih bentuk penyajian, mempresentasikan kepada teman, menerima tanggapan, dan memperbaiki hasil.';
+    if(/merefleksikan|refleksi/.test(t))a='Meninjau hasil belajar, mengisi refleksi diri, mendiskusikan kesulitan dan keberhasilan, lalu menentukan tindak lanjut.';
     if(/penguatan|review|latihan soal|remedial|pengayaan/.test(t))a='Meninjau kembali konsep/TP, latihan terarah, pendampingan sesuai kebutuhan, umpan balik, dan refleksi.';
     if(/proyek|projek/.test(t))a='Menentukan masalah/tema, merancang langkah kerja, berkolaborasi menghasilkan produk, mempresentasikan hasil, dan refleksi.';
     if(/sumatif|sas|akhir semester|ujian/.test(t))a='Review terarah, pelaksanaan asesmen terjadwal, pembahasan hasil, tindak lanjut, dan refleksi.';
@@ -46,7 +54,7 @@
     const card=wrap.closest('.sg-prota-card');
     const old=card?.querySelector('[data-prota-template-v5]');if(old)old.remove();
     const h2=card?.querySelector('.sg-prota-section h2');if(h2)h2.textContent='Rincian Program Tahunan';
-    const help=card?.querySelector('.sg-prota-help');if(help)help.textContent='Program tahunan disajikan terpisah berdasarkan Semester 1 dan Semester 2. Asesmen dan kegiatan pembelajaran dibuat lebih kontekstual berdasarkan materi/TP.';
+    const help=card?.querySelector('.sg-prota-help');if(help)help.textContent='Program tahunan disajikan terpisah berdasarkan Semester 1 dan Semester 2. Asesmen dan kegiatan pembelajaran mengikuti karakter TP/materi.';
     const v=document.createElement('div');v.dataset.protaTemplateV5='1';v.className='sg-prota-template-main';
     v.append(table(items.filter(x=>x.semester==='1'),'D. RINCIAN PROGRAM TAHUNAN — SEMESTER 1','Semester 1'),table(items.filter(x=>x.semester==='2'),'E. RINCIAN PROGRAM TAHUNAN — SEMESTER 2','Semester 2'));
     wrap.parentNode.insertBefore(v,wrap)
