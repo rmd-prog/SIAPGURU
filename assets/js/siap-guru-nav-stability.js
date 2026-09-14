@@ -10,11 +10,14 @@
     if(existing){if(existing.dataset.ready==='1'){done?.();return}existing.addEventListener('load',()=>{existing.dataset.ready='1';done?.()},{once:true});existing.addEventListener('error',()=>done?.(),{once:true});return}
     const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>{s.dataset.ready='1';done?.()};s.onerror=()=>done?.();document.head.appendChild(s);
   };
-  const loadAtpBridges=()=>{
-    loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal');
-    loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
-    loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=5','atpDocumentPreviewSync');
-    loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1');
+  const loadAtpBridges=done=>{
+    loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal',()=>{
+      loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview',()=>{
+        loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=5','atpDocumentPreviewSync',()=>{
+          loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1',done);
+        });
+      });
+    });
   };
   const loadTpBridges=done=>{
     loadScript('assets/js/siap-guru-tp-auto-v1.js?v=2','tpAutoV4',()=>{
@@ -31,7 +34,16 @@
     const link=target?.closest('.sg-topnav-link');
     if(!link)return;
     const label=link.textContent.trim();
-    if(label==='ATP'){loadAtpBridges();return}
+    if(label==='ATP'){
+      if(e.__sgAtpReplay)return;
+      e.preventDefault();e.stopImmediatePropagation();
+      loadAtpBridges(()=>{
+        const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});
+        Object.defineProperty(ev,'__sgAtpReplay',{value:true});
+        link.dispatchEvent(ev);
+      });
+      return;
+    }
     if(label!=='TP'||e.__sgTpReplay)return;
     e.preventDefault();e.stopImmediatePropagation();
     loadTpBridges(()=>{
