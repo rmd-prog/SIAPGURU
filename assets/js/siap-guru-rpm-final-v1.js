@@ -1,13 +1,30 @@
 (()=>{
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const clean=x=>String(x||'').replace(/^\s*(?:TP\s*)?\d+[.)\-:]?\s*/i,'').replace(/\s+/g,' ').trim().replace(/[.!?]+$/,'');
+  const verbs=['mengidentifikasi','menjelaskan','menyebutkan','menguraikan','membandingkan','mengelompokkan','menganalisis','menentukan','menggunakan','menerapkan','mempraktikkan','membuat','menyusun','merancang','menunjukkan','menyajikan','mengomunikasikan','menyimpulkan','mengevaluasi','merefleksikan'];
+  const syncPreview=(room,s)=>{
+    const preview=room.querySelector('.sg-doc-preview');
+    const paper=preview?.querySelector('.sg-doc-preview-paper');
+    if(!paper)return;
+    const val=id=>room.querySelector(id)?.value?.trim()||'-';
+    const sections=[...document.getElementById('sgRResult').querySelectorAll('article')];
+    const rows=sections.map(a=>{
+      const h=(a.querySelector('h3')?.textContent||'').trim();
+      const p=(a.querySelector('p')?.textContent||'').trim();
+      if(!h||!p)return '';
+      return `<tr><th>${esc(h)}</th><td>${esc(p)}</td></tr>`;
+    }).filter(Boolean).join('');
+    const ident=`<div class="sg-doc-ident"><div><b>Satuan Pendidikan</b><span>SD</span></div><div><b>Mata Pelajaran</b><span>${esc(val('#sgRSubject'))}</span></div><div><b>Fase / Kelas</b><span>${esc(val('#sgRPhase'))} / ${esc(val('#sgRClass'))}</span></div><div><b>Tahun Pelajaran</b><span>2026/2027</span></div><div><b>Semester</b><span>${esc(val('#sgRSemester'))}</span></div></div>`;
+    paper.innerHTML=ident+`<h3>RPM Deep Learning — Hasil Generate</h3><table class="sg-rpm-flat-table"><tbody>${rows}</tbody></table>`;
+    preview.dataset.sgRpmGeneratedSync='1';
+  };
   const run=()=>{
-    const r=document.getElementById('sgRResult'); if(!r||r.dataset.rpmFinalV1)return;
+    const r=document.getElementById('sgRResult'); if(!r)return;
     let s=null;try{s=JSON.parse(sessionStorage.getItem('siapguru_rpm_generated')||'null')}catch(_){s=null}
     if(!s?.selectedTP?.length)return;
     const topic=s.topic||'topik pembelajaran', model=s.model||'Problem Based Learning';
-    const clean=x=>String(x||'').replace(/^\s*(?:TP\s*)?\d+[.)\-:]?\s*/i,'').replace(/\s+/g,' ').trim().replace(/[.!?]+$/,'');
-    const verbs=['mengidentifikasi','menjelaskan','menyebutkan','menguraikan','membandingkan','mengelompokkan','menganalisis','menentukan','menggunakan','menerapkan','mempraktikkan','membuat','menyusun','merancang','menunjukkan','menyajikan','mengomunikasikan','menyimpulkan','mengevaluasi','merefleksikan'];
-    const ps=s.selectedTP.map((x,i)=>{const raw=clean(x.text);const m=raw.match(new RegExp('\\b('+verbs.join('|')+')\\b','i'));const action=(m?m[1]:'menunjukkan').toLowerCase();const content=clean(m?raw.slice(m.index+m[0].length).replace(/^\\s*(tentang|mengenai|terhadap|untuk)?\\s*/i,''):raw)||topic;return {no:i+1,action,content};});
-    const join=(arr)=>{if(arr.length===1)return arr[0];if(arr.length===2)return arr.join(' dan ');return arr.slice(0,-1).join(', ')+', dan '+arr[arr.length-1]};
+    const ps=s.selectedTP.map((x,i)=>{const raw=clean(x.text);const m=raw.match(new RegExp('\\b('+verbs.join('|')+')\\b','i'));const action=(m?m[1]:'menunjukkan').toLowerCase();const content=clean(m?raw.slice(m.index+m[0].length).replace(/^\s*(tentang|mengenai|terhadap|untuk)?\s*/i,''):raw)||topic;return {no:i+1,action,content};});
+    const join=arr=>arr.length===1?arr[0]:arr.length===2?arr.join(' dan '):arr.slice(0,-1).join(', ')+', dan '+arr[arr.length-1];
     const abilities=[...new Set(ps.map(x=>x.action+' '+x.content))];
     const goal=`Peserta didik mampu ${join(ps.map(x=>x.action+' '+x.content))} melalui pengalaman belajar yang kontekstual pada ${topic}, serta menunjukkan bukti belajar yang dapat diamati.`;
     const opening=`Guru membuka pembelajaran dengan mengaitkan ${topic} dengan pengalaman atau situasi yang dekat dengan peserta didik. Guru menyampaikan tujuan belajar dan pertanyaan pemantik, kemudian memeriksa kesiapan awal melalui respons singkat, pengamatan, atau pertanyaan diagnostik.`;
@@ -24,8 +41,11 @@
     replace('D. PENGALAMAN BELAJAR — Kegiatan Inti: Merefleksi',reflect);
     replace('D. PENGALAMAN BELAJAR — Kegiatan Penutup',closing);
     replace('F. ASESMEN',assessment);
+    [...r.querySelectorAll('article')].filter(a=>(a.querySelector('h3')?.textContent||'').startsWith('Sintaks ')).forEach(a=>a.remove());
     r.dataset.rpmFinalV1='1';
-    try{sessionStorage.setItem('siapguru_rpm_generated',JSON.stringify({...s,rpmFinal:{goal,opening,understand,apply,reflect,closing,assessment,abilities,model,topic},version:'RPM-SUPER-FINAL-1'}))}catch(_){ }
+    const saved={...s,rpmFinal:{goal,opening,understand,apply,reflect,closing,assessment,abilities,model,topic},version:'RPM-SUPER-FINAL-2'};
+    try{sessionStorage.setItem('siapguru_rpm_generated',JSON.stringify(saved))}catch(_){ }
+    syncPreview(document.querySelector('.sg-rpm-room'),saved);
   };
-  document.addEventListener('click',e=>{if(e.target?.id==='sgRBuild')queueMicrotask(()=>queueMicrotask(()=>queueMicrotask(()=>queueMicrotask(()=>queueMicrotask(run)))))},false);
+  document.addEventListener('click',e=>{if(e.target?.id==='sgRBuild')setTimeout(run,0)},false);
 })();
