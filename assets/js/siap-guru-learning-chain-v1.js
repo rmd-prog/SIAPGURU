@@ -1,7 +1,7 @@
 (()=>{
-/* SIAP GURU — learning chain bridge v4
+/* SIAP GURU — learning chain bridge v5
    TP → PROTA → RPM → LKPD → Materi
-   Adds annual multi-BAB TP aggregation from Master BAB.
+   Annual multi-BAB TP aggregation uses the live Master BAB bank.
    Local only; no token/API, D1, Worker, login, or navigation changes. */
 const read=(k,store=localStorage)=>{try{return JSON.parse(store.getItem(k)||'null')}catch(_){return null}};
 const norm=v=>String(v??'').trim().toLowerCase();
@@ -13,7 +13,7 @@ const annualTp=()=>{
  const ref=room.querySelector('#sgTpImport');if(!ref)return;
  const b=document.createElement('button');b.id='sgTpAllBab';b.type='button';b.className='sg-tp-secondary';b.textContent='Ambil Semua BAB';ref.insertAdjacentElement('afterend',b);
  b.addEventListener('click',()=>{
-  const master=read('siapguru_master_bab_v1')||[];
+  const master=(window.SiapGuruMasterBab?.getAll?.()||read('siapguru_master_bab_v1')||[]);
   const subject=room.querySelector('#sgTpSubject')?.value?.trim()||'';
   const klass=room.querySelector('#sgTpClass')?.value?.trim()||'';
   const phase=room.querySelector('#sgTpPhase')?.value?.trim()||'';
