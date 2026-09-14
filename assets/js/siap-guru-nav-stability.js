@@ -22,7 +22,7 @@
     loadScript('assets/js/siap-guru-rpm-cp-final-v1.js?v=1','rpmCpFinal');
     loadScript('assets/js/siap-guru-atp-auto-v1.js?v=2','atpAutoFinal');
     loadScript('assets/js/siap-guru-atp-preview.js?v=2','atpPreview');
-    loadScript('assets/js/siap-guru-atp-preview-sync-v1.js?v=1','atpPreviewSync');
+    loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=1','atpDocumentPreviewSync');
   };
   const boot=()=>{
     loadBridges();
