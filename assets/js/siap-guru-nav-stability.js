@@ -12,4 +12,15 @@
   };
   document.addEventListener('pointerdown',resetRpmGuard,true);
   document.addEventListener('click',resetRpmGuard,true);
+
+  // RPM CP bridge: load after the existing navigation guard, before RPM Generate is clicked.
+  const loadRpmCpBridge=()=>{
+    if(document.querySelector('script[data-rpm-cp-final]'))return;
+    const s=document.createElement('script');
+    s.src='assets/js/siap-guru-rpm-cp-final-v1.js?v=1';
+    s.dataset.rpmCpFinal='1';
+    document.head.appendChild(s);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadRpmCpBridge,{once:true});
+  else loadRpmCpBridge();
 })();
