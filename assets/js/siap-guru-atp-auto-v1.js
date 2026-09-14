@@ -26,7 +26,5 @@
     btn.addEventListener('click',make);
     [subject,phase,klass,room.querySelector('#sgAtpSemester')].filter(Boolean).forEach(el=>el.addEventListener('change',()=>show('Pilihan berubah. Klik “Isi ATP Otomatis” agar CP, TP, dan JP dihitung ulang.')));
   };
-  const watch=()=>{build();if(!document.querySelector('.sg-atp-room'))setTimeout(watch,500)};
-  document.addEventListener('click',e=>{const l=e.target.closest('.sg-topnav-link');if(l&&l.textContent.trim()==='ATP')setTimeout(build,120)},true);
-  watch();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else setTimeout(build,0);
 })();
