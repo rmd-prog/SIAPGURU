@@ -73,8 +73,18 @@
     document.head.appendChild(style);
   }
 
+  function loadSchoolInfo() {
+    if (window.SiapGuruSchoolInfo || document.querySelector('script[data-siapguru-school-info]')) return;
+    const script = document.createElement('script');
+    script.src = 'assets/js/siap-guru-school-info-v1.js?v=1';
+    script.dataset.siapguruSchoolInfo = '1';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     injectStyles();
     bindProfileButtons();
+    loadSchoolInfo();
   });
 })();
