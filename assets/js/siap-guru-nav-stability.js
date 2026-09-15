@@ -7,7 +7,9 @@
   const openProsem=()=>{
     loadScript('assets/js/siap-guru-prosem-matrix-v2.js?v=1','prosemMatrixFinal',()=>{
       if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
-      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=1','prosemMatrixFixFinal');
+      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=1','prosemMatrixFixFinal',()=>{
+        loadScript('assets/js/siap-guru-prosem-matrix-calendar-v1.js?v=1','prosemMatrixCalendarFinal');
+      });
     });
   };
   const replay=(link,marker)=>{const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
