@@ -1,5 +1,81 @@
-/* GLOBAL ROOM SHELL ALIGNMENT — shared by every SIAP GURU room */
-body.sg-ui-v2 #sg-ui-v2-windowbar{position:sticky!important;top:0!important;}
-body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view){padding-top:18px!important;}
-body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view)>.sg-room-view{width:100%!important;max-width:none!important;margin:0!important;min-height:calc(100dvh - 64px)!important;}
-@media(max-width:760px){body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view){padding:14px 12px 24px!important;}body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view)>.sg-room-view{min-height:calc(100dvh - 60px)!important;}}
+/* SIAP GURU MASTER ROOM GRID — shared geometry for every main-menu room */
+:root{--sg-room-left:280px;--sg-room-right:28px;--sg-room-top:16px;--sg-room-bottom:82px;--sg-room-max:1220px;}
+
+/* The application chrome and the room are separate layers. The room itself owns its grid. */
+body.sg-ui-v2.sg-room-mode .main-content,
+body.sg-ui-v2 .main-content.sg-room-mode{
+  position:relative!important;
+  display:block!important;
+  width:auto!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:var(--sg-room-top) var(--sg-room-right) var(--sg-room-bottom) var(--sg-room-left)!important;
+  min-height:calc(100dvh - 46px)!important;
+  box-sizing:border-box!important;
+}
+
+/* One master rail: every room starts and ends on the same vertical guides. */
+body.sg-ui-v2.sg-room-mode .main-content > .sg-room-view,
+body.sg-ui-v2.sg-room-mode .main-content > .inner-view,
+body.sg-ui-v2.sg-room-mode .main-content > section:not(#homeView),
+body.sg-ui-v2 .main-content.sg-room-mode > .sg-room-view,
+body.sg-ui-v2 .main-content.sg-room-mode > .inner-view,
+body.sg-ui-v2 .main-content.sg-room-mode > section:not(#homeView){
+  width:min(100%,var(--sg-room-max))!important;
+  max-width:var(--sg-room-max)!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+
+/* Existing room internals inherit the same width instead of introducing a second rail. */
+body.sg-ui-v2.sg-room-mode .sg-room-view,
+body.sg-ui-v2 .main-content.sg-room-mode .sg-room-view{
+  width:min(100%,var(--sg-room-max))!important;
+  max-width:var(--sg-room-max)!important;
+  margin:0!important;
+  min-height:calc(100dvh - 64px)!important;
+}
+
+/* Keep the room toolbar in normal document flow; never let it cover the first row. */
+body.sg-ui-v2.sg-room-mode #sg-ui-v2-windowbar,
+body.sg-ui-v2 .main-content.sg-room-mode ~ #sg-ui-v2-windowbar{
+  z-index:100!important;
+}
+
+/* Common precision rules: avoid accidental auto margins and oversized legacy rails. */
+body.sg-ui-v2.sg-room-mode .sg-room-head,
+body.sg-ui-v2.sg-room-mode .sg-atp-workspace,
+body.sg-ui-v2.sg-room-mode .sg-atp-hero,
+body.sg-ui-v2.sg-room-mode .sg-atp-docbar,
+body.sg-ui-v2.sg-room-mode .sg-atp-main,
+body.sg-ui-v2 .main-content.sg-room-mode .sg-room-head,
+body.sg-ui-v2 .main-content.sg-room-mode .sg-atp-workspace,
+body.sg-ui-v2 .main-content.sg-room-mode .sg-atp-hero,
+body.sg-ui-v2 .main-content.sg-room-mode .sg-atp-docbar,
+body.sg-ui-v2 .main-content.sg-room-mode .sg-atp-main{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:none!important;
+}
+
+@media(max-width:1250px){
+  :root{--sg-room-left:254px;--sg-room-right:22px;}
+}
+
+@media(max-width:760px){
+  :root{--sg-room-left:12px;--sg-room-right:12px;--sg-room-top:12px;--sg-room-bottom:70px;--sg-room-max:none;}
+  body.sg-ui-v2.sg-room-mode .main-content,
+  body.sg-ui-v2 .main-content.sg-room-mode{
+    padding:var(--sg-room-top) var(--sg-room-right) var(--sg-room-bottom) var(--sg-room-left)!important;
+    min-height:calc(100dvh - 46px)!important;
+  }
+  body.sg-ui-v2.sg-room-mode .main-content > .sg-room-view,
+  body.sg-ui-v2.sg-room-mode .main-content > .inner-view,
+  body.sg-ui-v2.sg-room-mode .main-content > section:not(#homeView),
+  body.sg-ui-v2 .main-content.sg-room-mode > .sg-room-view,
+  body.sg-ui-v2 .main-content.sg-room-mode > .inner-view,
+  body.sg-ui-v2 .main-content.sg-room-mode > section:not(#homeView){
+    width:100%!important;
+    max-width:none!important;
+  }
+}
