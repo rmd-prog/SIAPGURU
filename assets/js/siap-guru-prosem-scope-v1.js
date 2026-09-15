@@ -18,30 +18,23 @@
     wrap.className='sg-prosem-scope-control';
     wrap.innerHTML='<span>Cakupan PROSEM</span><select id="sgProsemScope"><option value="1">Semester 1</option><option value="2">Semester 2</option><option value="year">1 Tahun</option></select>';
     section.appendChild(wrap);
-    const select=wrap.querySelector('select');
-    select.value=scope==='1'||scope==='2'?scope:'year';
-    const recap1=document.createElement('div');
-    recap1.className='sg-prosem-recap sg-prosem-recap-sem1';
-    recap1.innerHTML='<div><span>Semester 1</span><strong>0 JP</strong></div><div><span>Cakupan</span><strong>Semester 1</strong></div>';
-    const update=()=>{
-      const v=select.value;
-      sem1.hidden=v==='2'; sem2.hidden=v==='1';
-      if(v==='1'&&!sem1.querySelector('.sg-prosem-recap-sem1')) sem1.querySelector('.sg-prosem-table-wrap')?.after(recap1);
-      if(v!=='1'&&recap1.parentNode)recap1.remove();
-      const sum=card=>[...card.querySelectorAll('tbody tr')].reduce((n,tr)=>{const i=tr.querySelector('input.sg-prosem-jp');return n+(i?Number(i.value)||0:0)},0);
-      const a=sum(sem1),b=sum(sem2);
-      const r1=sem1.querySelector('.sg-prosem-recap-sem1');
-      if(r1)r1.querySelector('strong').textContent=`${a} JP`;
-      const r2=sem2.querySelector('.sg-prosem-recap');
-      if(r2){const vals=r2.querySelectorAll('strong');if(vals[0])vals[0].textContent=`${a} JP`;if(vals[1])vals[1].textContent=`${b} JP`;if(vals[2])vals[2].textContent=`${a+b} JP`;}
-      writeScope(v);
+    const select=wrap.querySelector('#sgProsemScope');
+    select.value=scope;
+    const applyScope=()=>{
+      scope=select.value;
+      sem1.hidden=scope==='2';
+      sem2.hidden=scope==='1';
+      writeScope(scope);
+      const notice=room.querySelector('#sgProsemNotice');
+      if(notice){notice.textContent=scope==='year'?'Cakupan: 1 Tahun.':`Cakupan: Semester ${scope}.`;notice.hidden=false;clearTimeout(window.__sgProsemScopeNotice);window.__sgProsemScopeNotice=setTimeout(()=>notice.hidden=true,1800)}
     };
-    select.addEventListener('change',update);
-    room.addEventListener('input',e=>{if(e.target.matches('.sg-prosem-jp'))update()});
-    room.addEventListener('click',e=>{if(e.target.closest('#sgProsemSave'))setTimeout(()=>writeScope(select.value),0)});
-    update();
+    select.addEventListener('change',applyScope);
+    applyScope();
   };
-  const boot=()=>{const room=document.querySelector('.sg-prosem-room');if(room)apply(room)};
-  boot();
-  new MutationObserver(boot).observe(document.body,{childList:true,subtree:true});
+  const watch=()=>{
+    const room=document.querySelector('.sg-prosem-room');
+    if(room)apply(room);
+  };
+  watch();
+  new MutationObserver(watch).observe(document.body,{childList:true,subtree:true});
 })();
