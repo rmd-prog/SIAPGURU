@@ -255,3 +255,18 @@ h1,h2,h3,h4,h5,h6{line-height:var(--line-height-heading)}
 @media(max-width:767px){
   .sg-room-grid{grid-template-columns:1fr}
 }
+
+/* 15. GLOBAL LAYOUT LOCK */
+*,*::before,*::after{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+
+.container{
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 16px;
+}
+
+@media(min-width:768px){
+  .container{padding:0 24px}
+}
