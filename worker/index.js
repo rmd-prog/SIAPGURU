@@ -99,6 +99,32 @@ async function students(env, userId, search = "") {
   return json({ ok: true, students: result?.results || [], access });
 }
 
+const ensureSyncTable = env => env.DB.prepare(`CREATE TABLE IF NOT EXISTS siapguru_user_data (user_id TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (user_id, key))`).run();
+
+async function syncGet(env, userId) {
+  const user = await getUser(env, userId);
+  if (!user) return json({ ok: false, error: "USER_NOT_FOUND", message: "Sesi guru tidak ditemukan." }, 401);
+  await ensureSyncTable(env);
+  const result = await env.DB.prepare("SELECT key, value, updated_at FROM siapguru_user_data WHERE user_id = ? ORDER BY key").bind(String(user.id)).all();
+  return json({ ok: true, items: result?.results || [] });
+}
+
+async function syncPost(env, body) {
+  const user = await getUser(env, body?.user_id);
+  if (!user) return json({ ok: false, error: "USER_NOT_FOUND", message: "Sesi guru tidak ditemukan." }, 401);
+  const key = String(body?.key ?? "").trim();
+  if (!key.startsWith("siapguru_") || key.length > 200) return json({ ok: false, error: "INVALID_SYNC_KEY" }, 400);
+  await ensureSyncTable(env);
+  if (body?.remove === true) {
+    await env.DB.prepare("DELETE FROM siapguru_user_data WHERE user_id = ? AND key = ?").bind(String(user.id), key).run();
+    return json({ ok: true, removed: true });
+  }
+  const value = String(body?.value ?? "");
+  if (value.length > 900000) return json({ ok: false, error: "SYNC_VALUE_TOO_LARGE" }, 413);
+  await env.DB.prepare("INSERT INTO siapguru_user_data (user_id, key, value, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at").bind(String(user.id), key, value, new Date().toISOString()).run();
+  return json({ ok: true, saved: true });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -135,6 +161,20 @@ export default {
       if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
       try { return await students(env, url.searchParams.get("user_id"), url.searchParams.get("search")); }
       catch (_) { return json({ ok: false, error: "STUDENTS_DATABASE_ERROR", message: "Data siswa gagal dimuat." }, 500); }
+    }
+
+    if (url.pathname === "/api/sync" && request.method === "GET") {
+      if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
+      try { return await syncGet(env, url.searchParams.get("user_id")); }
+      catch (_) { return json({ ok: false, error: "SYNC_DATABASE_ERROR", message: "Sinkronisasi data gagal dimuat." }, 500); }
+    }
+
+    if (url.pathname === "/api/sync" && request.method === "POST") {
+      if (!env.DB) return json({ ok: false, error: "DB_NOT_CONFIGURED" }, 503);
+      let body;
+      try { body = await request.json(); } catch (_) { return json({ ok: false, error: "INVALID_JSON" }, 400); }
+      try { return await syncPost(env, body); }
+      catch (_) { return json({ ok: false, error: "SYNC_DATABASE_ERROR", message: "Data belum berhasil disimpan ke cloud." }, 500); }
     }
 
     return json({ ok: false, error: "NOT_FOUND" }, 404);
