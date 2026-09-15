@@ -8,66 +8,41 @@
     if(home)home.hidden=true;
     if(students)students.hidden=true;
     if(!document.querySelector('link[data-prosem-style]')){
-      const l=document.createElement('link');
-      l.rel='stylesheet';l.href='assets/css/siap-guru-prosem.css?v=2';l.dataset.prosemStyle='1';
-      document.head.appendChild(l);
+      const l=document.createElement('link');l.rel='stylesheet';l.href='assets/css/siap-guru-prosem.css?v=2';l.dataset.prosemStyle='1';document.head.appendChild(l);
     }
-    const room=document.createElement('section');
-    room.className='sg-room-view sg-prosem-room';
-    document.querySelector('.main-content')?.appendChild(room);
+    const room=document.createElement('section');room.className='sg-room-view sg-prosem-room';document.querySelector('.main-content')?.appendChild(room);
     room.innerHTML=`<div class="sg-room-head"><div><button type="button" class="sg-room-back">← Kembali ke Beranda</button><span class="sg-room-eyebrow">PEMBELAJARAN / PERENCANAAN</span><div class="sg-room-title-row"><span class="sg-room-icon">PS</span><div><h1>Program Semester (PROSEM)</h1><p>Penjabaran PROTA menjadi rencana pembelajaran semester yang runtut dan siap dicetak.</p></div></div></div><span class="sg-room-status">PROTA → PROSEM</span></div><div class="sg-prosem-shell"><section class="sg-prosem-card"><div class="sg-prosem-section"><div><span class="sg-prosem-label">A. IDENTITAS DAN SUMBER</span><h2>Program Semester</h2></div><span class="sg-prosem-muted">Mengikuti PROTA aktif</span></div><div class="sg-prosem-grid"><label><span>Satuan Pendidikan</span><input id="sgProsemSchool" value="SDN Muarasari 1"></label><label><span>Mapel</span><input id="sgProsemSubject" readonly></label><label><span>Fase</span><input id="sgProsemPhase" readonly></label><label><span>Kelas</span><input id="sgProsemClass" readonly></label><label><span>Tahun Pelajaran</span><input id="sgProsemYear" value="2026/2027"></label><label><span>Minggu Efektif / Tahun</span><input id="sgProsemWeeks" type="number" min="1" value="36"></label></div><div class="sg-prosem-source"><strong>Sumber penyusunan:</strong> PROTA aktif • TP/BAB dan alokasi JP diturunkan ke distribusi Semester 1 dan Semester 2.</div><div class="sg-prosem-actions"><button id="sgProsemLoad" class="sg-prosem-primary" type="button">⚡ Susun Otomatis dari PROTA</button><button id="sgProsemAdd" class="sg-prosem-secondary" type="button">+ Tambah Baris</button></div></section><section class="sg-prosem-card"><div class="sg-prosem-section"><div><span class="sg-prosem-label">B. DISTRIBUSI PEMBELAJARAN</span><h2>Semester 1</h2></div><span id="sgProsemCount1" class="sg-prosem-muted">0 rencana</span></div><div class="sg-prosem-table-wrap"><table class="sg-prosem-table"><thead><tr><th>No.</th><th>Minggu / Periode</th><th>BAB / Materi Pokok</th><th>Tujuan Pembelajaran</th><th>JP</th><th>Asesmen</th><th>Keterangan</th><th></th></tr></thead><tbody id="sgProsemList1"><tr><td colspan="8" class="sg-prosem-empty">Belum ada data Semester 1.</td></tr></tbody></table></div></section><section class="sg-prosem-card"><div class="sg-prosem-section"><div><span class="sg-prosem-label">C. DISTRIBUSI PEMBELAJARAN</span><h2>Semester 2</h2></div><span id="sgProsemCount2" class="sg-prosem-muted">0 rencana</span></div><div class="sg-prosem-table-wrap"><table class="sg-prosem-table"><thead><tr><th>No.</th><th>Minggu / Periode</th><th>BAB / Materi Pokok</th><th>Tujuan Pembelajaran</th><th>JP</th><th>Asesmen</th><th>Keterangan</th><th></th></tr></thead><tbody id="sgProsemList2"><tr><td colspan="8" class="sg-prosem-empty">Belum ada data Semester 2.</td></tr></tbody></table></div><div class="sg-prosem-recap"><div><span>Semester 1</span><strong id="sgProsemJp1">0 JP</strong></div><div><span>Semester 2</span><strong id="sgProsemJp2">0 JP</strong></div><div><span>Total</span><strong id="sgProsemJpTotal">0 JP</strong></div></div><div class="sg-prosem-footer"><button id="sgProsemClear" class="sg-prosem-secondary" type="button">Bersihkan</button><button id="sgProsemSave" class="sg-prosem-primary" type="button">Simpan PROSEM</button></div><div id="sgProsemNotice" class="sg-prosem-notice" hidden></div></section><section class="sg-prosem-card sg-prosem-note-card"><div class="sg-prosem-section"><div><span class="sg-prosem-label">D. KETERANGAN</span><h2>Catatan Program Semester</h2></div></div><textarea id="sgProsemNotes" placeholder="Catatan penguatan, penyesuaian kalender pendidikan, atau kegiatan khusus..."></textarea></section></div>`;
-    const $=id=>room.querySelector('#'+id);
-    const notice=$('sgProsemNotice');
+    const $=id=>room.querySelector('#'+id),notice=$('sgProsemNotice');
     let state={school:'SDN Muarasari 1',subject:'',phase:'',class:'',year:'2026/2027',weeks:36,items:[],notes:''};
     const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const readProta=()=>{try{return JSON.parse(localStorage.getItem('siapguru_prota_draft')||'null')}catch(_){return null}};
     const material=x=>x.topic||x.materi||x.material||x.submateri||x.bab||'Materi pembelajaran';
-    const assessment=x=>{const a=String(x.assessment||x.asesmen||'').trim();if(!a)return /asesmen|evaluasi|latihan|penguatan/i.test(x.text||'')?'Latihan / asesmen':'Asesmen formatif';return /^formatif$/i.test(a)?'Asesmen formatif':/^sumatif$/i.test(a)?'Asesmen sumatif':a;};
-    const note=x=>String(x.note||x.keterangan||'').trim()||'Pembelajaran reguler';
+    const assessment=x=>{const a=String(x.assessment||x.asesmen||'').trim();if(!a)return /sumatif|ulangan|ujian|akhir semester/i.test(x.text||'')?'Asesmen sumatif':'Asesmen formatif';return /^formatif$/i.test(a)?'Asesmen formatif':/^sumatif$/i.test(a)?'Asesmen sumatif':a;};
+    const note=x=>String(x.note||x.keterangan||'').trim();
     const normalize=x=>({...x,materi:material(x),assessment:assessment(x),note:note(x)});
     const renderRows=sem=>{
-      const list=$('sgProsemList'+sem);
-      const rows=state.items.map((x,i)=>({x,i})).filter(o=>String(o.x.semester)===String(sem));
+      const list=$('sgProsemList'+sem),rows=state.items.map((x,i)=>({x,i})).filter(o=>String(o.x.semester)===String(sem));
       $('sgProsemCount'+sem).textContent=rows.length+' rencana';
       if(!rows.length){list.innerHTML='<tr><td colspan="8" class="sg-prosem-empty">Belum ada data Semester '+sem+'.</td></tr>';return;}
-      list.innerHTML=rows.map((o,n)=>{const x=o.x,i=o.i;return `<tr><td>${n+1}</td><td><input data-field="period" data-i="${i}" value="${esc(x.period)}" placeholder="Juli M3"></td><td><input data-field="materi" data-i="${i}" value="${esc(x.materi||material(x))}" placeholder="BAB / materi pokok"></td><td><textarea data-field="text" data-i="${i}">${esc(x.text)}</textarea></td><td><input class="sg-prosem-jp" type="number" min="1" data-field="jp" data-i="${i}" value="${Number(x.jp)||1}"></td><td><input data-field="assessment" data-i="${i}" value="${esc(x.assessment||assessment(x))}" placeholder="Asesmen formatif"></td><td><input data-field="note" data-i="${i}" value="${esc(x.note||note(x))}" placeholder="Pembelajaran reguler"></td><td><button type="button" class="sg-prosem-del" data-del="${i}">Hapus</button></td></tr>`}).join('');
+      list.innerHTML=rows.map((o,n)=>{const x=o.x,i=o.i;return `<tr><td>${n+1}</td><td><input data-field="period" data-i="${i}" value="${esc(x.period)}" placeholder="Juli M3"></td><td><input data-field="materi" data-i="${i}" value="${esc(x.materi||material(x))}" placeholder="BAB / materi pokok"></td><td><textarea data-field="text" data-i="${i}">${esc(x.text)}</textarea></td><td><input class="sg-prosem-jp" type="number" min="1" data-field="jp" data-i="${i}" value="${Number(x.jp)||1}"></td><td><input data-field="assessment" data-i="${i}" value="${esc(x.assessment||assessment(x))}" placeholder="Asesmen formatif / sumatif"></td><td><input data-field="note" data-i="${i}" value="${esc(x.note||'')}" placeholder="Opsional: penguatan / pengayaan / kegiatan khusus"></td><td><button type="button" class="sg-prosem-del" data-del="${i}">Hapus</button></td></tr>`}).join('');
     };
-    const render=()=>{
-      state.items=state.items.map(normalize);
-      renderRows(1);renderRows(2);
-      const a=state.items.filter(x=>String(x.semester)==='1').reduce((n,x)=>n+Number(x.jp||0),0);
-      const b=state.items.filter(x=>String(x.semester)==='2').reduce((n,x)=>n+Number(x.jp||0),0);
-      $('sgProsemJp1').textContent=a+' JP';$('sgProsemJp2').textContent=b+' JP';$('sgProsemJpTotal').textContent=(a+b)+' JP';
-    };
-    const sync=()=>{
-      state.school=$('sgProsemSchool').value.trim()||'SDN Muarasari 1';
-      state.year=$('sgProsemYear').value.trim()||'2026/2027';
-      state.weeks=Math.max(1,Number($('sgProsemWeeks').value)||36);state.notes=$('sgProsemNotes').value;
-      room.querySelectorAll('[data-field]').forEach(el=>{const i=Number(el.dataset.i),f=el.dataset.field;if(state.items[i])state.items[i][f]=f==='jp'?Math.max(1,Number(el.value)||1):el.value;});
-    };
+    const render=()=>{state.items=state.items.map(normalize);renderRows(1);renderRows(2);const a=state.items.filter(x=>String(x.semester)==='1').reduce((n,x)=>n+Number(x.jp||0),0),b=state.items.filter(x=>String(x.semester)==='2').reduce((n,x)=>n+Number(x.jp||0),0);$('sgProsemJp1').textContent=a+' JP';$('sgProsemJp2').textContent=b+' JP';$('sgProsemJpTotal').textContent=(a+b)+' JP';};
+    const sync=()=>{state.school=$('sgProsemSchool').value.trim()||'SDN Muarasari 1';state.year=$('sgProsemYear').value.trim()||'2026/2027';state.weeks=Math.max(1,Number($('sgProsemWeeks').value)||36);state.notes=$('sgProsemNotes').value;room.querySelectorAll('[data-field]').forEach(el=>{const i=Number(el.dataset.i),f=el.dataset.field;if(state.items[i])state.items[i][f]=f==='jp'?Math.max(1,Number(el.value)||1):el.value;});};
     const show=m=>{notice.textContent=m;notice.hidden=false;clearTimeout(window.__sgProsemNotice);window.__sgProsemNotice=setTimeout(()=>notice.hidden=true,2600);};
-    const fromProta=()=>{
-      const p=readProta();
-      if(!p||!Array.isArray(p.items)||!p.items.length)return false;
-      state.school=p.school||state.school;state.subject=p.subject||'';state.phase=p.phase||'';state.class=p.class||'';state.year=p.year||'2026/2027';state.weeks=Number(p.weeks)||36;
-      state.items=p.items.map(x=>normalize({text:x.text||'',semester:String(x.semester||'1'),period:x.period||'',jp:Math.max(1,Number(x.jp)||2),topic:x.topic||'',materi:x.materi||'',assessment:x.assessment||x.asesmen||'',note:x.note||x.keterangan||''}));
-      $('sgProsemSchool').value=state.school;$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year;$('sgProsemWeeks').value=state.weeks;$('sgProsemNotes').value=state.notes;render();return true;
-    };
+    const fromProta=()=>{const p=readProta();if(!p||!Array.isArray(p.items)||!p.items.length)return false;state.school=p.school||state.school;state.subject=p.subject||'';state.phase=p.phase||'';state.class=p.class||'';state.year=p.year||'2026/2027';state.weeks=Number(p.weeks)||36;state.items=p.items.map(x=>normalize({text:x.text||'',semester:String(x.semester||'1'),period:x.period||'',jp:Math.max(1,Number(x.jp)||2),topic:x.topic||'',materi:x.materi||'',assessment:x.assessment||x.asesmen||'',note:x.note||x.keterangan||''}));$('sgProsemSchool').value=state.school;$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year;$('sgProsemWeeks').value=state.weeks;$('sgProsemNotes').value=state.notes;render();return true;};
     $('sgProsemLoad').onclick=()=>{if(fromProta())show(state.items.length+' rencana tersusun dari PROTA aktif.');else show('Belum ada PROTA tersimpan. Susun PROTA terlebih dahulu.');};
-    $('sgProsemAdd').onclick=()=>{sync();state.items.push({text:'',semester:state.items.some(x=>String(x.semester)==='1')?'2':'1',period:'',jp:2,topic:'',materi:'',assessment:'Asesmen formatif',note:'Pembelajaran reguler'});render();};
+    $('sgProsemAdd').onclick=()=>{sync();state.items.push({text:'',semester:state.items.some(x=>String(x.semester)==='1')?'2':'1',period:'',jp:2,topic:'',materi:'',assessment:'Asesmen formatif',note:''});render();};
     room.addEventListener('input',e=>{if(e.target.matches('[data-field],#sgProsemSchool,#sgProsemYear,#sgProsemWeeks,#sgProsemNotes'))sync();});
     room.addEventListener('change',e=>{if(e.target.matches('[data-field],#sgProsemSchool,#sgProsemYear,#sgProsemWeeks,#sgProsemNotes'))sync();});
     room.addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(b){sync();state.items.splice(Number(b.dataset.del),1);render();}});
     $('sgProsemClear').onclick=()=>{state.items=[];render();show('Form PROSEM dibersihkan.');};
-    $('sgProsemSave').onclick=()=>{sync();if(!state.items.length){show('Tambahkan minimal satu rencana.');return;}localStorage.setItem(KEY,JSON.stringify({...state,savedAt:new Date().toISOString(),version:'PROSEM-5'}));show('PROSEM tersimpan.');};
+    $('sgProsemSave').onclick=()=>{sync();if(!state.items.length){show('Tambahkan minimal satu rencana.');return;}localStorage.setItem(KEY,JSON.stringify({...state,savedAt:new Date().toISOString(),version:'PROSEM-6'}));show('PROSEM tersimpan.');};
     room.querySelector('.sg-room-back').onclick=()=>{room.remove();window.__sgProsemBoot=0;if(home)home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});};
     const saved=(()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}})();
-    if(saved?.items?.length){state={...state,...saved};state.items=state.items.map(normalize);$('sgProsemSchool').value=state.school||'SDN Muarasari 1';$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year||'2026/2027';$('sgProsemWeeks').value=state.weeks||36;$('sgProsemNotes').value=state.notes||'';render();}
-    else if(!fromProta())show('Belum ada PROTA tersimpan. Kamu bisa tambah baris manual.');
+    if(saved?.items?.length){state={...state,...saved};state.items=state.items.map(normalize);$('sgProsemSchool').value=state.school||'SDN Muarasari 1';$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year||'2026/2027';$('sgProsemWeeks').value=state.weeks||36;$('sgProsemNotes').value=state.notes||'';render();}else if(!fromProta())show('Belum ada PROTA tersimpan. Kamu bisa tambah baris manual.');
     window.scrollTo({top:0,behavior:'smooth'});
   };
   window.__openSiapGuruProsem=boot;
   const bindNav=()=>document.querySelectorAll('.sg-topnav-link').forEach(link=>{if(link.textContent.trim()==='PROSEM'&&link.dataset.prosemBound!=='1'){link.dataset.prosemBound='1';link.onclick=e=>{e.preventDefault();e.stopPropagation();boot();};}});
-  bindNav();
-  if(typeof MutationObserver==='function')new MutationObserver(bindNav).observe(document.body,{childList:true,subtree:true});
+  bindNav();if(typeof MutationObserver==='function')new MutationObserver(bindNav).observe(document.body,{childList:true,subtree:true});
 })();
