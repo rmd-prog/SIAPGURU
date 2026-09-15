@@ -1,0 +1,5 @@
+/* GLOBAL ROOM SHELL ALIGNMENT — shared by every SIAP GURU room */
+body.sg-ui-v2 #sg-ui-v2-windowbar{position:sticky!important;top:0!important;}
+body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view){padding-top:18px!important;}
+body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view)>.sg-room-view{width:100%!important;max-width:none!important;margin:0!important;min-height:calc(100dvh - 64px)!important;}
+@media(max-width:760px){body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view){padding:14px 12px 24px!important;}body.sg-ui-v2 .app-shell>.main-content:has(> .sg-room-view)>.sg-room-view{min-height:calc(100dvh - 60px)!important;}}
