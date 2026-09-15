@@ -1,0 +1,7 @@
+(()=>{'use strict';
+const css=`.sg-pm2-table .sg-pm2-week{min-width:30px!important;width:30px!important;padding:3px!important;font-size:10px!important}.sg-pm2-calendar-row td,.sg-pm2-calendar-row th{vertical-align:bottom!important}.sg-pm2-calendar-mark{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;font-size:8px;font-weight:800;letter-spacing:.2px;height:74px;display:inline-flex;align-items:flex-start;justify-content:center}.sg-pm2-calendar-dot{height:74px;display:flex;align-items:flex-start;justify-content:center;font-size:10px;font-weight:900}.sg-pm2-calendar-label{font-weight:800!important;text-align:left!important;background:#f8fafc!important}.sg-pm2-event td{vertical-align:middle!important}.sg-pm2-table thead tr:nth-child(2) .sg-pm2-week{font-size:11px!important;font-weight:800!important}`;
+const style=()=>{if(document.getElementById('sgProsemPolishV1'))return;const s=document.createElement('style');s.id='sgProsemPolishV1';s.textContent=css;document.head.appendChild(s)};
+const clean=s=>String(s||'').trim();
+const apply=()=>{style();document.querySelectorAll('.sg-pm2-table').forEach(t=>{t.querySelectorAll('thead tr:nth-child(2) th').forEach((th,i)=>{th.textContent=String((i%5)+1)});t.querySelectorAll('td.sg-pm2-cell.event').forEach(td=>{td.textContent='';td.title=td.title||'';td.classList.add('sg-pm2-calendar-dot')});});};
+const observe=new MutationObserver(apply);observe.observe(document.documentElement,{childList:true,subtree:true});apply();window.__sgProsemProsemPolish=apply;
+})();
