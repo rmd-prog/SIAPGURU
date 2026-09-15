@@ -1,3 +1,4 @@
+@import url('siap-guru-home-v3.css?v=1');
 /* SIAP GURU UI V2 — clean portal shell: no sidebar and no macOS window chrome. */
 body.sg-ui-v2{background:#f7f8fa;color:#20242b}
 body.sg-ui-v2 #sg-ui-v2-sidebar,body.sg-ui-v2 #sg-ui-v2-windowbar,body.sg-ui-v2 #sg-ui-v2-mobile,body.sg-ui-v2 .sgv2-mobile-overlay{display:none!important}
