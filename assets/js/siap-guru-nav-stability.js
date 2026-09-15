@@ -14,7 +14,9 @@
     loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal',()=>{
       loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview',()=>{
         loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=5','atpDocumentPreviewSync',()=>{
-          loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1',done);
+          loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1',()=>{
+            loadScript('assets/js/siap-guru-atp-ui-fix-v1.js?v=1','atpUiFixV1',done);
+          });
         });
       });
     });
