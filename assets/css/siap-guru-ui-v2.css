@@ -1,10 +1,8 @@
-/* SIAP GURU UI V2 — room shell retained; desktop sidebar/window chrome disabled in favor of homepage navigation. */
+/* SIAP GURU UI V2 — clean portal shell: no sidebar and no macOS window chrome. */
 body.sg-ui-v2{background:#f7f8fa;color:#20242b}
 body.sg-ui-v2 #sg-ui-v2-sidebar,body.sg-ui-v2 #sg-ui-v2-windowbar,body.sg-ui-v2 #sg-ui-v2-mobile,body.sg-ui-v2 .sgv2-mobile-overlay{display:none!important}
+body.sg-ui-v2 .topbar,body.sg-ui-v2 .footer{display:none!important}
 body.sg-ui-v2 .main-content{margin:0!important;padding:0 24px 30px!important;max-width:none!important}
 body.sg-ui-v2 .main-content.sg-room-mode{padding:var(--sg-room-top,18px) var(--sg-room-right,24px) var(--sg-room-bottom,24px) var(--sg-room-left,250px)!important}
-body.sg-ui-v2 .app-shell{width:100%;min-height:100vh}
-body.sg-ui-v2 .topbar{display:none!important}
-body.sg-ui-v2 .footer{display:none!important}
-body.sg-ui-v2 .menu-section{display:none!important}
+body.sg-ui-v2 .menu-section{display:block!important}
 @media(max-width:760px){body.sg-ui-v2 .main-content{padding:0 14px 24px!important}body.sg-ui-v2 .main-content.sg-room-mode{padding:12px!important}}
