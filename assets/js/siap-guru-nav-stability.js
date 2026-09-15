@@ -9,6 +9,11 @@
     const t=e.target instanceof Element?e.target:null,link=t?.closest('.sg-topnav-link');
     if(!link)return;
     const label=link.textContent.trim();
+    if(label==='PROSEM'){
+      e.preventDefault();e.stopImmediatePropagation();
+      if(typeof window.__openSiapGuruProsem==='function'){window.__openSiapGuruProsem()}
+      return;
+    }
     if(label==='ATP'){
       if(e.__sgAtpReplay)return;
       e.preventDefault();e.stopImmediatePropagation();
