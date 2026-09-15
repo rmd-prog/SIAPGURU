@@ -1,65 +1,53 @@
 (()=>{
-  // Cross-device persistence: localStorage remains the fallback cache; D1 is the shared source.
-  const API_BASE='https://siapguru.adm-sd.workers.dev/api';
-  const PREFIX='siapguru_';
-  const rawUser=sessionStorage.getItem('siapguru_user');
-  let user=null;
-  try{user=rawUser?JSON.parse(rawUser):null}catch(_){user=null}
-  if(!user?.id)return;
-
-  let hydrating=false;
-  let ready=false;
-  const isSyncKey=key=>typeof key==='string'&&key.startsWith(PREFIX);
-  const safeValue=value=>typeof value==='string'?value:JSON.stringify(value??null);
-
-  const push=(key,value)=>{
-    if(!ready||hydrating||!isSyncKey(key))return;
-    fetch(`${API_BASE}/sync`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({user_id:user.id,key,value:safeValue(value)})}).catch(()=>{});
-  };
-  const removeRemote=key=>{
-    if(!ready||hydrating||!isSyncKey(key))return;
-    fetch(`${API_BASE}/sync`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({user_id:user.id,key,remove:true})}).catch(()=>{});
-  };
-
-  const originalSet=Storage.prototype.setItem;
-  const originalRemove=Storage.prototype.removeItem;
-  const originalClear=Storage.prototype.clear;
-  Storage.prototype.setItem=function(key,value){
-    originalSet.call(this,key,value);
-    if(this===window.localStorage)push(String(key),String(value));
-  };
-  Storage.prototype.removeItem=function(key){
-    originalRemove.call(this,key);
-    if(this===window.localStorage)removeRemote(String(key));
-  };
-  Storage.prototype.clear=function(){
-    const keys=[];
-    if(this===window.localStorage)for(let i=0;i<this.length;i++){const k=this.key(i);if(isSyncKey(k))keys.push(k)}
-    originalClear.call(this);
-    keys.forEach(removeRemote);
-  };
-
-  const boot=async()=>{
-    try{
-      const response=await fetch(`${API_BASE}/sync?user_id=${encodeURIComponent(user.id)}`,{cache:'no-store'});
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok||!data.ok)throw new Error('SYNC_FAILED');
-      const remote=Array.isArray(data.items)?data.items:[];
-      hydrating=true;
-      if(remote.length){
-        remote.forEach(item=>{if(isSyncKey(item.key)&&typeof item.value==='string')originalSet.call(window.localStorage,item.key,item.value)});
-      }else{
-        const local=[];
-        for(let i=0;i<window.localStorage.length;i++){const key=window.localStorage.key(i);if(isSyncKey(key))local.push([key,window.localStorage.getItem(key)])}
-        await Promise.all(local.map(([key,value])=>fetch(`${API_BASE}/sync`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({user_id:user.id,key,value})}).catch(()=>null)));
-      }
-    }catch(_){
-      // Offline/server failure must never block the existing localStorage workflow.
-    }finally{
-      hydrating=false;
-      ready=true;
-      window.dispatchEvent(new CustomEvent('siapguru-cloud-sync-ready'));
+'use strict';
+/* SIAP GURU cloud persistence v2
+   D1 is the shared source for explicitly supported user data.
+   localStorage remains the immediate UI cache.
+*/
+const API_BASE='https://siapguru.adm-sd.workers.dev/api';
+const raw=sessionStorage.getItem('siapguru_user');
+let user=null;try{user=raw?JSON.parse(raw):null}catch(_){user=null}
+if(!user?.id)return;
+const PREFIX='siapguru_';
+const SYNC_KEYS=new Set([
+  'siapguru_prota_draft',
+  'siapguru_prosem_draft',
+  'siapguru_tp_draft',
+  'siapguru_atp_draft',
+  'siapguru_cp_draft'
+]);
+let ready=false,hydrating=false,writeChain=Promise.resolve();
+const isKey=k=>SYNC_KEYS.has(String(k));
+const send=(key,value,remove=false)=>{
+  writeChain=writeChain.then(()=>fetch(`${API_BASE}/sync`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({user_id:String(user.id),key:String(key),...(remove?{remove:true}:{value:String(value??'')})})}).then(r=>r.ok?r.json():Promise.reject(new Error('SYNC_HTTP')))).catch(()=>null);
+  return writeChain;
+};
+const originalSet=Storage.prototype.setItem;
+const originalRemove=Storage.prototype.removeItem;
+Storage.prototype.setItem=function(key,value){
+  originalSet.call(this,key,value);
+  if(this===window.localStorage&&ready&&!hydrating&&isKey(key))send(key,value);
+};
+Storage.prototype.removeItem=function(key){
+  originalRemove.call(this,key);
+  if(this===window.localStorage&&ready&&!hydrating&&isKey(key))send(key,'',true);
+};
+async function boot(){
+  try{
+    const r=await fetch(`${API_BASE}/sync?user_id=${encodeURIComponent(user.id)}`,{cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.ok)throw new Error('SYNC_GET_FAILED');
+    const remote=Array.isArray(d.items)?d.items:[];
+    hydrating=true;
+    if(remote.length){
+      remote.forEach(x=>{if(isKey(x.key)&&typeof x.value==='string')originalSet.call(window.localStorage,x.key,x.value)});
+    }else{
+      const local=[];
+      for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(isKey(k))local.push([k,localStorage.getItem(k)])}
+      for(const [k,v] of local)await send(k,v);
     }
-  };
-  boot();
+  }catch(e){console.warn('SIAP GURU cloud sync:',e?.message||e)}
+  finally{hydrating=false;ready=true;window.dispatchEvent(new CustomEvent('siapguru-cloud-sync-ready'))}
+}
+boot();
 })();
