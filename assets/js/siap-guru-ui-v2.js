@@ -37,7 +37,7 @@ const ico=n=>`<svg viewBox="0 0 20 20" aria-hidden="true">${icons[n]||icons['Dok
 function originalCard(name){return [...document.querySelectorAll('.menu-card')].find(x=>(x.querySelector('h3')?.textContent||'').trim()===name)}
 function originalSub(name){return [...document.querySelectorAll('.sub-menu span,.sub-menu-button')].find(x=>(x.textContent||'').trim()===name)}
 function clickOriginal(name){const el=originalSub(name);if(el){el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));return true}const card=originalCard(name);if(card){card.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));return true}return false}
-function loadRoomShell(){if(document.querySelector('link[data-sg-room-shell]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href='assets/css/siap-guru-room-shell-v1.css?v=1';l.dataset.sgRoomShell='1';document.head.appendChild(l)}
+function loadRoomShell(){if(document.querySelector('link[data-sg-room-shell]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href='assets/css/siap-guru-room-shell-v1.css?v=2';l.dataset.sgRoomShell='1';document.head.appendChild(l)}
 function build(){if(document.getElementById(ID))return;
  const bar=document.createElement('div');bar.id=BAR;bar.innerHTML='<div class="sgd-traffic"><i class="sgd-dot"></i><i class="sgd-dot"></i><i class="sgd-dot"></i></div><div class="sgd-window-title">SIAP GURU</div><div class="sgd-window-tools"><button class="sgd-tool" type="button" aria-label="Pencarian">⌕</button><button class="sgd-tool" type="button" aria-label="Menu">•••</button></div>';document.body.appendChild(bar);
  const side=document.createElement('aside');side.id=ID;side.setAttribute('aria-label','Navigasi SIAP GURU');
@@ -47,12 +47,25 @@ function build(){if(document.getElementById(ID))return;
  const mob=document.createElement('button');mob.id=MOBILE;mob.type='button';mob.setAttribute('aria-label','Buka menu SIAP GURU');mob.textContent='☰';document.body.appendChild(mob);
  const actions=document.querySelector('.top-actions');if(actions){actions.classList.add('sgv2-userbox');document.getElementById('sgv2-user-slot').appendChild(actions)}
  side.querySelectorAll('[data-group]').forEach(btn=>btn.addEventListener('click',()=>{const name=btn.dataset.group;const sub=side.querySelector(`[data-sub="${CSS.escape(name)}"]`);const was=sub.classList.contains('open');side.querySelectorAll('.sgv2-sub').forEach(x=>x.classList.remove('open'));side.querySelectorAll('[data-group]').forEach(x=>x.classList.remove('open'));if(!was){sub.classList.add('open');btn.classList.add('open')}clickOriginal(name)}));
- side.querySelectorAll('[data-subitem]').forEach(btn=>btn.addEventListener('click',()=>{clickOriginal(btn.dataset.subitem);side.classList.remove('sgv2-mobile-open');overlay.classList.remove('open');setTimeout(sync,80)}));
- side.querySelector('[data-home]')?.addEventListener('click',()=>{clickOriginal('Beranda');side.classList.remove('sgv2-mobile-open');overlay.classList.remove('open');setTimeout(sync,80)});
+ side.querySelectorAll('[data-subitem]').forEach(btn=>btn.addEventListener('click',()=>{clickOriginal(btn.dataset.subitem);side.classList.remove('sgv2-mobile-open');overlay.classList.remove('open');setTimeout(sync,100)}));
+ side.querySelector('[data-home]')?.addEventListener('click',()=>{clickOriginal('Beranda');side.classList.remove('sgv2-mobile-open');overlay.classList.remove('open');setTimeout(sync,100)});
  mob.addEventListener('click',()=>{side.classList.toggle('sgv2-mobile-open');overlay.classList.toggle('open')});overlay.addEventListener('click',()=>{side.classList.remove('sgv2-mobile-open');overlay.classList.remove('open')});
 }
-function sync(){const homeVisible=document.getElementById('homeView')&&!document.getElementById('homeView').hidden;if(homeVisible)document.querySelector('[data-home]')?.classList.add('active');else document.querySelector('[data-home]')?.classList.remove('active')}
+function roomIsOpen(){
+ const home=document.getElementById('homeView');
+ if(home && !home.hidden) return false;
+ const main=document.querySelector('.main-content');
+ if(!main) return false;
+ return [...main.children].some(el=>!el.hidden && el.id!=='homeView');
+}
+function sync(){
+ const active=roomIsOpen();
+ document.body.classList.toggle('sg-room-mode',active);
+ document.querySelector('.main-content')?.classList.toggle('sg-room-mode',active);
+ const homeVisible=document.getElementById('homeView')&&!document.getElementById('homeView').hidden;
+ if(homeVisible)document.querySelector('[data-home]')?.classList.add('active');else document.querySelector('[data-home]')?.classList.remove('active');
+}
 function boot(){document.body.classList.add('sg-ui-v2');loadRoomShell();build();sync()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-const mo=new MutationObserver(()=>{if(!document.getElementById(ID))build();sync()});mo.observe(document.body,{childList:true,subtree:true});
+const mo=new MutationObserver(()=>{if(!document.getElementById(ID))build();sync()});mo.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class']});
 })();
