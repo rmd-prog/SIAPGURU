@@ -30,5 +30,8 @@ const boot=()=>{
  if(p?.items?.length){const sig=signature(p);if(saved?.items?.length&&saved.sourceSig===sig){state={...state,...saved,items:saved.items.map(x=>({...x,materi:x.materi||material(x),assessment:x.assessment||assessment(x)}))};$('sgProsemSchool').value=state.school||'SDN Muarasari 1';$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year||'2026/2027';$('sgProsemWeeks').value=state.weeks||36;$('sgProsemNotes').value=state.notes||'';render()}else{fromProta();show('PROSEM otomatis mengikuti PROTA terbaru.')}}else if(saved?.items?.length){state={...state,...saved};$('sgProsemSchool').value=state.school||'SDN Muarasari 1';$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year||'2026/2027';$('sgProsemWeeks').value=state.weeks||36;$('sgProsemNotes').value=state.notes||'';render()}else load();
  window.scrollTo({top:0,behavior:'smooth'});
 };
-document.addEventListener('click',e=>{const l=e.target.closest('.sg-topnav-link,.sub-menu span');if(l&&l.textContent.trim()==='PROSEM'){e.preventDefault();e.stopImmediatePropagation();boot()}},true);
+window.__openSiapGuruProsem=boot;
+const bindNav=()=>{document.querySelectorAll('.sg-topnav-link').forEach(link=>{if(link.textContent.trim()!=='PROSEM'||link.dataset.prosemBound==='1')return;link.dataset.prosemBound='1';link.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();boot()});})};
+bindNav();
+new MutationObserver(bindNav).observe(document.body,{childList:true,subtree:true});
 })();
