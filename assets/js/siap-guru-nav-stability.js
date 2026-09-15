@@ -4,21 +4,11 @@
   document.addEventListener('pointerdown',resetRpmGuard,true);
   document.addEventListener('click',resetRpmGuard,true);
   const loadScript=(src,marker)=>{if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.defer=true;document.head.appendChild(s)};
-  const replay=(link,marker,after)=>{if(link.dataset.sgReplay==='1')return;link.dataset.sgReplay='1';const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
+  const replay=(link,marker)=>{const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
   document.addEventListener('click',e=>{
     const t=e.target instanceof Element?e.target:null,link=t?.closest('.sg-topnav-link');
     if(!link)return;
     const label=link.textContent.trim();
-    if(label==='PROSEM'){
-      if(e.__sgProsemReplay)return;
-      e.preventDefault();e.stopImmediatePropagation();
-      /* PROSEM itself owns its room-opening handler. Do not gate that click
-         behind an optional bridge; otherwise a bridge failure can make PROSEM
-         appear dead. Load the scope enhancer independently. */
-      loadScript('assets/js/siap-guru-prosem-scope-v1.js?v=2','prosemScopeV2');
-      replay(link,'Prosem');
-      return;
-    }
     if(label==='ATP'){
       if(e.__sgAtpReplay)return;
       e.preventDefault();e.stopImmediatePropagation();
