@@ -1,34 +1,14 @@
 /* SIAP GURU — navigation stability */
 (()=>{
   const resetRpmGuard=e=>{const t=e.target instanceof Element?e.target:null,l=t?.closest('.sg-topnav-link');if(l&&l.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
-  document.addEventListener('pointerdown',resetRpmGuard,true);
-  document.addEventListener('click',resetRpmGuard,true);
+  document.addEventListener('pointerdown',resetRpmGuard,true);document.addEventListener('click',resetRpmGuard,true);
   const loadScript=(src,marker,onload)=>{if(document.querySelector(`script[data-${marker}]`)){if(typeof onload==='function')onload();return}const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>typeof onload==='function'&&onload();s.onerror=()=>console.error('[SIAP GURU] gagal memuat',src);document.head.appendChild(s)};
-  const openProsem=()=>{
-    loadScript('assets/js/siap-guru-prosem-matrix-v2.js?v=4','prosemMatrixFinalV4',()=>{
-      if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
-      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=4','prosemMatrixFixFinalV4',()=>{
-        loadScript('assets/js/siap-guru-prosem-matrix-calendar-v1.js?v=4','prosemMatrixCalendarFinalV4',()=>{
-          loadScript('assets/js/siap-guru-prosem-matrix-layout-fix-v1.js?v=4','prosemMatrixLayoutFixFinalV4',()=>{
-            loadScript('assets/js/siap-guru-prosem-matrix-export-fix-v1.js?v=4','prosemMatrixExportFixFinalV4',()=>{
-              loadScript('assets/js/siap-guru-prosem-matrix-polish-v1.js?v=4','prosemMatrixPolishFinalV4');
-            });
-          });
-        });
-      });
-    });
-  };
+  const openProsem=()=>loadScript('assets/js/siap-guru-prosem-matrix-v3.js?v=1','prosemMatrixFinalV3',()=>{if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem()});
   const replay=(link,marker)=>{const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
   document.addEventListener('click',e=>{
-    const t=e.target instanceof Element?e.target:null,link=t?.closest('.sg-topnav-link');
-    if(!link)return;
-    const label=link.textContent.trim();
-    if(label==='PROSEM'){e.preventDefault();e.stopImmediatePropagation();openProsem();return;}
-    if(label==='ATP'){
-      if(e.__sgAtpReplay)return;e.preventDefault();e.stopImmediatePropagation();
-      loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal');loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=6','atpDocumentPreviewSync');loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1');loadScript('assets/js/siap-guru-atp-ui-fix-v1.js?v=1','atpUiFixV1');loadScript('assets/js/siap-guru-atp-topic-v1.js?v=2','atpTopicV1');replay(link,'Atp');return;
-    }
-    if(label!=='TP'||e.__sgTpReplay)return;e.preventDefault();e.stopImmediatePropagation();
-    loadScript('assets/js/siap-guru-tp-auto-v1.js?v=2','tpAutoV4');loadScript('assets/js/siap-guru-tp-master-bridge-v1.js?v=1','tpMasterBridgeV1');loadScript('assets/js/siap-guru-tp-master-select-bridge-v1.js?v=1','tpMasterSelectBridgeV1');loadScript('assets/js/siap-guru-tp-topic-dropdown-v1.js?v=1','tpTopicDropdownV1');loadScript('assets/js/siap-guru-tp-topic-smart-v2.js?v=2','tpTopicSmartV2');loadScript('assets/js/siap-guru-tp-atp-import-sync-v1.js?v=1','tpAtpImportSyncV1');replay(link,'Tp');
+    const t=e.target instanceof Element?e.target:null,link=t?.closest('.sg-topnav-link');if(!link)return;const label=link.textContent.trim();
+    if(label==='PROSEM'){e.preventDefault();e.stopImmediatePropagation();openProsem();return}
+    if(label==='ATP'){if(e.__sgAtpReplay)return;e.preventDefault();e.stopImmediatePropagation();loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal');loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=6','atpDocumentPreviewSync');loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1');loadScript('assets/js/siap-guru-atp-ui-fix-v1.js?v=1','atpUiFixV1');loadScript('assets/js/siap-guru-atp-topic-v1.js?v=2','atpTopicV1');replay(link,'Atp');return}
+    if(label!=='TP'||e.__sgTpReplay)return;e.preventDefault();e.stopImmediatePropagation();loadScript('assets/js/siap-guru-tp-auto-v1.js?v=2','tpAutoV4');loadScript('assets/js/siap-guru-tp-master-bridge-v1.js?v=1','tpMasterBridgeV1');loadScript('assets/js/siap-guru-tp-master-select-bridge-v1.js?v=1','tpMasterSelectBridgeV1');loadScript('assets/js/siap-guru-tp-topic-dropdown-v1.js?v=1','tpTopicDropdownV1');loadScript('assets/js/siap-guru-tp-topic-smart-v2.js?v=2','tpTopicSmartV2');loadScript('assets/js/siap-guru-tp-atp-import-sync-v1.js?v=1','tpAtpImportSyncV1');replay(link,'Tp');
   },true);
 })();
