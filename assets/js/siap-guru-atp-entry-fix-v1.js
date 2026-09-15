@@ -1,0 +1,1 @@
+(()=>{document.querySelectorAll('.sub-menu span').forEach(el=>{const t=el.textContent.trim();if(t==='ATP'||t==='TP'||t==='PROSEM')el.classList.add('sg-topnav-link')})})();
