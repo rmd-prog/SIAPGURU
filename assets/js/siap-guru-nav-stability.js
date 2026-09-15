@@ -5,7 +5,7 @@
   document.addEventListener('click',resetRpmGuard,true);
   const loadScript=(src,marker,onload)=>{if(document.querySelector(`script[data-${marker}]`)){if(typeof onload==='function')onload();return}const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>typeof onload==='function'&&onload();s.onerror=()=>console.error('[SIAP GURU] gagal memuat',src);document.head.appendChild(s)};
   const openProsem=()=>{
-    loadScript('assets/js/siap-guru-prosem-matrix-v1.js?v=1','prosemMatrixFinal',()=>{
+    loadScript('assets/js/siap-guru-prosem-matrix-v2.js?v=1','prosemMatrixFinal',()=>{
       if(typeof window.__openSiapGuruProsem==='function'){window.__openSiapGuruProsem();return}
       loadScript('assets/js/siap-guru-prosem.js?v=10','prosemNavFinal',()=>{
         if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
