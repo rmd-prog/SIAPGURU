@@ -5,12 +5,14 @@
   document.addEventListener('click',resetRpmGuard,true);
   const loadScript=(src,marker,onload)=>{if(document.querySelector(`script[data-${marker}]`)){if(typeof onload==='function')onload();return}const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>typeof onload==='function'&&onload();s.onerror=()=>console.error('[SIAP GURU] gagal memuat',src);document.head.appendChild(s)};
   const openProsem=()=>{
-    loadScript('assets/js/siap-guru-prosem-matrix-v2.js?v=1','prosemMatrixFinal',()=>{
+    loadScript('assets/js/siap-guru-prosem-matrix-v2.js?v=2','prosemMatrixFinal',()=>{
       if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
-      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=1','prosemMatrixFixFinal',()=>{
-        loadScript('assets/js/siap-guru-prosem-matrix-calendar-v1.js?v=1','prosemMatrixCalendarFinal',()=>{
-          loadScript('assets/js/siap-guru-prosem-matrix-layout-fix-v1.js?v=1','prosemMatrixLayoutFixFinal',()=>{
-            loadScript('assets/js/siap-guru-prosem-matrix-export-fix-v1.js?v=1','prosemMatrixExportFixFinal');
+      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=2','prosemMatrixFixFinal',()=>{
+        loadScript('assets/js/siap-guru-prosem-matrix-calendar-v1.js?v=2','prosemMatrixCalendarFinal',()=>{
+          loadScript('assets/js/siap-guru-prosem-matrix-layout-fix-v1.js?v=2','prosemMatrixLayoutFixFinal',()=>{
+            loadScript('assets/js/siap-guru-prosem-matrix-export-fix-v1.js?v=2','prosemMatrixExportFixFinal',()=>{
+              loadScript('assets/js/siap-guru-prosem-matrix-polish-v1.js?v=2','prosemMatrixPolishFinal');
+            });
           });
         });
       });
