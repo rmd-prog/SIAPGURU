@@ -1,26 +1,44 @@
-/* SIAP GURU — PROSEM route bridge V2
-   Owns only the PROSEM menu route. It does not render or alter PROSEM data.
+/* SIAP GURU — PROSEM scope bridge V3
+   Passive only: no click interception, no stopPropagation, no replay.
 */
 (()=>{
-  if(window.__sgProsemRouteBridgeV2)return;
-  window.__sgProsemRouteBridgeV2=true;
-  const isProsem=el=>el instanceof Element&&el.textContent.trim()==='PROSEM';
-  const trigger=()=>{
-    const source=[...document.querySelectorAll('.sub-menu span')].find(isProsem);
-    if(source){source.click();return true}
-    const top=[...document.querySelectorAll('.sg-topnav-link')].find(isProsem);
-    if(top){top.click();return true}
-    return false;
+  if(window.__sgProsemScopeV3)return;
+  window.__sgProsemScopeV3=true;
+  try{
+    if(!document.querySelector('script[data-sg-prosem-route-v1]')){
+      const s=document.createElement('script');
+      s.src='assets/js/siap-guru-prosem-route-v1.js?v=1';
+      s.dataset.sgProsemRouteV1='1';
+      s.defer=true;
+      document.head.appendChild(s);
+    }
+  }catch(_){ }
+  const KEY='siapguru_prosem_draft';
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}};
+  const save=scope=>{try{const d=read()||{};localStorage.setItem(KEY,JSON.stringify({...d,scope,version:'PROSEM-4',savedAt:new Date().toISOString()}))}catch(_){}};
+  const apply=room=>{
+    if(!room||room.dataset.prosemScopeReady==='1')return;
+    const cards=[...room.querySelectorAll('.sg-prosem-card')];
+    if(cards.length<3)return;
+    room.dataset.prosemScopeReady='1';
+    const box=document.createElement('div');
+    box.className='sg-prosem-scope';
+    box.innerHTML='<label><span>Cakupan PROSEM</span><select id="sgProsemScope"><option value="1">Semester 1</option><option value="2">Semester 2</option><option value="year">1 Tahun</option></select></label>';
+    (cards[0].querySelector('.sg-prosem-actions')?.parentElement||cards[0]).appendChild(box);
+    const select=box.querySelector('#sgProsemScope');
+    const old=read();
+    select.value=['1','2','year'].includes(old?.scope)?old.scope:'year';
+    const refresh=()=>{
+      const v=select.value;
+      cards[1].hidden=v==='2';
+      cards[2].hidden=v==='1';
+      if(v==='year'){cards[1].hidden=false;cards[2].hidden=false}
+      save(v);
+    };
+    select.addEventListener('change',refresh);
+    refresh();
   };
-  window.addEventListener('click',e=>{
-    if(e.__sgProsemRouteReplay)return;
-    const t=e.target instanceof Element?e.target.closest('.sg-topnav-link'):null;
-    if(!isProsem(t))return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});
-    Object.defineProperty(ev,'__sgProsemRouteReplay',{value:true});
-    const source=[...document.querySelectorAll('.sub-menu span')].find(isProsem);
-    if(source)source.dispatchEvent(ev);else t.dispatchEvent(ev);
-  },true);
+  const scan=()=>document.querySelectorAll('.sg-prosem-room').forEach(apply);
+  scan();
+  if(typeof MutationObserver==='function')new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
 })();
