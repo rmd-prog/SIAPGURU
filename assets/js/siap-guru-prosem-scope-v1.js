@@ -1,18 +1,10 @@
-/* SIAP GURU — PROSEM scope bridge V3
-   Passive only: no click interception, no stopPropagation, no replay.
+/* SIAP GURU — PROSEM scope bridge V4
+   Passive only: enriches the PROSEM room after navigation.
+   Navigation ownership belongs to siap-guru-nav-stability.js.
 */
 (()=>{
-  if(window.__sgProsemScopeV3)return;
-  window.__sgProsemScopeV3=true;
-  try{
-    if(!document.querySelector('script[data-sg-prosem-route-v1]')){
-      const s=document.createElement('script');
-      s.src='assets/js/siap-guru-prosem-route-v1.js?v=1';
-      s.dataset.sgProsemRouteV1='1';
-      s.defer=true;
-      document.head.appendChild(s);
-    }
-  }catch(_){ }
+  if(window.__sgProsemScopeV4)return;
+  window.__sgProsemScopeV4=true;
   const KEY='siapguru_prosem_draft';
   const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}};
   const save=scope=>{try{const d=read()||{};localStorage.setItem(KEY,JSON.stringify({...d,scope,version:'PROSEM-4',savedAt:new Date().toISOString()}))}catch(_){}};
