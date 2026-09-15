@@ -21,16 +21,19 @@
     let state={school:'SDN Muarasari 1',subject:'',phase:'',class:'',year:'2026/2027',weeks:36,items:[],notes:''};
     const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const readProta=()=>{try{return JSON.parse(localStorage.getItem('siapguru_prota_draft')||'null')}catch(_){return null}};
-    const material=x=>x.materi||x.material||x.submateri||x.topic||'Materi pembelajaran';
-    const assessment=x=>x.assessment||x.asesmen||(/asesmen|evaluasi|latihan|penguatan/i.test(x.text||'')?'Latihan / asesmen':'Asesmen formatif');
+    const material=x=>x.topic||x.materi||x.material||x.submateri||x.bab||'Materi pembelajaran';
+    const assessment=x=>{const a=String(x.assessment||x.asesmen||'').trim();if(!a)return /asesmen|evaluasi|latihan|penguatan/i.test(x.text||'')?'Latihan / asesmen':'Asesmen formatif';return /^formatif$/i.test(a)?'Asesmen formatif':/^sumatif$/i.test(a)?'Asesmen sumatif':a;};
+    const note=x=>String(x.note||x.keterangan||'').trim()||'Pembelajaran reguler';
+    const normalize=x=>({...x,materi:material(x),assessment:assessment(x),note:note(x)});
     const renderRows=sem=>{
       const list=$('sgProsemList'+sem);
       const rows=state.items.map((x,i)=>({x,i})).filter(o=>String(o.x.semester)===String(sem));
       $('sgProsemCount'+sem).textContent=rows.length+' rencana';
       if(!rows.length){list.innerHTML='<tr><td colspan="8" class="sg-prosem-empty">Belum ada data Semester '+sem+'.</td></tr>';return;}
-      list.innerHTML=rows.map((o,n)=>{const x=o.x,i=o.i;return `<tr><td>${n+1}</td><td><input data-field="period" data-i="${i}" value="${esc(x.period)}" placeholder="Juli M3"></td><td><input data-field="materi" data-i="${i}" value="${esc(x.materi||material(x))}" placeholder="BAB / materi pokok"></td><td><textarea data-field="text" data-i="${i}">${esc(x.text)}</textarea></td><td><input class="sg-prosem-jp" type="number" min="1" data-field="jp" data-i="${i}" value="${Number(x.jp)||1}"></td><td><input data-field="assessment" data-i="${i}" value="${esc(x.assessment||'Asesmen formatif')}" placeholder="Asesmen formatif"></td><td><input data-field="note" data-i="${i}" value="${esc(x.note||'')}" placeholder="Reguler / penguatan"></td><td><button type="button" class="sg-prosem-del" data-del="${i}">Hapus</button></td></tr>`}).join('');
+      list.innerHTML=rows.map((o,n)=>{const x=o.x,i=o.i;return `<tr><td>${n+1}</td><td><input data-field="period" data-i="${i}" value="${esc(x.period)}" placeholder="Juli M3"></td><td><input data-field="materi" data-i="${i}" value="${esc(x.materi||material(x))}" placeholder="BAB / materi pokok"></td><td><textarea data-field="text" data-i="${i}">${esc(x.text)}</textarea></td><td><input class="sg-prosem-jp" type="number" min="1" data-field="jp" data-i="${i}" value="${Number(x.jp)||1}"></td><td><input data-field="assessment" data-i="${i}" value="${esc(x.assessment||assessment(x))}" placeholder="Asesmen formatif"></td><td><input data-field="note" data-i="${i}" value="${esc(x.note||note(x))}" placeholder="Pembelajaran reguler"></td><td><button type="button" class="sg-prosem-del" data-del="${i}">Hapus</button></td></tr>`}).join('');
     };
     const render=()=>{
+      state.items=state.items.map(normalize);
       renderRows(1);renderRows(2);
       const a=state.items.filter(x=>String(x.semester)==='1').reduce((n,x)=>n+Number(x.jp||0),0);
       const b=state.items.filter(x=>String(x.semester)==='2').reduce((n,x)=>n+Number(x.jp||0),0);
@@ -47,19 +50,19 @@
       const p=readProta();
       if(!p||!Array.isArray(p.items)||!p.items.length)return false;
       state.school=p.school||state.school;state.subject=p.subject||'';state.phase=p.phase||'';state.class=p.class||'';state.year=p.year||'2026/2027';state.weeks=Number(p.weeks)||36;
-      state.items=p.items.map(x=>({text:x.text||'',semester:String(x.semester||'1'),period:x.period||'',jp:Math.max(1,Number(x.jp)||2),topic:x.topic||'',materi:material(x),assessment:assessment(x),note:x.note||''}));
+      state.items=p.items.map(x=>normalize({text:x.text||'',semester:String(x.semester||'1'),period:x.period||'',jp:Math.max(1,Number(x.jp)||2),topic:x.topic||'',materi:x.materi||'',assessment:x.assessment||x.asesmen||'',note:x.note||x.keterangan||''}));
       $('sgProsemSchool').value=state.school;$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year;$('sgProsemWeeks').value=state.weeks;$('sgProsemNotes').value=state.notes;render();return true;
     };
     $('sgProsemLoad').onclick=()=>{if(fromProta())show(state.items.length+' rencana tersusun dari PROTA aktif.');else show('Belum ada PROTA tersimpan. Susun PROTA terlebih dahulu.');};
-    $('sgProsemAdd').onclick=()=>{sync();state.items.push({text:'',semester:state.items.some(x=>String(x.semester)==='1')?'2':'1',period:'',jp:2,topic:'',materi:'',assessment:'Asesmen formatif',note:''});render();};
+    $('sgProsemAdd').onclick=()=>{sync();state.items.push({text:'',semester:state.items.some(x=>String(x.semester)==='1')?'2':'1',period:'',jp:2,topic:'',materi:'',assessment:'Asesmen formatif',note:'Pembelajaran reguler'});render();};
     room.addEventListener('input',e=>{if(e.target.matches('[data-field],#sgProsemSchool,#sgProsemYear,#sgProsemWeeks,#sgProsemNotes'))sync();});
     room.addEventListener('change',e=>{if(e.target.matches('[data-field],#sgProsemSchool,#sgProsemYear,#sgProsemWeeks,#sgProsemNotes'))sync();});
     room.addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(b){sync();state.items.splice(Number(b.dataset.del),1);render();}});
     $('sgProsemClear').onclick=()=>{state.items=[];render();show('Form PROSEM dibersihkan.');};
-    $('sgProsemSave').onclick=()=>{sync();if(!state.items.length){show('Tambahkan minimal satu rencana.');return;}localStorage.setItem(KEY,JSON.stringify({...state,savedAt:new Date().toISOString(),version:'PROSEM-4'}));show('PROSEM tersimpan.');};
+    $('sgProsemSave').onclick=()=>{sync();if(!state.items.length){show('Tambahkan minimal satu rencana.');return;}localStorage.setItem(KEY,JSON.stringify({...state,savedAt:new Date().toISOString(),version:'PROSEM-5'}));show('PROSEM tersimpan.');};
     room.querySelector('.sg-room-back').onclick=()=>{room.remove();window.__sgProsemBoot=0;if(home)home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});};
     const saved=(()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}})();
-    if(saved?.items?.length){state={...state,...saved};$('sgProsemSchool').value=state.school||'SDN Muarasari 1';$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year||'2026/2027';$('sgProsemWeeks').value=state.weeks||36;$('sgProsemNotes').value=state.notes||'';render();}
+    if(saved?.items?.length){state={...state,...saved};state.items=state.items.map(normalize);$('sgProsemSchool').value=state.school||'SDN Muarasari 1';$('sgProsemSubject').value=state.subject||'-';$('sgProsemPhase').value=state.phase||'-';$('sgProsemClass').value=state.class||'-';$('sgProsemYear').value=state.year||'2026/2027';$('sgProsemWeeks').value=state.weeks||36;$('sgProsemNotes').value=state.notes||'';render();}
     else if(!fromProta())show('Belum ada PROTA tersimpan. Kamu bisa tambah baris manual.');
     window.scrollTo({top:0,behavior:'smooth'});
   };
