@@ -31,7 +31,7 @@ const boot=()=>{
  window.scrollTo({top:0,behavior:'smooth'});
 };
 window.__openSiapGuruProsem=boot;
-const bindNav=()=>{document.querySelectorAll('.sg-topnav-link').forEach(link=>{if(link.textContent.trim()!=='PROSEM'||link.dataset.prosemBound==='1')return;link.dataset.prosemBound='1';link.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();boot()});})};
+const bindNav=()=>{document.querySelectorAll('.sg-topnav-link').forEach(link=>{if(link.textContent.trim()!=='PROSEM'||link.dataset.prosemBound==='1')return;link.dataset.prosemBound='1';link.onclick=e=>{e.preventDefault();e.stopPropagation();boot()};})};
 bindNav();
 new MutationObserver(bindNav).observe(document.body,{childList:true,subtree:true});
 })();
