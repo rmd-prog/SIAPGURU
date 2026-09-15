@@ -1,22 +1,27 @@
-/* SIAP GURU HOME V3 — portal layout based on the approved reference structure. */
-:root{--sgh-bg:#f7f8fa;--sgh-surface:#fff;--sgh-text:#20242b;--sgh-muted:#6f7783;--sgh-line:#e2e5e9;--sgh-accent:#4f67e8;--sgh-soft:#edf0ff;--sgh-max:1180px;--sgh-radius:14px}
-body.sg-ui-v2 .sg-home-v3{display:block;width:100%;max-width:var(--sgh-max);margin:0 auto}
-body.sg-ui-v2 .sg-home-v3-header{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:18px 0 17px;border-bottom:1px solid var(--sgh-line)}
-body.sg-ui-v2 .sg-home-v3-logo{font-size:19px;font-weight:800;letter-spacing:-.04em;color:var(--sgh-text);white-space:nowrap}
-body.sg-ui-v2 .sg-home-v3-nav{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-body.sg-ui-v2 .sg-home-v3-nav button{border:0;background:transparent;color:var(--sgh-muted);font:600 11px/1.2 inherit;padding:8px 10px;border-radius:8px;cursor:pointer}
-body.sg-ui-v2 .sg-home-v3-nav button:hover,body.sg-ui-v2 .sg-home-v3-nav button.active{background:var(--sgh-soft);color:#4359c8}
-body.sg-ui-v2 .sg-home-v3-hero{padding:58px 0 42px;text-align:center}
-body.sg-ui-v2 .sg-home-v3-hero .eyebrow{margin-bottom:10px;color:#68779b!important;font-size:9px!important;font-weight:750!important;letter-spacing:.14em!important;text-transform:uppercase}
-body.sg-ui-v2 .sg-home-v3-hero h1{margin:0;color:var(--sgh-text)!important;font-size:clamp(30px,4vw,48px)!important;line-height:1.08!important;letter-spacing:-.055em!important;font-weight:800!important}
-body.sg-ui-v2 .sg-home-v3-hero p{max-width:650px;margin:15px auto 0;color:var(--sgh-muted)!important;font-size:13px!important;line-height:1.65!important}
-body.sg-ui-v2 .sg-home-v3-hero .cta{display:inline-flex;margin-top:22px;align-items:center;justify-content:center;border:0;border-radius:9px;padding:10px 17px;background:var(--sgh-accent);color:#fff;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 7px 18px rgba(79,103,232,.18)}
-body.sg-ui-v2 .sg-home-v3-section-title{display:flex;align-items:end;justify-content:space-between;margin:0 0 12px}.sg-home-v3-section-title h2{margin:0!important;font-size:15px!important;color:var(--sgh-text)!important}.sg-home-v3-section-title span{font-size:9px;color:#9aa1ac}
-body.sg-ui-v2 .sg-home-v3-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-body.sg-ui-v2 .sg-home-v3-card{min-height:145px;padding:20px;border:1px solid var(--sgh-line);border-radius:var(--sgh-radius);background:var(--sgh-surface);box-shadow:0 7px 22px rgba(35,45,60,.045);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
-body.sg-ui-v2 .sg-home-v3-card:hover{transform:translateY(-2px);border-color:#cfd5e4;box-shadow:0 12px 28px rgba(35,45,60,.08)}
-body.sg-ui-v2 .sg-home-v3-icon{width:38px;height:38px;display:grid;place-items:center;margin-bottom:17px;border-radius:10px;background:var(--sgh-soft);color:var(--sgh-accent);font-size:16px;font-weight:800}
-body.sg-ui-v2 .sg-home-v3-card h3{margin:0;color:var(--sgh-text);font-size:14px;letter-spacing:-.02em}.sg-home-v3-card p{margin:6px 0 0;color:var(--sgh-muted);font-size:10px;line-height:1.55}
-body.sg-ui-v2 .sg-home-v3-footer{padding:36px 0 18px;margin-top:35px;border-top:1px solid var(--sgh-line);text-align:center;color:#9aa1ac;font-size:9px}
-@media(max-width:900px){body.sg-ui-v2 .sg-home-v3{max-width:100%}body.sg-ui-v2 .sg-home-v3-header{align-items:flex-start;flex-direction:column;gap:13px}body.sg-ui-v2 .sg-home-v3-nav{justify-content:flex-start;width:100%}body.sg-ui-v2 .sg-home-v3-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.sg-home-v3-nav{display:grid!important;grid-template-columns:repeat(2,1fr);width:100%!important}.sg-home-v3-nav button{text-align:left}.sg-home-v3-hero{padding:38px 0 32px!important}.sg-home-v3-grid{grid-template-columns:1fr!important;gap:10px!important}.sg-home-v3-card{min-height:120px!important;padding:17px!important}.sg-home-v3-icon{margin-bottom:13px!important}}
+/* SIAP GURU HOME V3 — homepage menu is the primary navigation. Existing menu-card click handlers are preserved. */
+body.sg-ui-v2 #homeView{max-width:1180px;margin:0 auto}
+body.sg-ui-v2 #homeView .dashboard-welcome{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:42px 0 34px;border-bottom:1px solid #e2e5e9}
+body.sg-ui-v2 #homeView .dashboard-welcome .eyebrow,body.sg-ui-v2 #homeView .dashboard-section .eyebrow,body.sg-ui-v2 #homeView .menu-section .eyebrow{font-size:9px;letter-spacing:.14em;font-weight:800;color:#68779b}
+body.sg-ui-v2 #homeView .dashboard-welcome h1{margin:7px 0 8px;font-size:clamp(28px,4vw,44px);line-height:1.08;letter-spacing:-.055em;color:#20242b}
+body.sg-ui-v2 #homeView .dashboard-welcome p{margin:0;max-width:650px;color:#6f7783;font-size:12px;line-height:1.65}
+body.sg-ui-v2 #homeView .teacher-chip{border:1px solid #e2e5e9;background:#fff;border-radius:12px;padding:12px 15px;min-width:145px;box-shadow:0 6px 18px rgba(35,45,60,.04)}
+body.sg-ui-v2 #homeView .teacher-chip strong{display:block;font-size:12px;color:#20242b}body.sg-ui-v2 #homeView .teacher-chip span{display:block;margin-top:3px;font-size:9px;color:#8a929e}
+body.sg-ui-v2 #homeView .dashboard-section{padding:26px 0 8px}
+body.sg-ui-v2 #homeView .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+body.sg-ui-v2 #homeView .summary-card{border:1px solid #e2e5e9;background:#fff;border-radius:11px;padding:14px;box-shadow:0 5px 16px rgba(35,45,60,.035)}
+body.sg-ui-v2 #homeView .summary-card strong{font-size:11px;color:#20242b}body.sg-ui-v2 #homeView .summary-card span:last-child{font-size:9px;line-height:1.45;color:#7c8490}
+body.sg-ui-v2 #homeView .summary-icon{width:28px;height:28px;margin-bottom:9px;border-radius:8px;background:#edf0ff;color:#4f67e8;font-size:12px}
+body.sg-ui-v2 #homeView .menu-section{display:block!important;padding:28px 0 0}
+body.sg-ui-v2 #homeView .menu-section .section-heading{display:flex;align-items:end;justify-content:space-between;margin-bottom:13px}
+body.sg-ui-v2 #homeView .menu-section .section-heading h2{margin:3px 0 0;font-size:16px;color:#20242b;letter-spacing:-.02em}
+body.sg-ui-v2 #homeView .structure-note{font-size:9px;color:#9aa1ac}
+body.sg-ui-v2 #homeView .main-menu-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+body.sg-ui-v2 #homeView .menu-card{position:relative;display:flex;flex-direction:column;min-height:154px;padding:18px;border:1px solid #e2e5e9;border-radius:13px;background:#fff;box-shadow:0 7px 22px rgba(35,45,60,.045);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;cursor:pointer}
+body.sg-ui-v2 #homeView .menu-card:hover{transform:translateY(-2px);border-color:#cfd5e4;box-shadow:0 12px 28px rgba(35,45,60,.08)}
+body.sg-ui-v2 #homeView .menu-icon{width:38px;height:38px;margin-bottom:18px;border-radius:10px;background:#edf0ff;color:#4f67e8;font-size:16px}
+body.sg-ui-v2 #homeView .menu-card h3{margin:0;color:#20242b;font-size:13px;letter-spacing:-.02em}
+body.sg-ui-v2 #homeView .menu-card p{margin:6px 0 0;color:#737b87;font-size:9px;line-height:1.5}
+body.sg-ui-v2 #homeView .sub-menu{display:none!important}
+body.sg-ui-v2 #homeView .menu-card.active-menu{border-color:#cbd3f7;background:#fbfbff}
+@media(max-width:1000px){body.sg-ui-v2 #homeView .main-menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){body.sg-ui-v2 #homeView .dashboard-welcome{align-items:flex-start;flex-direction:column;padding:30px 0 24px}body.sg-ui-v2 #homeView .teacher-chip{width:100%;box-sizing:border-box}body.sg-ui-v2 #homeView .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.sg-ui-v2 #homeView .main-menu-grid{grid-template-columns:1fr;gap:9px}body.sg-ui-v2 #homeView .menu-card{min-height:108px;padding:15px}body.sg-ui-v2 #homeView .menu-icon{margin-bottom:12px}}
