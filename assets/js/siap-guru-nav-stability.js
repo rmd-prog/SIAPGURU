@@ -39,7 +39,13 @@
     if(!link)return;
     const label=link.textContent.trim();
     if(label==='PROSEM'){
-      loadScript('assets/js/siap-guru-prosem-scope-v1.js?v=1','prosemScopeV1');
+      if(e.__sgProsemReplay)return;
+      e.preventDefault();e.stopImmediatePropagation();
+      loadScript('assets/js/siap-guru-prosem-scope-v1.js?v=2','prosemScopeV2',()=>{
+        const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});
+        Object.defineProperty(ev,'__sgProsemReplay',{value:true});
+        link.dispatchEvent(ev);
+      });
       return;
     }
     if(label==='ATP'){
