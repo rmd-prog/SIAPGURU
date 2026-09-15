@@ -1,0 +1,98 @@
+/* SIAP GURU — ROOM SYSTEM V2
+   Structural visual layer for every room.
+   Geometry/visuals only: no data, storage, navigation or business logic. */
+:root{
+  --sg-r2-max:var(--sg-container-max,1220px);
+  --sg-r2-gap:var(--sg-grid-gap,20px);
+  --sg-r2-radius:var(--sg-radius-lg,14px);
+  --sg-r2-bg:var(--sg-bg,#f6f8fb);
+  --sg-r2-surface:var(--sg-surface,#fff);
+  --sg-r2-border:var(--sg-border,#dbe2ea);
+  --sg-r2-text:var(--sg-text,#172033);
+  --sg-r2-muted:var(--sg-text-muted,#64748b);
+  --sg-r2-primary:var(--sg-primary,#2563eb);
+}
+body.sg-ui-v2.sg-room-mode .main-content{background:var(--sg-r2-bg)!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room){
+  width:min(100%,var(--sg-r2-max))!important;max-width:var(--sg-r2-max)!important;margin:0 auto!important;padding:0 0 36px!important;color:var(--sg-r2-text)!important;
+}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-head{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:24px!important;
+  min-height:116px!important;margin:0 0 18px!important;padding:22px 26px!important;
+  border:1px solid var(--sg-r2-border)!important;border-radius:var(--sg-r2-radius)!important;
+  background:var(--sg-r2-surface)!important;box-shadow:none!important;
+}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-title-row{margin-top:6px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-title-row h1{font-size:clamp(24px,2.4vw,32px)!important;color:var(--sg-r2-text)!important;letter-spacing:-.04em!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-title-row p{font-size:12px!important;color:var(--sg-r2-muted)!important;max-width:720px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-icon{width:42px!important;height:42px!important;border-radius:11px!important;background:var(--sg-primary-soft,#eff6ff)!important;border-color:var(--sg-border)!important;color:var(--sg-r2-primary)!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-status{border-color:var(--sg-r2-border)!important;background:var(--sg-surface-raised,#fff)!important;color:var(--sg-r2-muted)!important}
+
+/* Every legacy room becomes a vertical workspace: header -> controls -> content -> actions. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-body,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-room,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-room,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-shell,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) [class*="-workspace"]{
+  width:100%!important;max-width:none!important;margin:0!important;display:flex!important;flex-direction:column!important;gap:var(--sg-r2-gap)!important;
+}
+
+/* Panels are surfaces, not floating cards. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-card,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-panel,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-card,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .panel,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .card{
+  background:var(--sg-r2-surface)!important;border:1px solid var(--sg-r2-border)!important;border-radius:var(--sg-r2-radius)!important;box-shadow:none!important;
+}
+
+/* CP — reference/document workspace. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-controls{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-grid{grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr)!important;gap:14px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-element{background:var(--sg-surface-muted,#f8fafc)!important;border-color:var(--sg-r2-border)!important}
+
+/* TP — one-column objective list; no 3-column card wall. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-toolbar{grid-template-columns:2fr 1.2fr .7fr .7fr .9fr 1.4fr auto auto!important;gap:8px!important;padding:16px!important;background:var(--sg-surface-muted,#f8fafc)!important;border:1px solid var(--sg-r2-border)!important;border-radius:12px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-list{display:flex!important;flex-direction:column!important;gap:0!important;margin-top:0!important;border-top:1px solid var(--sg-r2-border)!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-item{display:grid!important;grid-template-columns:42px minmax(0,1fr) auto!important;gap:14px!important;padding:17px 4px!important;border:0!important;border-bottom:1px solid var(--sg-r2-border)!important;border-radius:0!important;box-shadow:none!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-number{width:32px!important;height:32px!important;border-radius:8px!important;background:var(--sg-primary-soft,#eff6ff)!important;color:var(--sg-r2-primary)!important;border:0!important}
+
+/* PROTA — planning board, not a stack of decorative cards. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-command{grid-template-columns:minmax(0,1fr) auto!important;border-radius:12px!important;background:var(--sg-r2-surface)!important;box-shadow:none!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-flow{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;border:1px solid var(--sg-r2-border)!important;border-radius:12px!important;overflow:hidden!important;background:var(--sg-r2-surface)!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-flow-step{border:0!important;border-right:1px solid var(--sg-r2-border)!important;border-radius:0!important;background:transparent!important;min-height:54px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-flow-step:last-child{border-right:0!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-card{padding:0!important;overflow:hidden!important}
+
+/* Tables — shared precision grid. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) table{border-collapse:separate!important;border-spacing:0!important;background:var(--sg-r2-surface)!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) table th{background:var(--sg-surface-muted,#f8fafc)!important;color:var(--sg-r2-muted)!important;border-bottom:1px solid var(--sg-r2-border)!important;font-weight:700!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) table td{border-bottom:1px solid var(--sg-r2-border)!important;color:var(--sg-r2-text)!important}
+
+/* Inputs/buttons — shared geometry. */
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) input:not([type=checkbox]):not([type=radio]),
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) select,
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) textarea{min-height:40px!important;border:1px solid var(--sg-r2-border)!important;background:var(--sg-r2-surface)!important;color:var(--sg-r2-text)!important;border-radius:8px!important}
+body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) button{min-height:34px!important;border-radius:8px!important}
+
+@media(max-width:900px){
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-head{grid-template-columns:1fr!important;gap:12px!important;min-height:auto!important;padding:18px!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-controls{grid-template-columns:1fr 1fr!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-grid{grid-template-columns:1fr!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-toolbar{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media(max-width:640px){
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room){padding-bottom:20px!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-head{margin-bottom:12px!important;padding:16px!important;border-radius:11px!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-room-title-row h1{font-size:22px!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-cp-controls{grid-template-columns:1fr!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-toolbar{grid-template-columns:1fr 1fr!important;padding:12px!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-list{border-top:0!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-item{grid-template-columns:32px minmax(0,1fr)!important;gap:10px!important;padding:14px 0!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-tp-actions{grid-column:2!important;justify-self:end!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-flow{grid-template-columns:1fr 1fr!important}
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-flow-step{border-bottom:1px solid var(--sg-r2-border)!important}
+}
+@media(max-width:430px){
+ body.sg-ui-v2.sg-room-mode .sg-room-view:not(.sg-atp-room) .sg-prota-flow{grid-template-columns:1fr!important}
+}
