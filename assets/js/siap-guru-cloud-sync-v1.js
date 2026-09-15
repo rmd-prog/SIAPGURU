@@ -1,15 +1,17 @@
 (()=>{
 'use strict';
-/* SIAP GURU cloud persistence v3
-   Semua data aplikasi yang memakai namespace siapguru_* pada localStorage
-   disinkronkan ke D1 per akun guru. Remote hanya menggantikan cache lokal
-   bila key remote memang ada; key lokal yang belum ada di cloud di-upload.
+/* SIAP GURU cloud persistence v4
+   Sinkronisasi dilakukan sebelum modul membaca ulang data cloud. Jika D1
+   memiliki data yang berbeda dari cache perangkat, halaman dimuat ulang
+   sekali setelah hydration agar semua modul membaca data cloud terbaru.
 */
 const API_BASE='https://siapguru.adm-sd.workers.dev/api';
 const raw=sessionStorage.getItem('siapguru_user');
 let user=null;try{user=raw?JSON.parse(raw):null}catch(_){user=null}
 if(!user?.id)return;
 const PREFIX='siapguru_';
+const RELOAD_FLAG='siapguru_sync_reload_in_progress_v1';
+if(sessionStorage.getItem(RELOAD_FLAG)==='1')sessionStorage.removeItem(RELOAD_FLAG);
 let ready=false,hydrating=false,writeChain=Promise.resolve();
 const isKey=k=>String(k||'').startsWith(PREFIX)&&String(k)!=='siapguru_user';
 const send=(key,value,remove=false)=>{
@@ -41,6 +43,7 @@ function localKeys(){
   return out;
 }
 async function boot(){
+  let remoteChanged=false;
   try{
     const r=await fetch(`${API_BASE}/sync?user_id=${encodeURIComponent(user.id)}`,{cache:'no-store'});
     const d=await r.json().catch(()=>({}));
@@ -48,9 +51,14 @@ async function boot(){
     const remote=Array.isArray(d.items)?d.items:[];
     const remoteKeys=new Set(remote.map(x=>String(x?.key||'')));
     hydrating=true;
-    /* Remote wins only for keys that actually exist remotely. */
+    /* Remote wins only when the key exists in D1. Track real changes. */
     for(const x of remote){
-      if(isKey(x.key)&&typeof x.value==='string')originalSet.call(window.localStorage,x.key,x.value);
+      if(!isKey(x.key)||typeof x.value!=='string')continue;
+      const old=window.localStorage.getItem(x.key);
+      if(old!==x.value){
+        remoteChanged=true;
+        originalSet.call(window.localStorage,x.key,x.value);
+      }
     }
     /* First device / newly introduced module: upload local data not yet in D1. */
     for(const [k,v] of localKeys()){
@@ -62,6 +70,12 @@ async function boot(){
     hydrating=false;
     ready=true;
     window.dispatchEvent(new CustomEvent('siapguru-cloud-sync-ready'));
+    /* Modules are defer-loaded and may already have read old local data.
+       Reload once so every module initializes from the hydrated cloud cache. */
+    if(remoteChanged&&sessionStorage.getItem(RELOAD_FLAG)!=='1'){
+      sessionStorage.setItem(RELOAD_FLAG,'1');
+      setTimeout(()=>window.location.reload(),80);
+    }
   }
 }
 boot();
