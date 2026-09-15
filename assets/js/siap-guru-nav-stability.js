@@ -6,12 +6,8 @@
   const loadScript=(src,marker,onload)=>{if(document.querySelector(`script[data-${marker}]`)){if(typeof onload==='function')onload();return}const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>typeof onload==='function'&&onload();s.onerror=()=>console.error('[SIAP GURU] gagal memuat',src);document.head.appendChild(s)};
   const openProsem=()=>{
     loadScript('assets/js/siap-guru-prosem-matrix-v2.js?v=1','prosemMatrixFinal',()=>{
-      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=1','prosemMatrixFixFinal',()=>{
-        if(typeof window.__openSiapGuruProsem==='function'){window.__openSiapGuruProsem();return}
-        loadScript('assets/js/siap-guru-prosem.js?v=10','prosemNavFinal',()=>{
-          if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
-        });
-      });
+      if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
+      loadScript('assets/js/siap-guru-prosem-matrix-fix-v1.js?v=1','prosemMatrixFixFinal');
     });
   };
   const replay=(link,marker)=>{const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
