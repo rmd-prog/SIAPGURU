@@ -1,4 +1,5 @@
 (()=>{
+  // Cross-device persistence: localStorage remains the fallback cache; D1 is the shared source.
   const API_BASE='https://siapguru.adm-sd.workers.dev/api';
   const PREFIX='siapguru_';
   const rawUser=sessionStorage.getItem('siapguru_user');
