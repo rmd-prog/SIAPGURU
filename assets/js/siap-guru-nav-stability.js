@@ -3,7 +3,13 @@
   const resetRpmGuard=e=>{const t=e.target instanceof Element?e.target:null,l=t?.closest('.sg-topnav-link');if(l&&l.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
   document.addEventListener('pointerdown',resetRpmGuard,true);
   document.addEventListener('click',resetRpmGuard,true);
-  const loadScript=(src,marker)=>{if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.defer=true;document.head.appendChild(s)};
+  const loadScript=(src,marker,onload)=>{if(document.querySelector(`script[data-${marker}]`)){if(typeof onload==='function')onload();return}const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>typeof onload==='function'&&onload();s.onerror=()=>console.error('[SIAP GURU] gagal memuat',src);document.head.appendChild(s)};
+  const openProsem=()=>{
+    if(typeof window.__openSiapGuruProsem==='function'){window.__openSiapGuruProsem();return}
+    loadScript('assets/js/siap-guru-prosem.js?v=6','prosemNavFinal',()=>{
+      if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
+    });
+  };
   const replay=(link,marker)=>{const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
   document.addEventListener('click',e=>{
     const t=e.target instanceof Element?e.target:null,link=t?.closest('.sg-topnav-link');
@@ -11,7 +17,7 @@
     const label=link.textContent.trim();
     if(label==='PROSEM'){
       e.preventDefault();e.stopImmediatePropagation();
-      if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem();
+      openProsem();
       return;
     }
     if(label==='ATP'){
