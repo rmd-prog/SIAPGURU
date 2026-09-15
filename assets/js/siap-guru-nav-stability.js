@@ -38,6 +38,10 @@
     const link=target?.closest('.sg-topnav-link');
     if(!link)return;
     const label=link.textContent.trim();
+    if(label==='PROSEM'){
+      loadScript('assets/js/siap-guru-prosem-scope-v1.js?v=1','prosemScopeV1');
+      return;
+    }
     if(label==='ATP'){
       if(e.__sgAtpReplay)return;
       e.preventDefault();e.stopImmediatePropagation();
