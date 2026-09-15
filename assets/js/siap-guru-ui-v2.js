@@ -37,6 +37,7 @@ const ico=n=>`<svg viewBox="0 0 20 20" aria-hidden="true">${icons[n]||icons['Dok
 function originalCard(name){return [...document.querySelectorAll('.menu-card')].find(x=>(x.querySelector('h3')?.textContent||'').trim()===name)}
 function originalSub(name){return [...document.querySelectorAll('.sub-menu span,.sub-menu-button')].find(x=>(x.textContent||'').trim()===name)}
 function clickOriginal(name){const el=originalSub(name);if(el){el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));return true}const card=originalCard(name);if(card){card.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));return true}return false}
+function loadRoomShell(){if(document.querySelector('link[data-sg-room-shell]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href='assets/css/siap-guru-room-shell-v1.css?v=1';l.dataset.sgRoomShell='1';document.head.appendChild(l)}
 function build(){if(document.getElementById(ID))return;
  const bar=document.createElement('div');bar.id=BAR;bar.innerHTML='<div class="sgd-traffic"><i class="sgd-dot"></i><i class="sgd-dot"></i><i class="sgd-dot"></i></div><div class="sgd-window-title">SIAP GURU</div><div class="sgd-window-tools"><button class="sgd-tool" type="button" aria-label="Pencarian">⌕</button><button class="sgd-tool" type="button" aria-label="Menu">•••</button></div>';document.body.appendChild(bar);
  const side=document.createElement('aside');side.id=ID;side.setAttribute('aria-label','Navigasi SIAP GURU');
@@ -51,7 +52,7 @@ function build(){if(document.getElementById(ID))return;
  mob.addEventListener('click',()=>{side.classList.toggle('sgv2-mobile-open');overlay.classList.toggle('open')});overlay.addEventListener('click',()=>{side.classList.remove('sgv2-mobile-open');overlay.classList.remove('open')});
 }
 function sync(){const homeVisible=document.getElementById('homeView')&&!document.getElementById('homeView').hidden;if(homeVisible)document.querySelector('[data-home]')?.classList.add('active');else document.querySelector('[data-home]')?.classList.remove('active')}
-function boot(){document.body.classList.add('sg-ui-v2');build();sync()}
+function boot(){document.body.classList.add('sg-ui-v2');loadRoomShell();build();sync()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 const mo=new MutationObserver(()=>{if(!document.getElementById(ID))build();sync()});mo.observe(document.body,{childList:true,subtree:true});
 })();
