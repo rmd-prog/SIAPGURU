@@ -1,0 +1,22 @@
+/* SIAP GURU HOME V3 — portal layout based on the approved reference structure. */
+:root{--sgh-bg:#f7f8fa;--sgh-surface:#fff;--sgh-text:#20242b;--sgh-muted:#6f7783;--sgh-line:#e2e5e9;--sgh-accent:#4f67e8;--sgh-soft:#edf0ff;--sgh-max:1180px;--sgh-radius:14px}
+body.sg-ui-v2 .sg-home-v3{display:block;width:100%;max-width:var(--sgh-max);margin:0 auto}
+body.sg-ui-v2 .sg-home-v3-header{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:18px 0 17px;border-bottom:1px solid var(--sgh-line)}
+body.sg-ui-v2 .sg-home-v3-logo{font-size:19px;font-weight:800;letter-spacing:-.04em;color:var(--sgh-text);white-space:nowrap}
+body.sg-ui-v2 .sg-home-v3-nav{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+body.sg-ui-v2 .sg-home-v3-nav button{border:0;background:transparent;color:var(--sgh-muted);font:600 11px/1.2 inherit;padding:8px 10px;border-radius:8px;cursor:pointer}
+body.sg-ui-v2 .sg-home-v3-nav button:hover,body.sg-ui-v2 .sg-home-v3-nav button.active{background:var(--sgh-soft);color:#4359c8}
+body.sg-ui-v2 .sg-home-v3-hero{padding:58px 0 42px;text-align:center}
+body.sg-ui-v2 .sg-home-v3-hero .eyebrow{margin-bottom:10px;color:#68779b!important;font-size:9px!important;font-weight:750!important;letter-spacing:.14em!important;text-transform:uppercase}
+body.sg-ui-v2 .sg-home-v3-hero h1{margin:0;color:var(--sgh-text)!important;font-size:clamp(30px,4vw,48px)!important;line-height:1.08!important;letter-spacing:-.055em!important;font-weight:800!important}
+body.sg-ui-v2 .sg-home-v3-hero p{max-width:650px;margin:15px auto 0;color:var(--sgh-muted)!important;font-size:13px!important;line-height:1.65!important}
+body.sg-ui-v2 .sg-home-v3-hero .cta{display:inline-flex;margin-top:22px;align-items:center;justify-content:center;border:0;border-radius:9px;padding:10px 17px;background:var(--sgh-accent);color:#fff;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 7px 18px rgba(79,103,232,.18)}
+body.sg-ui-v2 .sg-home-v3-section-title{display:flex;align-items:end;justify-content:space-between;margin:0 0 12px}.sg-home-v3-section-title h2{margin:0!important;font-size:15px!important;color:var(--sgh-text)!important}.sg-home-v3-section-title span{font-size:9px;color:#9aa1ac}
+body.sg-ui-v2 .sg-home-v3-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+body.sg-ui-v2 .sg-home-v3-card{min-height:145px;padding:20px;border:1px solid var(--sgh-line);border-radius:var(--sgh-radius);background:var(--sgh-surface);box-shadow:0 7px 22px rgba(35,45,60,.045);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+body.sg-ui-v2 .sg-home-v3-card:hover{transform:translateY(-2px);border-color:#cfd5e4;box-shadow:0 12px 28px rgba(35,45,60,.08)}
+body.sg-ui-v2 .sg-home-v3-icon{width:38px;height:38px;display:grid;place-items:center;margin-bottom:17px;border-radius:10px;background:var(--sgh-soft);color:var(--sgh-accent);font-size:16px;font-weight:800}
+body.sg-ui-v2 .sg-home-v3-card h3{margin:0;color:var(--sgh-text);font-size:14px;letter-spacing:-.02em}.sg-home-v3-card p{margin:6px 0 0;color:var(--sgh-muted);font-size:10px;line-height:1.55}
+body.sg-ui-v2 .sg-home-v3-footer{padding:36px 0 18px;margin-top:35px;border-top:1px solid var(--sgh-line);text-align:center;color:#9aa1ac;font-size:9px}
+@media(max-width:900px){body.sg-ui-v2 .sg-home-v3{max-width:100%}body.sg-ui-v2 .sg-home-v3-header{align-items:flex-start;flex-direction:column;gap:13px}body.sg-ui-v2 .sg-home-v3-nav{justify-content:flex-start;width:100%}body.sg-ui-v2 .sg-home-v3-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){body.sg-ui-v2 .sg-home-v3-header{padding:14px 0}.sg-home-v3-nav{display:grid!important;grid-template-columns:repeat(2,1fr);width:100%!important}.sg-home-v3-nav button{text-align:left}.sg-home-v3-hero{padding:38px 0 32px!important}.sg-home-v3-grid{grid-template-columns:1fr!important;gap:10px!important}.sg-home-v3-card{min-height:120px!important;padding:17px!important}.sg-home-v3-icon{margin-bottom:13px!important}}
