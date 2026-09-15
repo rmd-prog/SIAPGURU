@@ -200,8 +200,58 @@ a:hover{color:var(--sg-primary-hover)}
 
 /* 12. RESPONSIVE */
 @media(max-width:1080px){.sg-menu-grid,.sg-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){:root{--sg-card-padding:16px;--sg-grid-gap:14px;--sg-section-gap:22px;--sg-control-height:44px}.sg-container,.sg-container-narrow{padding-inline:12px}.sg-menu-grid,.sg-card-grid,.sg-form-grid{grid-template-columns:1fr}.sg-card,.sg-room-card,.sg-menu-card{border-radius:var(--sg-radius-md)}.sg-btn{width:100%}}
+@media(max-width:720px){:root{--sg-card-padding:16px;--sg-grid-gap:14px;--sg-section-gap:22px}.sg-container,.sg-container-narrow{padding-inline:12px}.sg-menu-grid,.sg-card-grid,.sg-form-grid{grid-template-columns:1fr}.sg-card,.sg-room-card,.sg-menu-card{border-radius:var(--sg-radius-md)}.sg-btn{width:100%}}
 
 /* 13. ACCESSIBILITY */
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
 :focus-visible{outline:3px solid var(--sg-focus);outline-offset:2px}
+
+/* 14. RESPONSIVE TYPOGRAPHIC SCALE & SCREEN SYSTEM */
+:root{
+  --font-size-sm:0.8125rem;
+  --font-size-base:1rem;
+  --font-size-md:1.125rem;
+  --font-size-lg:1.5rem;
+  --font-size-xl:2rem;
+  --line-height-body:1.5;
+  --line-height-heading:1.2;
+  --sg-responsive-container-max:1200px;
+  --sg-responsive-mobile-padding:16px;
+}
+
+body{font-size:var(--font-size-base);line-height:var(--line-height-body)}
+h1,h2,h3,h4,h5,h6{line-height:var(--line-height-heading)}
+
+/* Explicit scale utilities: rem-based and safe to reuse in every room. */
+.sg-text-sm{font-size:var(--font-size-sm)!important}
+.sg-text-base{font-size:var(--font-size-base)!important}
+.sg-text-md{font-size:var(--font-size-md)!important}
+.sg-text-lg{font-size:var(--font-size-lg)!important}
+.sg-text-xl{font-size:var(--font-size-xl)!important}
+
+/* Semantic room/page headings. Existing room-specific layout remains untouched. */
+.sg-page-title,.sg-room-title{font-size:var(--font-size-xl);line-height:var(--line-height-heading)}
+.sg-section-title,.sg-subheader{font-size:var(--font-size-lg);line-height:var(--line-height-heading)}
+.sg-room-card .sg-card-title,.sg-menu-card .sg-card-title{font-size:var(--font-size-md)}
+.sg-caption,.sg-sub-label{font-size:var(--font-size-sm);line-height:1.4}
+
+/* Desktop: centered content rail at 1200px. ATP and other special room layouts are not forced into columns. */
+@media(min-width:768px){
+  .sg-container,.sg-container-narrow{width:min(100%,var(--sg-responsive-container-max));margin-inline:auto}
+  .sg-responsive-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sg-grid-gap)}
+  .sg-responsive-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sg-grid-gap)}
+  .sg-responsive-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sg-grid-gap)}
+}
+
+/* Mobile: one column, 16px side padding, compact 24px H1. */
+@media(max-width:767px){
+  .sg-container,.sg-container-narrow{width:100%;max-width:none;margin-inline:0;padding-inline:var(--sg-responsive-mobile-padding)}
+  .sg-responsive-grid,.sg-responsive-grid-3,.sg-responsive-grid-4{grid-template-columns:1fr}
+  .sg-page-title,.sg-room-title,.sg-h1{font-size:1.5rem;line-height:var(--line-height-heading)}
+  .sg-section-title,.sg-subheader{font-size:1.25rem;line-height:var(--line-height-heading)}
+}
+
+/* Keep existing room-grid behavior, but guarantee a single column on phones. */
+@media(max-width:767px){
+  .sg-room-grid{grid-template-columns:1fr}
+}
