@@ -17,7 +17,9 @@
     return `Buku teks/SIBI, media visual, lingkungan sekitar, dan LKPD yang relevan dengan ${t}.`;
   };
   const source=(t,m)=>{const s=m.toLowerCase();if(s.includes('matematika'))return 'Buku teks/SIBI, contoh soal kontekstual, benda konkret, lingkungan sekitar, dan sumber belajar digital yang relevan.';if(s.includes('ipas'))return 'Buku teks/SIBI, lingkungan alam sekitar, hasil pengamatan/percobaan, dan sumber digital tepercaya.';if(s.includes('pendidikan pancasila'))return 'Buku teks/SIBI, lingkungan sekolah/masyarakat, contoh situasi nyata, dan sumber belajar resmi.';if(s.includes('bahasa indonesia'))return 'Buku teks/SIBI, teks bacaan yang sesuai topik, contoh penggunaan bahasa, dan sumber belajar resmi.';return `Buku teks/SIBI, bahan referensi pendukung, lingkungan sekitar, dan sumber belajar resmi yang relevan dengan ${t}.`};
-  const apply=()=>{const r=document.querySelector(ROOM);if(!r)return;const t=topic(),m=subject();if(!t)return;const a=r.querySelector('#sgPaMedia'),b=r.querySelector('#sgPaSource');if(a&&!text(a.value))a.value=media(t,m);if(b&&!text(b.value))b.value=source(t,m)};
+  const genericMedia=v=>/Media pembelajaran yang relevan dengan/i.test(text(v));
+  const genericSource=v=>/Buku teks\/SIBI, lingkungan sekitar, dan sumber digital yang relevan/i.test(text(v));
+  const apply=()=>{const r=document.querySelector(ROOM);if(!r)return;const t=topic(),m=subject();if(!t)return;const a=r.querySelector('#sgPaMedia'),b=r.querySelector('#sgPaSource');if(a&&(!text(a.value)||genericMedia(a.value)))a.value=media(t,m);if(b&&(!text(b.value)||genericSource(b.value)))b.value=source(t,m)};
   if(window.__sgPerangkatMediaSourceV1)return;window.__sgPerangkatMediaSourceV1=1;
   new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('change',e=>{if(e.target?.id==='sgPaTopic')setTimeout(apply,20)},true);
