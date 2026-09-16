@@ -4,7 +4,8 @@ if(window.__SIAP_GURU_RPM_CALENDAR_UI_V1__)return;
 window.__SIAP_GURU_RPM_CALENDAR_UI_V1__=true;
 const C=()=>window.SiapGuruRPMCalendar;
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function loadDateEngine(){if(window.SiapGuruRPMDate)return Promise.resolve();if(document.querySelector('script[data-sg-rpm-date-engine]'))return Promise.resolve();return new Promise(resolve=>{const s=document.createElement('script');s.src='assets/js/siap-guru-rpm-date-engine-v1.js?v=1';s.defer=true;s.dataset.sgRpmDateEngine='1';s.onload=resolve;s.onerror=resolve;document.head.appendChild(s)})}
+function loadScript(src,attr){if(document.querySelector(`script[${attr}]`))return Promise.resolve();return new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.defer=true;s.setAttribute(attr,'1');s.onload=resolve;s.onerror=resolve;document.head.appendChild(s)})}
+function loadEngines(){return loadScript('assets/js/siap-guru-rpm-date-engine-v1.js?v=1','data-sg-rpm-date-engine').then(()=>loadScript('assets/js/siap-guru-rpm-date-bridge-v1.js?v=1','data-sg-rpm-date-bridge'))}
 function mount(){
  if(document.querySelector('[data-sg-rpm-calendar]'))return;
  const anchor=document.querySelector('.sg-rpm-room'); if(!anchor)return;
@@ -16,6 +17,6 @@ function mount(){
  box.querySelector('#sgRCalAdd').onclick=()=>{if(!date.value)return;C()?.add(year.value,date.value,note.value.trim());note.value='';render()};
  year.onchange=render;list.onclick=e=>{const b=e.target.closest('[data-remove]');if(b){C()?.remove(year.value,b.dataset.remove);render()}};render();
 }
-const boot=()=>{if(document.querySelector('.sg-rpm-room'))loadDateEngine().then(mount)};
+const boot=()=>{if(document.querySelector('.sg-rpm-room'))loadEngines().then(mount)};
 new MutationObserver(boot).observe(document.body,{childList:true,subtree:true});boot();
 })();
