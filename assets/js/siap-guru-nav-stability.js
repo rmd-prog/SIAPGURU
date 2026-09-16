@@ -13,7 +13,7 @@
   loadScript('assets/js/siap-guru-perangkat-rpm-bridge-v1.js?v=3','perangkatRpmBridgeV3');
   loadScript('assets/js/siap-guru-perangkat-auto-v2.js?v=16','perangkatAutoV16',watchPerangkatMaterial);
   loadScript('assets/js/siap-guru-perangkat-state-guard-v1.js?v=1','perangkatStateGuardV1');
-  loadScript('assets/js/siap-guru-perangkat-polish-v1.js?v=2','perangkatPolishV2');
+  loadScript('assets/js/siap-guru-perangkat-polish-v1.js?v=3','perangkatPolishV3');
   watchPerangkatMaterial();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startMasterHydrate,{once:true});else startMasterHydrate();
 })();
