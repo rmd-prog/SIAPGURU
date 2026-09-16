@@ -1,0 +1,27 @@
+(()=>{
+'use strict';
+if(window.__SIAP_GURU_RPM_TOPIC_SYNC_V1__)return;
+window.__SIAP_GURU_RPM_TOPIC_SYNC_V1__=true;
+const clean=s=>String(s??'').replace(/\s+/g,' ').trim();
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const user=()=>{try{return JSON.parse(sessionStorage.getItem('siapguru_user')||'null')}catch(_){return null}};
+const getTopics=()=>{const api=window.SiapGuruMasterBab;return api?.getAll?api.getAll():[]};
+const same=(x,a,b,c,d)=>String(x?.mapel||'')===String(a||'')&&String(x?.kelas||'')===String(c||'')&&String(x?.semester||'')===String(d||'');
+const tpFor=(topic)=>{try{const p=JSON.parse(localStorage.getItem('siapguru_tp_draft')||'null');if(!p||!Array.isArray(p.items))return[];const ok=String(p.topic||'')===String(topic.bab||'')&&(!p.subject||String(p.subject)===String(topic.mapel||''))&&(!p.class||String(p.class)===String(topic.kelas||''))&&(!p.semester||String(p.semester)===String(topic.semester||''));return ok?p.items.map(x=>({text:x.text||'',element:x.element||'-',jp:Number(x.jp)||2})).filter(x=>x.text):[]}catch(_){return[]}};
+const install=()=>{const room=document.querySelector('.sg-rpm-room');if(!room||room.dataset.topicSyncV1==='1')return false;const topicInput=room.querySelector('#sgRTopic');const actions=room.querySelector('.sg-rpm-actions');const subject=room.querySelector('#sgRSubject');const phaseClass=room.querySelector('#sgRPhaseClass');const semester=room.querySelector('#sgRSemester');const jp=room.querySelector('#sgRJP');const tpList=room.querySelector('#sgRTpList');if(!topicInput||!actions||!subject||!phaseClass||!semester||!jp||!tpList)return false;room.dataset.topicSyncV1='1';
+const label=document.createElement('label');label.className='sg-rpm-field';label.innerHTML='<span>Topik / Bab</span>';const select=document.createElement('select');select.id='sgRTopicSelect';select.innerHTML='<option value="">Pilih BAB / Topik...</option>';label.appendChild(select);topicInput.closest('.sg-rpm-field')?.replaceWith(label);
+const refresh=()=>{const topics=getTopics().filter(x=>same(x,subject.value,'',phaseClass.value,semester.value)||true).filter(x=>{const pc=String(phaseClass.value||'');return String(x.mapel||'')===String(subject.value||'')&&(!pc||pc.includes(String(x.kelas||''))||pc.includes(String(x.fase||'')))&&String(x.semester||'')===String(semester.value||'')});const old=select.dataset.topic||'';select.innerHTML='<option value="">Pilih BAB / Topik...</option>'+topics.map((x,i)=>`<option value="${esc(x.id||i)}">${esc(x.bab||`BAB ${i+1}`)}</option>`).join('');const found=topics.find(x=>String(x.id)===old||String(x.bab)===old);if(found)select.value=String(found.id||'');return topics};
+const context=topic=>{const t=clean(topic?.bab);const sub=Array.isArray(topic?.subtopik)?topic.subtopik.filter(Boolean).map(clean):[];const tp=tpFor(topic);return {t,sub,tp}};
+const apply=topic=>{if(!topic)return;const c=context(topic);select.dataset.topic=String(topic.id||topic.bab||'');topicInput.value=c.t;subject.value=topic.mapel||subject.value;phaseClass.value=[topic.fase,topic.kelas].filter(Boolean).join(' / ')||phaseClass.value;semester.value=String(topic.semester||semester.value);jp.value=Math.max(1,Number(topic.jp)||2);let list=c.tp;if(!list.length&&Array.isArray(topic.tp))list=topic.tp.map(x=>typeof x==='string'?{text:x,element:'-',jp:2}:{text:x.text||'',element:x.element||'-',jp:Number(x.jp)||2}).filter(x=>x.text);tpList.innerHTML=list.length?list.map((x,i)=>`<label class="sg-rpm-tp"><input type="checkbox" checked data-tp="${i}"><div><strong>TP ${i+1}. ${esc(x.text)}</strong><small>Elemen CP: ${esc(x.element||'-')} • ${x.jp||2} JP</small></div></label>`).join(''):'<div class="sg-rpm-empty">TP untuk BAB ini belum tersedia.</div>';
+const content=room.querySelector('#sgRContent');if(content)content.value=t;
+const material=room.querySelector('#sgRMaterial');if(material&&!material.value)material.value=`Materi pembelajaran berfokus pada ${t}${c.sub.length?` dengan subtopik ${c.sub.join(', ')}`:''}.`;
+const source=room.querySelector('#sgRSource');if(source&&!source.value)source.value=topic.source||'';
+try{sessionStorage.setItem('siapguru_selected_topic',JSON.stringify(topic))}catch(_){ }
+window.dispatchEvent(new CustomEvent('sg:rpm-topic-changed',{detail:{topic,context:c}}));
+try{window.__SG_RPM_AUTO_SYNC?.()}catch(_){ }
+};
+const addPick=()=>{if(room.querySelector('#sgRChooseTopic'))return;const b=document.createElement('button');b.id='sgRChooseTopic';b.type='button';b.className='sg-rpm-secondary';b.textContent='↻ Muat BAB';b.addEventListener('click',()=>refresh());actions.insertBefore(b,actions.firstChild)};
+const boot=()=>{addPick();refresh();const u=user();const author=room.querySelector('#sgRAuthor');if(author&&u?.nama){author.value=u.nama;author.readOnly=true;author.dataset.auto='1'}select.addEventListener('change',()=>{const topics=refresh();const t=topics.find(x=>String(x.id)===String(select.value));if(t)apply(t);});[subject,semester].forEach(e=>e.addEventListener('change',()=>refresh()));const old=topicInput.value;if(old){const t=getTopics().find(x=>String(x.bab)===old);if(t){select.value=String(t.id||'');apply(t)}}};
+boot();return true};
+const obs=new MutationObserver(()=>{const r=install();if(r){} });obs.observe(document.documentElement,{childList:true,subtree:true});let n=0;const timer=setInterval(()=>{if(install()||++n>60)clearInterval(timer)},250);
+})();
