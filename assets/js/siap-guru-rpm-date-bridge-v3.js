@@ -4,7 +4,7 @@ if(window.__SIAP_GURU_RPM_DATE_BRIDGE_V3__)return;
 window.__SIAP_GURU_RPM_DATE_BRIDGE_V3__=true;
 const S=()=>window.SiapGuruRPMSchedule,C=()=>window.SiapGuruRPMCalendar,M=()=>window.SiapGuruMasterBab;
 const $=(root,id)=>root?.querySelector('#'+id),norm=s=>String(s??'').trim(),clean=s=>norm(s).replace(/\s+/g,' '),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const cls=v=>{const s=clean(v);return s.match(/(?:kelas\s*)?([1-6])(?:\s*\)?\s*)$/i)?.[1]||s.match(/\b([1-6])\b/)?.[1]||''};
+const cls=v=>{const s=clean(v).toUpperCase().replace(/KELAS\s*/i,'').trim();const roman={I:'1',II:'2',III:'3',IV:'4',V:'5',VI:'6'};if(roman[s])return roman[s];const m=s.match(/(?:^|\b)([1-6])(?:\s*\)?\s*)$/);return m?.[1]||s.match(/\b([1-6])\b/)?.[1]||''};
 const dayName=n=>['','Senin','Selasa','Rabu','Kamis','Jumat'][n]||'';
 const jp=x=>Number(x?.jp)||Number(x?.alokasi)||Number(x?.jam)||2;
 const bab=x=>{let b=clean(x?.bab);if(b&&!/^(materi|materi pembelajaran|pembelajaran)$/i.test(b))return b;let t=clean(x?.text||x?.materi||x?.topic),m=t.match(/^(?:TP\s*)?(\d+)\.(\d+)/i)||t.match(/\bBAB\s*(\d+)\b/i);return m?'BAB '+m[1]:''};
