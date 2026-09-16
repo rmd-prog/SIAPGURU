@@ -1,6 +1,6 @@
 (()=>{
-const MEDIA_SOURCE='assets/js/siap-guru-perangkat-media-source-v1.js?v=2';
-if(!document.querySelector('script[data-sg-perangkat-media-source-v1]')){const s=document.createElement('script');s.src=MEDIA_SOURCE;s.dataset.sgPerangkatMediaSourceV1='1';document.head.appendChild(s)}
+const MEDIA_SOURCE='assets/js/siap-guru-perangkat-media-source-v1.js?v=3';
+if(!document.querySelector('script[data-sg-perangkat-media-source-v3]')){const old=document.querySelector('script[data-sg-perangkat-media-source-v1]');if(old)old.remove();const s=document.createElement('script');s.src=MEDIA_SOURCE;s.dataset.sgPerangkatMediaSourceV3='1';document.head.appendChild(s)}
 const HANDOFF='siapguru_rpm_handoff';
 const esc=s=>String(s??'');
 const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}};
