@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
-if(window.__SIAP_GURU_RPM_DATE_BRIDGE_V2__)return;
-window.__SIAP_GURU_RPM_DATE_BRIDGE_V2__=true;
+if(window.__SIAP_GURU_RPM_DATE_BRIDGE_V3__)return;
+window.__SIAP_GURU_RPM_DATE_BRIDGE_V3__=true;
 const S=()=>window.SiapGuruRPMSchedule,D=()=>window.SiapGuruRPMDate,C=()=>window.SiapGuruRPMCalendar;
 const $=(root,id)=>root?.querySelector('#'+id);
 const cls=v=>String(v||'').match(/\b([1-6])\b/)?.[1]||'';
@@ -40,7 +40,7 @@ function mount(){
  render();
  return true;
 }
-window.SiapGuruRPMDateBridge={version:'RPM-DATE-BRIDGE-V2',mount};
+window.SiapGuruRPMDateBridge={version:'RPM-DATE-BRIDGE-V3',mount};
 const watch=()=>mount();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});
 new MutationObserver(watch).observe(document.documentElement,{childList:true,subtree:true});
