@@ -4,15 +4,18 @@
   const resetRpmGuard=e=>{const l=getLink(e);if(l&&l.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
   document.addEventListener('pointerdown',resetRpmGuard,true);document.addEventListener('click',resetRpmGuard,true);
 
-  /* Home V3 bridge: the redesigned cards replace the old menu DOM, so their
-     clicks must be routed to the existing, already-bound application actions. */
-  const originalSub=name=>[...document.querySelectorAll('.sub-menu span,.sub-menu-button')]
-    .find(x=>(x.textContent||'').trim().toLowerCase()===String(name).trim().toLowerCase());
-  const originalView=name=>{const el=originalSub(name);if(!el)return false;el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));return true};
+  /* Home V3 bridge: route redesigned controls to the actual module controls.
+     Main cards cannot be clicked directly because the legacy menu is hidden. */
+  const findText=selector=>name=>[...document.querySelectorAll(selector)].find(x=>(x.textContent||'').trim().toLowerCase()===String(name).trim().toLowerCase());
+  const originalSub=findText('.sub-menu span,.sub-menu-button');
+  const topLink=findText('.sg-topnav-link');
+  const fire=el=>{if(!el)return false;el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));return true};
+  const originalView=name=>fire(topLink(name))||fire(originalSub(name));
   const home=()=>{document.querySelector('.sg-room-view')?.remove();const h=document.getElementById('homeView'),s=document.getElementById('studentsView'),p=document.getElementById('profileView');if(h)h.hidden=false;if(s)s.hidden=true;if(p)p.hidden=true;window.scrollTo({top:0,behavior:'smooth'});};
   const route=name=>{
     if(name==='Beranda'){home();return true}
     if(name==='Satuan Pendidikan'){if(typeof window.SiapGuruSchoolInfo?.open==='function'){window.SiapGuruSchoolInfo.open();return true}return false}
+    /* These are real module entry points, not the parent menu cards. */
     const map={'Pembelajaran':'CP','Asesmen':'Penilaian','Peserta Didik':'Data Siswa','Dokumen':'Draft'};
     return originalView(map[name]||name);
   };
