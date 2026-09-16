@@ -8,7 +8,7 @@ const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_) {}};
 const topic=room=>clean(room?.querySelector('#sgPaTopic')?.value);
 const escRe=s=>String(s||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const stripContext=(s,t)=>clean(s)
-  .replace(new RegExp(`\\s+pada\\s+${escRe(t)}(?=\\s*[,;.]|\\s*$)`,'gi'),'')
+  .replace(new RegExp('\\s+pada\\s+'+escRe(t)+'(?=\\s*[,;.\\s]|$)','gi'),'')
   .replace(/\s+dalam pembelajaran\s+.*?\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'')
   .replace(/\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'')
   .replace(/\s{2,}/g,' ')
@@ -16,20 +16,22 @@ const stripContext=(s,t)=>clean(s)
 const polishDiff=(v,t)=>{
   let s=stripContext(v,t);
   if(!s)return '';
-  const m=s.match(/^(Diferensiasi\\s+[^:]+:\s*konten difokuskan pada\\s+)(.*?)(;\\s*proses\\s+)/i);
+  const m=s.match(/^(Diferensiasi\s+[^:]+:\s*konten difokuskan pada\s+)(.*?)(;\s*proses\s+)/i);
   if(!m)return s;
-  const focus=clean(m[2]).replace(/\\s+pada\\s+$/i,'');
+  const focus=clean(m[2]).replace(/\s+pada\s+$/i,'');
   return `${m[1]}${focus}; proses untuk peserta didik yang memerlukan dukungan menggunakan contoh konkret, pemodelan, pertanyaan penuntun, dan langkah bertahap pada fokus tersebut, sedangkan peserta didik yang sudah mencapai tujuan mendapat tantangan untuk memperluas atau menerapkan fokus pada konteks baru; produk dapat berupa teks/hasil tulisan dan presentasi lisan sesuai tingkat kesiapan, disesuaikan dengan kesiapan tanpa mengubah tujuan inti.`;
 };
 const polishFollow=(v,t)=>{
   let s=stripContext(v,t);
   if(!s)return '';
-  const m=s.match(/^Remedial dan pengayaan\\s+[^:]+:\s*remedial mengulang dan memperkuat\\s+(.*?)(?:,\\s*contoh konkret|\\s+melalui\\s+penjelasan ulang|;\\s*pengayaan memperluas)\\s*(.*)$/i);
-  if(m){
-    let focus=clean(m[1]).replace(/\\s+pada\\s+$/i,'');
-    return `Remedial dan pengayaan ${t}: remedial mengulang dan memperkuat ${focus} melalui penjelasan ulang, contoh konkret, latihan terbimbing, umpan balik, dan perbaikan hasil kerja sampai tujuan inti tercapai; pengayaan memperluas ${focus} melalui konteks baru, tugas yang lebih kompleks, pengembangan teks/hasil tulisan dan presentasi lisan sesuai tingkat kesiapan, atau presentasi/penjelasan mandiri.`;
-  }
-  return s;
+  const prefix=new RegExp('^Remedial dan pengayaan\\s+[^:]+:\\s*remedial mengulang dan memperkuat\\s+','i');
+  if(!prefix.test(s))return s;
+  const body=s.replace(prefix,'');
+  const marker=body.search(/\s*(?:,\s*contoh konkret|\s+melalui\s+penjelasan ulang|;\s*pengayaan memperluas)\b/i);
+  if(marker<0)return s;
+  const focus=clean(body.slice(0,marker)).replace(/[,:;.]\s*$/,'').replace(/\s+pada\s+$/i,'');
+  if(!focus)return s;
+  return `Remedial dan pengayaan ${t}: remedial mengulang dan memperkuat ${focus} melalui penjelasan ulang, contoh konkret, latihan terbimbing, umpan balik, dan perbaikan hasil kerja sampai tujuan inti tercapai; pengayaan memperluas ${focus} melalui konteks baru, tugas yang lebih kompleks, pengembangan teks/hasil tulisan dan presentasi lisan sesuai tingkat kesiapan, atau presentasi/penjelasan mandiri.`;
 };
 const sync=room=>{
   const t=topic(room);
@@ -55,8 +57,8 @@ const sync=room=>{
   write(CTX,db);
 };
 const boot=()=>{
-  if(window.__sgPerangkatPolishV2)return;
-  window.__sgPerangkatPolishV2=1;
+  if(window.__sgPerangkatPolishV3)return;
+  window.__sgPerangkatPolishV3=1;
   const run=()=>{const room=document.querySelector(ROOM);if(room)sync(room)};
   new MutationObserver(run).observe(document.body,{childList:true,subtree:true,characterData:true});
   document.addEventListener('input',e=>{if(e.target?.id==='sgPaDifferentiation'||e.target?.id==='sgPaFollowup')run()},true);
