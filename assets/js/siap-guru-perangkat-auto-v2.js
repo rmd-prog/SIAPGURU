@@ -1,10 +1,21 @@
 (()=>{
 const ROOM='.sg-perangkat-room';
+const GLOBAL='SEMUA BAB / 1 TAHUN';
 const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}};
 const text=v=>String(v??'').trim();
 const esc=s=>text(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let applying=false;
 const pick=(x,...keys)=>{for(const k of keys){if(x&&x[k]!=null&&text(x[k]))return x[k]}return ''};
+const selectedMaster=()=>{try{return JSON.parse(sessionStorage.getItem('siapguru_selected_topic')||'null')||{}}catch(_){return {}}};
+const masterRows=()=>window.SiapGuruMasterBab?.getAll?.()||[];
+const canonicalSelected=()=>{
+ const sel=selectedMaster();
+ const all=masterRows();
+ if(sel?.id){const hit=all.find(x=>String(x.id)===String(sel.id));if(hit)return hit}
+ const name=text(sel?.bab||sel?.topic);
+ if(name){const hit=all.find(x=>text(x.bab)===name);if(hit)return hit}
+ return sel;
+};
 const records=()=>{
  const out=[];
  const add=(x,inheritedTopic='',inheritedSemester='')=>{
@@ -25,22 +36,25 @@ const records=()=>{
   ['items','rows','data','tp','lessons','chapters','topics','records'].forEach(k=>{if(x[k])walk(x[k],d+1,nextTopic,nextSemester)});
  };
  ['siapguru_tp_draft','siapguru_prota_draft','siapguru_prosem_draft','siapguru_atp_draft'].forEach(k=>walk(read(k)));
- try{const selected=JSON.parse(sessionStorage.getItem('siapguru_selected_topic')||'null');if(selected)walk(selected)}catch(_){ }
  return out;
 };
 const ctxKey=t=>text(t)||'__tanpa_bab__';
 const contexts=()=>read('siapguru_perangkat_bab_context_v1')||{};
 const saveContext=room=>{
  if(applying)return;
- const topic=text(room.querySelector('#sgPaTopic')?.value);if(!topic)return;
+ const topic=text(room.querySelector('#sgPaTopic')?.value);if(!topic||topic===GLOBAL)return;
  const db=contexts();db[ctxKey(topic)]={topic,manual:true,material:text(room.querySelector('#sgPaMaterial')?.value),media:text(room.querySelector('#sgPaMedia')?.value),source:text(room.querySelector('#sgPaSource')?.value),notes:text(room.querySelector('#sgPaNotes')?.value),lkpd:text(room.querySelector('#sgPaLkpd')?.value),assessment:text(room.querySelector('#sgPaAssessment')?.value),differentiation:text(room.querySelector('#sgPaDifferentiation')?.value),followup:text(room.querySelector('#sgPaFollowup')?.value)};localStorage.setItem('siapguru_perangkat_bab_context_v1',JSON.stringify(db));
 };
-const topicList=rs=>{const a=[];rs.forEach(r=>{if(r.topic&&!a.includes(r.topic))a.push(r.topic)});return a};
+const topicList=rs=>{const a=[];rs.forEach(r=>{if(r.topic&&!a.includes(r.topic)&&r.topic!==GLOBAL)a.push(r.topic)});return a};
+const validManual=saved=>saved?.manual===true&&!Object.values(saved).some(v=>text(v).includes(GLOBAL));
 const apply=(room,topic)=>{
- topic=text(topic);if(!topic)return;
- const rs=records(), same=rs.filter(r=>r.topic===topic), base=same.length?same:rs.filter(r=>!r.topic);
+ const selected=canonicalSelected();
+ const canonical=text(selected?.bab||selected?.topic)||text(topic);
+ topic=canonical;
+ if(!topic||topic===GLOBAL)return;
+ const rs=records(), same=rs.filter(r=>r.topic===topic), base=same.length?same:rs.filter(r=>!r.topic||r.topic===GLOBAL&&false);
  const tp=[];base.forEach(r=>{if(r.tp&&!tp.some(x=>x.tp===r.tp))tp.push(r)});
- const db=contexts(),saved=db[ctxKey(topic)]||{},manual=saved.manual===true,first=base[0]||{};
+ const db=contexts(),saved=db[ctxKey(topic)]||{},manual=validManual(saved),first=base[0]||{};
  const jp=Math.max(1,tp.reduce((n,r)=>n+(r.jp||0),0)||base.reduce((n,r)=>n+(r.jp||0),0)||2);
  const material=manual&&saved.material?saved.material:(first.material||`Materi pembelajaran ${topic}, disusun sesuai TP pada BAB ini.`);
  const media=manual&&saved.media?saved.media:(first.media||`Media pembelajaran untuk ${topic}: Buku teks/SIBI, media visual, LKPD, dan media pembelajaran yang relevan.`);
@@ -58,20 +72,28 @@ const apply=(room,topic)=>{
  ['sgPaMaterial','sgPaMedia','sgPaSource','sgPaNotes','sgPaLkpd','sgPaAssessment','sgPaDifferentiation','sgPaFollowup','sgPaJP'].forEach(id=>room.querySelector('#'+id)?.dispatchEvent(new Event('input',{bubbles:true})));
  applying=false;
  window.__sgPerangkatActiveTopic=topic;
- try{sessionStorage.setItem('siapguru_selected_topic',JSON.stringify({topic}))}catch(_){ }
+ try{if(selected?.id||selected?.bab)sessionStorage.setItem('siapguru_selected_topic',JSON.stringify(selected));else sessionStorage.setItem('siapguru_selected_topic',JSON.stringify({topic}))}catch(_){ }
 };
 const boot=()=>{
  const room=document.querySelector(ROOM);if(!room||window.__sgPerangkatAutoV2Booted===room)return;window.__sgPerangkatAutoV2Booted=room;
  const sel=room.querySelector('#sgPaTopic');if(!sel)return;
- const rs=records(),topics=topicList(rs);
+ const selected=canonicalSelected(),master=masterRows();
+ const rs=records(),recordTopics=topicList(rs);
+ const masterContext=selected?.mapel||selected?.mapelName||room.querySelector('#sgPaSubject')?.value;
+ const masterTopics=master.filter(x=>!masterContext||text(x.mapel)===text(masterContext)).filter(x=>x.bab).map(x=>text(x.bab)).filter((x,i,a)=>x&&!a.slice(0,i).includes(x));
+ const topics=masterTopics.length?masterTopics:recordTopics;
  if(sel.tagName!=='SELECT'){
   const old=text(sel.value),next=document.createElement('select');next.id='sgPaTopic';next.className=sel.className;next.style.cssText=sel.style.cssText;next.setAttribute('aria-label','BAB / Topik');sel.replaceWith(next);
   if(old)next.dataset.previousValue=old;
  }
- const s=room.querySelector('#sgPaTopic'),current=text(s.value)||text(s.dataset.previousValue);
+ const s=room.querySelector('#sgPaTopic'),current=text(selected?.bab)||text(s.value)||text(s.dataset.previousValue);
  s.innerHTML='<option value="">Pilih BAB / Topik...</option>'+topics.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
  if(current&&topics.includes(current))s.value=current;else if(topics.length)s.value=topics[0];
- s.addEventListener('change',()=>apply(room,s.value));
+ s.addEventListener('change',()=>{
+  const row=master.find(x=>text(x.bab)===text(s.value));
+  try{if(row)sessionStorage.setItem('siapguru_selected_topic',JSON.stringify(row))}catch(_){ }
+  apply(room,s.value);
+ });
  ['sgPaMaterial','sgPaMedia','sgPaSource','sgPaNotes','sgPaLkpd','sgPaAssessment','sgPaDifferentiation','sgPaFollowup'].forEach(id=>room.querySelector('#'+id)?.addEventListener('input',()=>saveContext(room)));
  if(s.value)apply(room,s.value);
  const reload=room.querySelector('#sgPaReload');if(reload&&!reload.dataset.sgBound){reload.dataset.sgBound='1';reload.addEventListener('click',()=>{window.__sgPerangkatAutoV2Booted=null;window.__sgPerangkatActiveTopic='';boot()})}
