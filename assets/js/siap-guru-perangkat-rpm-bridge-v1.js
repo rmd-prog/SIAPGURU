@@ -1,4 +1,6 @@
 (()=>{
+const MEDIA_SOURCE='assets/js/siap-guru-perangkat-media-source-v1.js?v=1';
+if(!document.querySelector('script[data-sg-perangkat-media-source-v1]')){const s=document.createElement('script');s.src=MEDIA_SOURCE;s.dataset.sgPerangkatMediaSourceV1='1';document.head.appendChild(s)}
 const HANDOFF='siapguru_rpm_handoff';
 const esc=s=>String(s??'');
 const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}};
