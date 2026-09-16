@@ -8,7 +8,7 @@ const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_) {}};
 const topic=room=>clean(room?.querySelector('#sgPaTopic')?.value);
 const escRe=s=>String(s||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const stripContext=(s,t)=>clean(s)
-  .replace(new RegExp('\\s+pada\\s+'+escRe(t)+'(?=\\s*[,;.\\s]|$)','gi'),'')
+  .replace(new RegExp(`\\s+pada\\s+${escRe(t)}(?=\\s*[,;.]|\\s*$)`,'gi'),'')
   .replace(/\s+dalam pembelajaran\s+.*?\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'')
   .replace(/\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'')
   .replace(/\s{2,}/g,' ')
@@ -24,12 +24,21 @@ const polishDiff=(v,t)=>{
 const polishFollow=(v,t)=>{
   let s=stripContext(v,t);
   if(!s)return '';
-  const prefix=new RegExp('^Remedial dan pengayaan\\s+[^:]+:\\s*remedial mengulang dan memperkuat\\s+','i');
+  const prefix=new RegExp(`^Remedial dan pengayaan\\s+[^:]+:\\s*remedial mengulang dan memperkuat\\s+`,'i');
   if(!prefix.test(s))return s;
   const body=s.replace(prefix,'');
-  const marker=body.search(/\s*(?:,\s*contoh konkret|\s+melalui\s+penjelasan ulang|;\s*pengayaan memperluas)\b/i);
-  if(marker<0)return s;
-  const focus=clean(body.slice(0,marker)).replace(/[,:;.]\s*$/,'').replace(/\s+pada\s+$/i,'');
+  const lower=body.toLowerCase();
+  const markers=['; pengayaan memperluas',';pengayaan memperluas'];
+  let split=-1;
+  markers.forEach(marker=>{const i=lower.indexOf(marker);if(i>=0&&(split<0||i<split))split=i});
+  const remedialPart=split>=0?body.slice(0,split):body;
+  const markerAt=split>=0?body.slice(split).replace(/^;\s*/,''):'';
+  const focus=clean(remedialPart)
+    .replace(/,\s*contoh konkret[\s\S]*$/i,'')
+    .replace(/\s+melalui\s+penjelasan ulang[\s\S]*$/i,'')
+    .replace(/\s+contoh konkret[\s\S]*$/i,'')
+    .replace(/\s+pada\s+$/i,'')
+    .replace(/[,;\s]+$/,'');
   if(!focus)return s;
   return `Remedial dan pengayaan ${t}: remedial mengulang dan memperkuat ${focus} melalui penjelasan ulang, contoh konkret, latihan terbimbing, umpan balik, dan perbaikan hasil kerja sampai tujuan inti tercapai; pengayaan memperluas ${focus} melalui konteks baru, tugas yang lebih kompleks, pengembangan teks/hasil tulisan dan presentasi lisan sesuai tingkat kesiapan, atau presentasi/penjelasan mandiri.`;
 };
