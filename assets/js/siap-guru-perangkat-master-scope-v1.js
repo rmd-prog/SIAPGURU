@@ -75,4 +75,4 @@
   const boot=()=>{run();if(!window.__sgPerangkatMasterScopeWatch){window.__sgPerangkatMasterScopeWatch=1;new MutationObserver(run).observe(document.body,{childList:true,subtree:true});document.addEventListener('change',e=>{if(e.target?.id==='sgPaClass'||e.target?.id==='sgPaSubject'||e.target?.id==='sgPaTopic')run()},true)}};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
-(()=>{const marker='sgPerangkatNarrativeV1';if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src='assets/js/siap-guru-perangkat-narrative-v1.js?v=2';s.dataset[marker]='1';s.onload=()=>{};s.onerror=()=>console.error('[SIAP GURU] gagal memuat narrative v1');document.head.appendChild(s)})();
+(()=>{const marker='sgPerangkatNarrativeV1';if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src='assets/js/siap-guru-perangkat-narrative-v1.js?v=3';s.dataset[marker]='1';s.onload=()=>{};s.onerror=()=>console.error('[SIAP GURU] gagal memuat narrative v1');document.head.appendChild(s)})();
