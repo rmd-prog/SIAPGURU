@@ -12,7 +12,7 @@
     if(label==='ATP'){
       if(e.__sgAtpReplay)return;
       e.preventDefault();e.stopImmediatePropagation();
-      loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal');
+      loadScript('assets/js/siap-guru-atp-auto-v1.js?v=6','atpAutoFinal');
       loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
       loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=6','atpDocumentPreviewSync');
       loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1');
