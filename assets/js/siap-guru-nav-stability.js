@@ -4,8 +4,6 @@
   const resetRpmGuard=e=>{const l=getLink(e);if(l&&l.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
   document.addEventListener('pointerdown',resetRpmGuard,true);document.addEventListener('click',resetRpmGuard,true);
 
-  /* Home V3 bridge: route redesigned controls to the actual module controls.
-     Main cards cannot be clicked directly because the legacy menu is hidden. */
   const findText=selector=>name=>[...document.querySelectorAll(selector)].find(x=>(x.textContent||'').trim().toLowerCase()===String(name).trim().toLowerCase());
   const originalSub=findText('.sub-menu span,.sub-menu-button');
   const topLink=findText('.sg-topnav-link');
@@ -15,7 +13,6 @@
   const route=name=>{
     if(name==='Beranda'){home();return true}
     if(name==='Satuan Pendidikan'){if(typeof window.SiapGuruSchoolInfo?.open==='function'){window.SiapGuruSchoolInfo.open();return true}return false}
-    /* These are real module entry points, not the parent menu cards. */
     const map={'Pembelajaran':'CP','Asesmen':'Penilaian','Peserta Didik':'Data Siswa','Dokumen':'Draft'};
     return originalView(map[name]||name);
   };
@@ -30,7 +27,25 @@
   };
   document.addEventListener('click',bridgeHomeV3,true);
 
+  const bridgeHomeV4=e=>{
+    const t=e.target instanceof Element?t=e.target:null;
+    if(!t)return;
+    const item=t.closest('.sg-home-v4-item');
+    if(!item)return;
+    const name=(item.dataset.sghItem||item.textContent||'').trim();
+    e.preventDefault();e.stopImmediatePropagation();
+    if(name==='Profil Satuan Pendidikan'){if(typeof window.SiapGuruSchoolInfo?.open==='function')window.SiapGuruSchoolInfo.open();return}
+    originalView(name);
+  };
+  document.addEventListener('click',bridgeHomeV4,true);
+
   const loadScript=(src,marker,onload)=>{if(document.querySelector(`script[data-${marker}]`)){if(typeof onload==='function')onload();return}const s=document.createElement('script');s.src=src;s.dataset[marker]='1';s.onload=()=>typeof onload==='function'&&onload();s.onerror=()=>console.error('[SIAP GURU] gagal memuat',src);document.head.appendChild(s)};
+  const loadHomeV4=()=>{
+    if(!document.querySelector('link[data-sg-home-v4]')){const l=document.createElement('link');l.rel='stylesheet';l.dataset.sgHomeV4='1';l.href='assets/css/siap-guru-home-v4.css?v=1';document.head.appendChild(l)}
+    loadScript('assets/js/siap-guru-home-v4.js?v=1','homeV4');
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(loadHomeV4,180));else setTimeout(loadHomeV4,180);
+
   const openProsem=()=>loadScript('assets/js/siap-guru-prosem-matrix-v4.js?v=6','prosemMatrixFinalV6',()=>{loadScript('assets/js/siap-guru-prosem-signing-v1.js?v=1','prosemSigningV1',()=>{if(typeof window.__openSiapGuruProsem==='function')window.__openSiapGuruProsem()})});
   const replay=(link,marker)=>{link.classList.add('sg-topnav-link');const ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});Object.defineProperty(ev,'__sg'+marker+'Replay',{value:true});link.dispatchEvent(ev)};
   document.addEventListener('click',e=>{
