@@ -6,14 +6,23 @@ const esc=s=>text(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','
 const pick=(x,...keys)=>{for(const k of keys){if(x&&x[k]!=null&&text(x[k]))return x[k]}return ''};
 const records=()=>{
  const out=[];
- const add=x=>{
+ const add=(x,inheritedTopic='',inheritedSemester='')=>{
   if(!x||typeof x!=='object')return;
-  const topic=text(pick(x,'topic','topik','bab','babTopik','bab_topik','judulBab','judulTopik','chapter','unit'));
+  const topic=text(pick(x,'topic','topik','bab','babTopik','bab_topik','judulBab','judulTopik','chapter','unit'))||inheritedTopic;
   const tp=text(pick(x,'text','tp','tujuan','tujuanPembelajaran'));
   const material=text(pick(x,'material','materi','materiPokok','bahanAjar'));
-  if(topic||tp||material)out.push({topic,tp,material,media:text(pick(x,'media')),source:text(pick(x,'source','sumber','sumberBelajar')),element:text(pick(x,'element','elemen','cpElement')),jp:Number(pick(x,'jp','alokasiJp','alokasi','hours')||0)||0,semester:text(pick(x,'semester','sem')),period:text(pick(x,'period','waktu','minggu'))});
+  const semester=text(pick(x,'semester','sem'))||inheritedSemester;
+  if(topic||tp||material)out.push({topic,tp,material,media:text(pick(x,'media')),source:text(pick(x,'source','sumber','sumberBelajar')),element:text(pick(x,'element','elemen','cpElement')),jp:Number(pick(x,'jp','alokasiJp','alokasi','hours')||0)||0,semester,period:text(pick(x,'period','waktu','minggu'))});
+  return {topic,semester};
  };
- const walk=(x,d=0)=>{if(!x||d>8)return;if(Array.isArray(x)){x.forEach(v=>walk(v,d+1));return}if(typeof x!=='object')return;add(x);['items','rows','data','tp','lessons','chapters','topics','records'].forEach(k=>x[k]&&walk(x[k],d+1))};
+ const walk=(x,d=0,parentTopic='',parentSemester='')=>{
+  if(!x||d>10)return;
+  if(Array.isArray(x)){x.forEach(v=>walk(v,d+1,parentTopic,parentSemester));return}
+  if(typeof x!=='object')return;
+  const meta=add(x,parentTopic,parentSemester)||{topic:parentTopic,semester:parentSemester};
+  const nextTopic=meta.topic||parentTopic,nextSemester=meta.semester||parentSemester;
+  ['items','rows','data','tp','lessons','chapters','topics','records'].forEach(k=>{if(x[k])walk(x[k],d+1,nextTopic,nextSemester)});
+ };
  ['siapguru_tp_draft','siapguru_prota_draft','siapguru_prosem_draft','siapguru_atp_draft'].forEach(k=>walk(read(k)));
  return out;
 };
