@@ -12,10 +12,8 @@ const follow=r=>r?.querySelector('#sgPaFollowup');
 const diff=r=>r?.querySelector('#sgPaDifferentiation');
 const compactFocus=(t,s,m)=>{
  const x=(t+' '+s+' '+m).toLowerCase();
- const parts=[];
- const add=v=>{if(v&&!parts.some(p=>p.toLowerCase()===v.toLowerCase()))parts.push(v)};
  if(/bahasa indonesia|bahasa/.test(x)){
-  if(/hobi/.test(x))return 'pemahaman informasi dan kosakata tentang hobi, unsur kebahasaan dalam deskripsi, penyusunan teks deskripsi, serta presentasi lisan';
+  if(/hobi/.test(x))return 'pemahaman informasi, kosakata, dan unsur kebahasaan tentang hobi, penyusunan teks deskripsi, serta presentasi lisan';
   if(/deskripsi|aku yang unik|orang|tokoh/.test(x))return 'pemahaman informasi dan kosakata, unsur kebahasaan teks deskripsi, penyusunan tulisan, serta komunikasi hasil belajar';
   if(/membaca|bacaan|buku|teks/.test(x))return 'pemahaman informasi dan kosakata, analisis isi teks, penyusunan tanggapan, serta penyampaian hasil belajar';
   return 'pemahaman informasi dan kosakata, penggunaan bahasa sesuai konteks, penyusunan produk bahasa, serta komunikasi hasil belajar';
@@ -39,13 +37,14 @@ const compactFocus=(t,s,m)=>{
  if(/pjok/.test(x))return 'pemahaman dan praktik keterampilan gerak, strategi aktivitas jasmani, kebugaran, keselamatan, serta pola hidup sehat';
  if(/seni/.test(x))return 'pemahaman unsur dan teknik berkarya, proses serta ekspresi kreatif, dan apresiasi terhadap karya';
  if(/agama/.test(x))return 'pemahaman ajaran dan nilai keagamaan, keteladanan, praktik, serta penerapannya dalam perilaku sehari-hari';
- add('pemahaman konsep dan informasi utama');add('penerapan melalui aktivitas atau produk sesuai karakter materi');add('komunikasi dan refleksi hasil belajar');
- return parts.join(', ');
+ return 'pemahaman konsep dan informasi utama, penerapan melalui aktivitas atau produk sesuai karakter materi, serta komunikasi dan refleksi hasil belajar';
 };
 const rewriteFollow=(r)=>{
  const f=follow(r);if(!f)return false;
- const raw=clean(f.value);if(raw.length<420)return false;
+ const raw=clean(f.value);if(!raw)return false;
  const t=topic(r);if(!t||t==='SEMUA BAB / 1 TAHUN')return false;
+ const generatedLike=/^Remedial dan pengayaan .*?: remedial mengulang dan memperkuat /i.test(raw)||/mengidentifikasi informasi|menjelaskan cara mendeskripsikan|menyusun teks deskripsi|mempresentasikan deskripsi/i.test(raw)||raw.length>=420;
+ if(!generatedLike)return false;
  const focus=compactFocus(t,subject(r),material(r));
  const next=`Remedial dan pengayaan ${t}: remedial mengulang dan memperkuat ${focus} melalui penjelasan ulang, contoh konkret, latihan terbimbing, umpan balik, dan perbaikan hasil kerja sampai tujuan inti tercapai; pengayaan memperluas kemampuan tersebut melalui konteks baru, tugas yang lebih kompleks, pengembangan produk sesuai karakter materi, atau presentasi/penjelasan mandiri.`;
  if(f.value===next)return false;
@@ -66,6 +65,6 @@ const rewriteDiff=(r)=>{
  return true;
 };
 const run=()=>{const r=document.querySelector(ROOM);if(!r)return;rewriteFollow(r);rewriteDiff(r)};
-const boot=()=>{if(window.__sgPerangkatNarrativeV1)return;window.__sgPerangkatNarrativeV1=1;run();new MutationObserver(run).observe(document.body,{childList:true,subtree:true,characterData:true});document.addEventListener('input',e=>{if(['sgPaTopic','sgPaMaterial','sgPaSubject','sgPaFollowup','sgPaDifferentiation'].includes(e.target?.id))setTimeout(run,0)},true);window.setInterval(run,500)};
+const boot=()=>{if(window.__sgPerangkatNarrativeV2)return;window.__sgPerangkatNarrativeV2=1;run();new MutationObserver(run).observe(document.body,{childList:true,subtree:true,characterData:true});document.addEventListener('input',e=>{if(['sgPaTopic','sgPaMaterial','sgPaSubject','sgPaFollowup','sgPaDifferentiation'].includes(e.target?.id))setTimeout(run,0)},true);[25,100,250,500,1000,2000].forEach(ms=>setTimeout(run,ms));window.setInterval(run,750)};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
