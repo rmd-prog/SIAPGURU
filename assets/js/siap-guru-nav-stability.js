@@ -13,6 +13,7 @@
   loadScript('assets/js/siap-guru-perangkat-rpm-bridge-v1.js?v=3','perangkatRpmBridgeV3');
   loadScript('assets/js/siap-guru-perangkat-auto-v2.js?v=14','perangkatAutoV14',watchPerangkatMaterial);
   loadScript('assets/js/siap-guru-perangkat-master-scope-v1.js?v=2','perangkatMasterScopeV1');
+  loadScript('assets/js/siap-guru-rpm-date-bridge-v1.js?v=3','rpmDateBridgeV3');
   watchPerangkatMaterial();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startMasterHydrate,{once:true});else startMasterHydrate();
 })();
