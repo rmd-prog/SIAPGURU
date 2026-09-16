@@ -12,10 +12,9 @@
     if(label==='ATP'){
       if(e.__sgAtpReplay)return;
       e.preventDefault();e.stopImmediatePropagation();
-      loadScript('assets/js/siap-guru-atp-auto-v1.js?v=7','atpAutoFinal');
+      loadScript('assets/js/siap-guru-atp-auto-v1.js?v=8','atpAutoFinal');
       loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
       loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=6','atpDocumentPreviewSync');
-      loadScript('assets/js/siap-guru-atp-actions-v1.js?v=1','atpActionsV1');
       loadScript('assets/js/siap-guru-atp-ui-fix-v1.js?v=1','atpUiFixV1');
       loadScript('assets/js/siap-guru-atp-topic-v1.js?v=2','atpTopicV1');
       replay(link,'Atp');
