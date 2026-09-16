@@ -1,5 +1,5 @@
 (()=>{
-const MEDIA_SOURCE='assets/js/siap-guru-perangkat-media-source-v1.js?v=1';
+const MEDIA_SOURCE='assets/js/siap-guru-perangkat-media-source-v1.js?v=2';
 if(!document.querySelector('script[data-sg-perangkat-media-source-v1]')){const s=document.createElement('script');s.src=MEDIA_SOURCE;s.dataset.sgPerangkatMediaSourceV1='1';document.head.appendChild(s)}
 const HANDOFF='siapguru_rpm_handoff';
 const esc=s=>String(s??'');
