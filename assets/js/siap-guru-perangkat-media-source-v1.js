@@ -1,10 +1,10 @@
-/* SIAP GURU — PERANGKAT Media + Bahan Ajar guard v1 */
+/* SIAP GURU — PERANGKAT Media + Bahan Ajar guard v2 */
 (()=>{
   const ROOM='.sg-perangkat-room';
   const text=v=>String(v??'').trim();
   const selected=()=>{try{return JSON.parse(sessionStorage.getItem('siapguru_selected_topic')||'null')||{}}catch(_){return {}}};
   const topic=()=>text(document.querySelector(`${ROOM} #sgPaTopic`)?.value)||text(selected()?.bab||selected()?.topic);
-  const subject=()=>{const s=selected();const room=document.querySelector(ROOM);return text(s?.mapel||s?.mapelName||room?.querySelector('#sgPaSubject')?.value)};
+  const subject=()=>{const s=selected();const room=document.querySelector(ROOM);return text(s?.mapel||s?.mapelName||s?.subject||s?.subjectName||room?.querySelector('#sgPaSubject')?.value)};
   const media=(t,m)=>{
     const x=t.toLowerCase(),s=m.toLowerCase();
     if(s.includes('matematika')){if(/pecahan|desimal/.test(x))return 'Buku teks/SIBI, model atau kartu pecahan, garis bilangan, benda konkret, media visual, dan LKPD.';if(/kpk|fpb/.test(x))return 'Buku teks/SIBI, kartu bilangan, tabel faktor dan kelipatan, garis bilangan, papan tulis/media visual, dan LKPD.';if(/bangun|sudut|lingkaran|kubus|balok/.test(x))return 'Buku teks/SIBI, model bangun, alat ukur, gambar/jaring-jaring, media visual, dan LKPD.';return 'Buku teks/SIBI, kartu bilangan, benda konkret, media visual, dan LKPD.'}
@@ -20,7 +20,7 @@
   const genericMedia=v=>/Media pembelajaran yang relevan dengan/i.test(text(v));
   const genericSource=v=>/Buku teks\/SIBI, lingkungan sekitar, dan sumber digital yang relevan/i.test(text(v));
   const apply=()=>{const r=document.querySelector(ROOM);if(!r)return;const t=topic(),m=subject();if(!t)return;const a=r.querySelector('#sgPaMedia'),b=r.querySelector('#sgPaSource');if(a&&(!text(a.value)||genericMedia(a.value)))a.value=media(t,m);if(b&&(!text(b.value)||genericSource(b.value)))b.value=source(t,m)};
-  if(window.__sgPerangkatMediaSourceV1)return;window.__sgPerangkatMediaSourceV1=1;
+  if(window.__sgPerangkatMediaSourceV2)return;window.__sgPerangkatMediaSourceV2=1;
   new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
   document.addEventListener('change',e=>{if(e.target?.id==='sgPaTopic')setTimeout(apply,20)},true);
   document.addEventListener('input',e=>{if(e.target?.id==='sgPaTopic')setTimeout(apply,20)},true);
