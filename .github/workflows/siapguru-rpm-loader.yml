@@ -17,13 +17,15 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
+          import re
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
           marker='<script src="assets/js/siap-guru-rpm-time-final-v1.js?v=1" defer></script>'
-          anchor='<script src="assets/js/siap-guru-rpm-final-v1.js?v=7" defer></script>'
-          if marker not in s:
-              if anchor not in s: raise SystemExit('RPM final anchor not found')
-              s=s.replace(anchor,anchor+marker,1)
+          if 'assets/js/siap-guru-rpm-time-final-v1.js' not in s:
+              m=re.search(r'<script src="assets/js/siap-guru-rpm-final-v1\.js(?:\?[^\"]*)?" defer></script>',s)
+              if not m:
+                  raise SystemExit('RPM final anchor not found')
+              s=s[:m.end()]+marker+s[m.end():]
               p.write_text(s,encoding='utf-8')
       - name: Commit
         run: |
