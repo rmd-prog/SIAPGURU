@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
-if(window.__SIAP_GURU_RPM_DATE_BRIDGE_V3__)return;
-window.__SIAP_GURU_RPM_DATE_BRIDGE_V3__=true;
+if(window.__SIAP_GURU_RPM_DATE_BRIDGE_V4__)return;
+window.__SIAP_GURU_RPM_DATE_BRIDGE_V4__=true;
 const S=()=>window.SiapGuruRPMSchedule,D=()=>window.SiapGuruRPMDate,C=()=>window.SiapGuruRPMCalendar;
 const $=(root,id)=>root?.querySelector('#'+id);
 const cls=v=>String(v||'').match(/\b([1-6])\b/)?.[1]||'';
@@ -9,9 +9,8 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 function mount(){
  const room=document.querySelector('.sg-rpm-room');
  if(!room)return false;
- const host=room.querySelector('.sg-rpm-shell');
- if(!host)return false;
  if(room.querySelector('[data-rpm-date-bridge]'))return true;
+ const host=room.querySelector('.sg-rpm-shell')||room;
  const card=document.createElement('section');
  card.className='sg-rpm-card';
  card.dataset.rpmDateBridge='1';
@@ -40,7 +39,7 @@ function mount(){
  render();
  return true;
 }
-window.SiapGuruRPMDateBridge={version:'RPM-DATE-BRIDGE-V3',mount};
+window.SiapGuruRPMDateBridge={version:'RPM-DATE-BRIDGE-V4',mount};
 const watch=()=>mount();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});
 new MutationObserver(watch).observe(document.documentElement,{childList:true,subtree:true});
