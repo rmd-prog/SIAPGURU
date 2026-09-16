@@ -1,31 +1,23 @@
-/* SIAP GURU — navigation stability
-   Feature bridges are lazy-loaded only when their menu is opened.
-   The Beranda stays lightweight; feature work starts inside its own room.
-*/
+/* SIAP GURU — navigation stability */
 (()=>{
-  const resetRpmGuard=(event)=>{const target=event.target instanceof Element?event.target:null;const link=target?.closest('.sg-topnav-link');if(link&&link.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
-  document.addEventListener('pointerdown',resetRpmGuard,true);
-  document.addEventListener('click',resetRpmGuard,true);
-  const loadScript=(src,marker)=>{if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src=src;s.dataset[marker]='1';document.head.appendChild(s)};
-  const loadAtpBridges=()=>{
-    loadScript('assets/js/siap-guru-atp-auto-v1.js?v=5','atpAutoFinal');
-    loadScript('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
-    loadScript('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=5','atpDocumentPreviewSync');
-  };
-  const loadTpBridges=()=>{
-    loadScript('assets/js/siap-guru-tp-auto-v1.js?v=2','tpAutoV4');
-    loadScript('assets/js/siap-guru-tp-master-bridge-v1.js?v=1','tpMasterBridgeV1');
-    loadScript('assets/js/siap-guru-tp-master-select-bridge-v1.js?v=1','tpMasterSelectBridgeV1');
-    loadScript('assets/js/siap-guru-tp-topic-dropdown-v1.js?v=1','tpTopicDropdownV1');
-    loadScript('assets/js/siap-guru-tp-topic-smart-v2.js?v=2','tpTopicSmartV2');
-    loadScript('assets/js/siap-guru-tp-atp-import-sync-v1.js?v=1','tpAtpImportSyncV1');
-  };
+  const resetRpmGuard=e=>{const l=(e.target instanceof Element)?e.target.closest('.sg-topnav-link'):null;if(l&&l.textContent.trim()==='RPM Deep Learning')window.__sgRpmBoot=0};
+  document.addEventListener('pointerdown',resetRpmGuard,true);document.addEventListener('click',resetRpmGuard,true);
+  const load=(src,marker)=>{if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src=src;s.dataset[marker]='1';document.head.appendChild(s)};
   document.addEventListener('click',e=>{
-    const target=e.target instanceof Element?e.target:null;
-    const link=target?.closest('.sg-topnav-link');
-    if(!link)return;
-    const label=link.textContent.trim();
-    if(label==='ATP')loadAtpBridges();
-    if(label==='TP')loadTpBridges();
+    const l=(e.target instanceof Element)?e.target.closest('.sg-topnav-link'):null;if(!l)return;
+    const label=l.textContent.trim();
+    if(label==='ATP'){
+      load('assets/js/siap-guru-atp-auto-v1.js?v=6','atpAutoFinalV6');
+      load('assets/js/siap-guru-atp-preview.js?v=5','atpPreview');
+      load('assets/js/siap-guru-atp-document-preview-sync-v2.js?v=5','atpDocumentPreviewSync');
+    }
+    if(label==='TP'){
+      load('assets/js/siap-guru-tp-auto-v1.js?v=4','tpAutoV4');
+      load('assets/js/siap-guru-tp-master-bridge-v1.js?v=1','tpMasterBridgeV1');
+      load('assets/js/siap-guru-tp-master-select-bridge-v1.js?v=1','tpMasterSelectBridgeV1');
+      load('assets/js/siap-guru-tp-topic-dropdown-v1.js?v=1','tpTopicDropdownV1');
+      load('assets/js/siap-guru-tp-topic-smart-v2.js?v=2','tpTopicSmartV2');
+      load('assets/js/siap-guru-tp-atp-import-sync-v1.js?v=1','tpAtpImportSyncV1');
+    }
   },true);
 })();
