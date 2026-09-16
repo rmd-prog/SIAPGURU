@@ -1,26 +1,63 @@
-/* SIAP GURU — ATP AUTO FINAL */
+/* SIAP GURU — ATP AUTO FINAL v6
+   Sumber ATP: TP 1 tahun yang tersimpan.
+   Urutan: BAB/Materi -> TP -> ATP. JP mengikuti TP pada semester aktif.
+*/
 (()=>{
+  if(window.__sgAtpAutoV6)return;
+  window.__sgAtpAutoV6=1;
+  const read=(key,store=localStorage)=>{try{return JSON.parse(store.getItem(key)||'null')}catch(_){return null}};
+  const clean=v=>String(v??'').replace(/\s+/g,' ').trim();
   const build=()=>{
     const room=document.querySelector('.sg-atp-room');
-    if(!room||room.dataset.autoFinal==='1')return;
-    room.dataset.autoFinal='1';
-    const footer=room.querySelector('.sg-atp-footer'),btnHost=room.querySelector('#sgAtpAdd');
-    const subject=room.querySelector('#sgAtpSubject'),phase=room.querySelector('#sgAtpPhase'),klass=room.querySelector('#sgAtpClass');
-    const element=room.querySelector('#sgAtpElement'),list=room.querySelector('#sgAtpList'),name=room.querySelector('#sgAtpName'),total=room.querySelector('#sgAtpTotalJp'),notice=room.querySelector('#sgAtpNotice');
+    if(!room)return;
+    const footer=room.querySelector('.sg-atp-footer');
+    const btnHost=room.querySelector('#sgAtpAdd');
+    const subject=room.querySelector('#sgAtpSubject');
+    const phase=room.querySelector('#sgAtpPhase');
+    const klass=room.querySelector('#sgAtpClass');
+    const element=room.querySelector('#sgAtpElement');
+    const list=room.querySelector('#sgAtpList');
+    const name=room.querySelector('#sgAtpName');
+    const total=room.querySelector('#sgAtpTotalJp');
+    const semester=room.querySelector('#sgAtpSemester');
+    const notice=room.querySelector('#sgAtpNotice');
     if(!footer||!btnHost||!subject||!phase||!klass||!element||!list)return;
-    const btn=document.createElement('button');btn.id='sgAtpAuto';btn.type='button';btn.className='sg-atp-primary';btn.textContent='⚡ Isi ATP Otomatis';footer.insertBefore(btn,footer.firstChild);
-    const show=m=>{if(notice){notice.textContent=m;notice.classList.add('is-show');clearTimeout(show.t);show.t=setTimeout(()=>notice.classList.remove('is-show'),3200)}};
-    const JP={'Pendidikan Agama Islam dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Kristen dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Katolik dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Hindu dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Buddha dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Agama Khonghucu dan Budi Pekerti':{1:108,2:108,3:108,4:108,5:108,6:96},'Pendidikan Pancasila':{1:144,2:144,3:144,4:144,5:144,6:128},'Bahasa Indonesia':{1:252,2:288,3:216,4:216,5:216,6:192},'Matematika':{1:144,2:180,3:180,4:180,5:180,6:160},'IPAS':{1:0,2:0,3:180,4:180,5:180,6:160},'Ilmu Pengetahuan Alam dan Sosial':{1:0,2:0,3:180,4:180,5:180,6:160},'Pendidikan Jasmani Olahraga dan Kesehatan':{1:108,2:108,3:108,4:108,5:108,6:96},'PJOK':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Musik':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Rupa':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Tari':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni Teater':{1:108,2:108,3:108,4:108,5:108,6:96},'Seni dan Budaya':{1:108,2:108,3:108,4:108,5:108,6:96},'Bahasa Inggris':{1:0,2:0,3:72,4:72,5:72,6:64},'Koding dan Kecerdasan Artifisial':{1:0,2:0,3:0,4:0,5:72,6:64},'Informatika':{1:0,2:0,3:0,4:0,5:0,6:0}};
-    const refAnnual=()=>Number(JP[subject.value]?.[klass.value]||0),weeks=()=>klass.value==='6'?32:36,semesterWeeks=()=>room.querySelector('#sgAtpSemester')?.value==='2'?(klass.value==='6'?14:18):18,refSemester=()=>{const annual=refAnnual();return annual?Math.round(annual/weeks()*semesterWeeks()):0};
-    const clean=s=>String(s||'').replace(/\s+/g,' ').trim(),sentence=s=>{s=clean(s);return s?s.charAt(0).toLowerCase()+s.slice(1):''},verbFor=i=>['mengidentifikasi','menjelaskan','menerapkan','menganalisis','mengevaluasi','mengomunikasikan'][Math.min(i,5)];
-    const makeText=(cp,el,i)=>{const c=sentence(cp),e=clean(el),v=verbFor(i);return c?`Peserta didik mampu ${v} ${c} melalui pembelajaran yang kontekstual dan bermakna pada elemen ${e}.`:`Peserta didik mampu ${v} konsep dan keterampilan pada elemen ${e} sesuai karakteristik Fase ${phase.value}.`};
-    const distribute=(n,target)=>{if(!n||!target)return Array(n).fill(0);const a=Array(n).fill(1);let remain=Math.max(0,target-n),weights=Array.from({length:n},(_,i)=>i+1),sum=weights.reduce((x,y)=>x+y,0);for(let i=0;i<n;i++)a[i]+=Math.floor(remain*weights[i]/sum);let used=a.reduce((x,y)=>x+y,0),i=n-1;while(used<target){a[(i%n+n)%n]++;used++;i--}return a};
-    const save=()=>{const items=[...list.querySelectorAll('.sg-atp-item')].map(item=>({text:item.querySelector('.sg-atp-text')?.textContent.trim()||'',element:item.dataset.element||'',cp:item.dataset.cp||'',jp:item.querySelector('.sg-atp-jp')?.value||1}));localStorage.setItem('siapguru_atp_draft',JSON.stringify({name:name?.value.trim()||`ATP ${subject.value} Kelas ${klass.value} Fase ${phase.value}`,semester:room.querySelector('#sgAtpSemester')?.value||'1',totalJp:total?.value||'',group:room.querySelector('#sgAtpGroup')?.value||'umum',subject:subject.value,phase:phase.value,class:klass.value,items}))};
-    const make=()=>{const opts=[...element.options],annual=refAnnual(),target=refSemester(),addItem=window.__sgAtpAddItem;if(!opts.length){show('CP belum tersedia untuk pilihan ini.');return}if(!annual){show(`Referensi JP resmi belum tersedia untuk ${subject.value} kelas ${klass.value}; ATP tidak dipaksakan.`);return}if(typeof addItem!=='function'){show('ATP belum siap. Silakan tunggu sebentar lalu coba lagi.');return}list.innerHTML='';const jps=distribute(opts.length,target);opts.forEach((opt,i)=>{element.value=opt.value;addItem();const item=list.lastElementChild;if(!item)return;const text=item.querySelector('.sg-atp-text'),cp=item.dataset.cp||'',title=opt.textContent.trim();if(text)text.textContent=makeText(cp,title,i);item.dataset.element=title;item.dataset.cp=cp;const inp=item.querySelector('.sg-atp-jp');if(inp)inp.value=jps[i]});if(name&&!name.value.trim())name.value=`ATP ${subject.value} Kelas ${klass.value} Fase ${phase.value}`;if(total)total.value=target;save();window.dispatchEvent(new CustomEvent('sg:atp-updated'));show(`${opts.length} TP otomatis • ${target} JP semester ${room.querySelector('#sgAtpSemester')?.value||'1'} • ${annual} JP/tahun intrakurikuler • ${weeks()} minggu efektif.`)};
-    btn.addEventListener('click',make);
-    [subject,phase,klass,room.querySelector('#sgAtpSemester')].filter(Boolean).forEach(el=>el.addEventListener('change',()=>show('Pilihan berubah. Klik “Isi ATP Otomatis” agar CP, TP, dan JP dihitung ulang.')));
+    if(room.querySelector('#sgAtpAuto'))return;
+    const btn=document.createElement('button');
+    btn.id='sgAtpAuto';btn.type='button';btn.className='sg-atp-primary';btn.textContent='⚡ Isi ATP Otomatis';
+    footer.insertBefore(btn,footer.firstChild);
+    const show=m=>{if(!notice)return;notice.textContent=m;notice.classList.add('is-show');clearTimeout(show.t);show.t=setTimeout(()=>notice.classList.remove('is-show'),3500)};
+    const tp=()=>read('siapguru_tp_draft')||{};
+    const getItems=()=>{const d=tp();let items=Array.isArray(d.items)?d.items:[];const wanted=String(semester?.value||'1');const same=items.filter(x=>String(x.semester||wanted)===wanted&&clean(x.text||x.tp));return same.length?same:items.filter(x=>clean(x.text||x.tp));};
+    const save=items=>{localStorage.setItem('siapguru_atp_draft',JSON.stringify({name:clean(name?.value)||`ATP ${clean(subject.value)} Kelas ${clean(klass.value)} Fase ${clean(phase.value)}`,semester:String(semester?.value||'1'),subject:clean(subject.value),phase:clean(phase.value),class:clean(klass.value),totalJp:Number(total?.value)||items.reduce((n,x)=>n+Math.max(1,Number(x.jp)||1),0),items:items.map(x=>({text:clean(x.text||x.tp),element:clean(x.element),cp:clean(x.cp||x.cpText),jp:Math.max(1,Number(x.jp)||1),semester:String(x.semester||semester?.value||'1'),topic:clean(x.topic||x.bab)}))}))};
+    const make=()=>{
+      const source=getItems();
+      if(!source.length){show('TP 1 tahun belum tersedia. Generate TP dari BAB/Materi terlebih dahulu.');return;}
+      const addItem=window.__sgAtpAddItem;
+      if(typeof addItem!=='function'){show('ATP belum siap. Buka ulang menu ATP lalu coba lagi.');return;}
+      list.innerHTML='';
+      const opts=[...element.options];
+      source.forEach((x,i)=>{
+        const el=clean(x.element)||clean(opts[i%Math.max(1,opts.length)]?.textContent)||'Elemen CP';
+        if(opts.length){const hit=opts.find(o=>clean(o.textContent)===el)||opts[i%opts.length];if(hit)element.value=hit.value;}
+        addItem();
+        const item=list.lastElementChild;if(!item)return;
+        const text=item.querySelector('.sg-atp-text');if(text)text.textContent=clean(x.text||x.tp);
+        item.dataset.element=el;item.dataset.cp=clean(x.cp||x.cpText);item.dataset.topic=clean(x.topic||x.bab);
+        const jp=item.querySelector('.sg-atp-jp');if(jp)jp.value=Math.max(1,Number(x.jp)||1);
+      });
+      const sum=[...list.querySelectorAll('.sg-atp-item .sg-atp-jp')].reduce((n,x)=>n+Math.max(1,Number(x.value)||1),0);
+      if(total)total.value=sum;
+      if(name&&!clean(name.value))name.value=`ATP ${clean(subject.value)} Kelas ${clean(klass.value)} Fase ${clean(phase.value)}`;
+      const finalItems=source.map(x=>({...x,semester:String(x.semester||semester?.value||'1'),text:clean(x.text||x.tp),jp:Math.max(1,Number(x.jp)||1)}));
+      save(finalItems);window.dispatchEvent(new CustomEvent('sg:atp-updated'));
+      show(`${source.length} ATP mengikuti TP • ${sum} JP semester ${semester?.value||'1'} • sumber: TP 1 tahun.`);
+    };
+    btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();make()});
+    semester?.addEventListener('change',()=>show('Semester berubah. Klik “Isi ATP Otomatis” untuk mengambil TP semester yang sesuai.'));
   };
-  window.addEventListener('sg:atp-room-ready',build,{once:false});
-  document.addEventListener('click',e=>{const l=e.target.closest?.('.sg-topnav-link');if(l&&l.textContent.trim()==='ATP')setTimeout(build,50)},true);
+  const watch=()=>setTimeout(build,80);
+  window.addEventListener('sg:atp-room-ready',watch);
+  document.addEventListener('click',e=>{const l=e.target.closest?.('.sg-topnav-link');if(l&&clean(l.textContent)==='ATP')watch()},true);
   if(document.querySelector('.sg-atp-room'))build();
 })();
