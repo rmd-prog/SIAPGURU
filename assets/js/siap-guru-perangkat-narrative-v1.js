@@ -68,4 +68,5 @@ const rewriteDiff=(r)=>{
 const run=()=>{const r=document.querySelector(ROOM);if(!r)return;rewriteFollow(r);rewriteDiff(r)};
 const boot=()=>{if(window.__sgPerangkatNarrativeV1)return;window.__sgPerangkatNarrativeV1=1;run();new MutationObserver(run).observe(document.body,{childList:true,subtree:true,characterData:true});document.addEventListener('input',e=>{if(['sgPaTopic','sgPaMaterial','sgPaSubject','sgPaFollowup','sgPaDifferentiation'].includes(e.target?.id))setTimeout(run,0)},true);window.setInterval(run,500)};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+(()=>{const marker='sgPerangkatTpBridgeV1';if(document.querySelector(`script[data-${marker}]`))return;const s=document.createElement('script');s.src='assets/js/siap-guru-perangkat-tp-bridge-v1.js?v=1';s.dataset[marker]='1';s.onerror=()=>console.error('[SIAP GURU] gagal memuat TP bridge v1');document.head.appendChild(s)})();
 })();
