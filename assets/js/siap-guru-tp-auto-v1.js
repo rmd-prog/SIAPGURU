@@ -112,6 +112,14 @@
       `merefleksikan sikap yang perlu dipertahankan untuk hidup rukun dalam keberagaman`
     ];
     if(subject==='Bahasa Indonesia'){
+      if(/hobi|ekspresi diri/.test(t))return [
+        `mengidentifikasi informasi, kosakata, dan kata sifat yang berkaitan dengan hobi pada ${topic}`,
+        `menjelaskan cara mendeskripsikan hobi dengan pilihan kata, kata sifat, dan sinonim yang sesuai`,
+        `menyusun teks deskripsi tentang hobi secara runtut dengan kosakata dan struktur kalimat yang tepat`,
+        `mempresentasikan deskripsi tentang hobi secara lisan dengan jelas, runtut, dan percaya diri`,
+        `menyunting teks deskripsi tentang hobi berdasarkan ketepatan isi, pilihan kata, struktur, dan penggunaan bahasa`,
+        `merefleksikan penggunaan kosakata dan strategi komunikasi setelah menyusun serta mempresentasikan deskripsi hobi`
+      ];
       if(/buku|membaca|literasi/.test(t))return [
         `mengidentifikasi informasi penting dari teks yang dibaca pada ${topic}`,
         `menentukan ide pokok dan informasi pendukung berdasarkan teks`,
