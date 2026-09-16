@@ -6,6 +6,7 @@ on:
       - 'assets/js/siap-guru-rpm-time-final-v1.js'
       - 'assets/js/siap-guru-rpm-topic-sync-v1.js'
       - 'assets/js/siap-guru-rpm-author-sync-v1.js'
+      - 'assets/js/siap-guru-master-bab-v1.js'
       - 'index.html'
       - '.github/workflows/siapguru-rpm-loader.yml'
 permissions:
@@ -25,17 +26,19 @@ jobs:
           legacy=['siap-guru-rpm-syntax-v2.js','siap-guru-rpm-scope-v1.js','siap-guru-rpm-narrative-v1.js','siap-guru-rpm-assessment-v1.js','siap-guru-rpm-scope-planner-v1.js','siap-guru-rpm-alignment-v1.js','siap-guru-rpm-quality-v1.js','siap-guru-rpm-final-v1.js','siap-guru-rpm-cp-final-v1.js','siap-guru-rpm-date-engine-v1.js','siap-guru-rpm-date-bridge-v1.js','siap-guru-rpm-date-bridge-v2.js','siap-guru-rpm-date-bridge-v3.js']
           for name in legacy:
               s=re.sub(r'<script src="assets/js/'+re.escape(name)+r'(?:\?[^\"]*)?" defer></script>','',s)
+          nonlocal_s=[s]
           def ensure(name,anchor,version):
               nonlocal_s[0]=re.sub(r'<script src="assets/js/'+re.escape(name)+r'(?:\?[^\"]*)?" defer></script>','',nonlocal_s[0])
               tag=f'<script src="assets/js/{name}?v={version}" defer></script>'
               if anchor in nonlocal_s[0]: nonlocal_s[0]=nonlocal_s[0].replace(anchor,anchor+tag)
-          nonlocal_s=[s]
           rpm='<script src="assets/js/siap-guru-rpm.js?v=7" defer></script>'
           ensure('siap-guru-rpm-time-final-v1.js',rpm,'3')
           rpm='<script src="assets/js/siap-guru-rpm-time-final-v1.js?v=3" defer></script>'
           ensure('siap-guru-rpm-author-sync-v1.js',rpm,'2')
           rpm='<script src="assets/js/siap-guru-rpm-author-sync-v1.js?v=2" defer></script>'
-          ensure('siap-guru-rpm-topic-sync-v1.js',rpm,'1')
+          ensure('siap-guru-master-bab-v1.js',rpm,'1')
+          rpm='<script src="assets/js/siap-guru-master-bab-v1.js?v=1" defer></script>'
+          ensure('siap-guru-rpm-topic-sync-v1.js',rpm,'2')
           p.write_text(nonlocal_s[0],encoding='utf-8')
       - name: Commit
         run: |
@@ -43,5 +46,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'feat: wire RPM topic sync loader'
+          git commit -m 'fix: load Master BAB before RPM topic sync'
           git push
