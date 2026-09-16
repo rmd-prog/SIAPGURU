@@ -14,6 +14,7 @@
   loadScript('assets/js/siap-guru-perangkat-auto-v2.js?v=16','perangkatAutoV16',watchPerangkatMaterial);
   loadScript('assets/js/siap-guru-perangkat-state-guard-v1.js?v=1','perangkatStateGuardV1');
   loadScript('assets/js/siap-guru-perangkat-polish-v1.js?v=4','perangkatPolishV4');
+  loadScript('assets/js/siap-guru-perangkat-narrative-v1.js?v=1','perangkatNarrativeV1');
   watchPerangkatMaterial();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startMasterHydrate,{once:true});else startMasterHydrate();
 })();
