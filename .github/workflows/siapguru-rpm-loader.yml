@@ -13,25 +13,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inject RPM final timing script
+      - name: Keep only standalone RPM Deep Learning engine
         shell: python
         run: |
           from pathlib import Path
           import re
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          marker='<script src="assets/js/siap-guru-rpm-time-final-v1.js?v=1" defer></script>'
-          if 'assets/js/siap-guru-rpm-time-final-v1.js' not in s:
-              m=re.search(r'<script src="assets/js/siap-guru-rpm-final-v1\.js(?:\?[^\"]*)?" defer></script>',s)
-              if not m:
-                  raise SystemExit('RPM final anchor not found')
-              s=s[:m.end()]+marker+s[m.end():]
-              p.write_text(s,encoding='utf-8')
+          legacy=[
+            'siap-guru-rpm-syntax-v2.js','siap-guru-rpm-scope-v1.js','siap-guru-rpm-narrative-v1.js',
+            'siap-guru-rpm-assessment-v1.js','siap-guru-rpm-scope-planner-v1.js','siap-guru-rpm-alignment-v1.js',
+            'siap-guru-rpm-quality-v1.js','siap-guru-rpm-final-v1.js','siap-guru-rpm-cp-final-v1.js',
+            'siap-guru-rpm-date-engine-v1.js','siap-guru-rpm-date-bridge-v1.js','siap-guru-rpm-date-bridge-v2.js','siap-guru-rpm-date-bridge-v3.js'
+          ]
+          for name in legacy:
+              s=re.sub(r'<script src="assets/js/'+re.escape(name)+r'(?:\?[^\"]*)?" defer></script>','',s)
+          marker='<script src="assets/js/siap-guru-rpm-time-final-v1.js?v=2" defer></script>'
+          s=re.sub(r'<script src="assets/js/siap-guru-rpm-time-final-v1.js(?:\?[^\"]*)?" defer></script>','',s)
+          anchor='<script src="assets/js/siap-guru-rpm.js?v=7" defer></script>'
+          if marker not in s and anchor in s:
+              s=s.replace(anchor,anchor+marker)
+          p.write_text(s,encoding='utf-8')
       - name: Commit
         run: |
           if git diff --quiet -- index.html; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'fix: load SIAP GURU RPM final timing'
+          git commit -m 'refactor: retire legacy RPM core loaders'
           git push
