@@ -3,21 +3,23 @@
   const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
   const readJson=(storage,key)=>{try{return JSON.parse(storage.getItem(key)||'null')||{}}catch{return {}}};
   const getUser=()=>readJson(sessionStorage,'siapguru_user');
-  const getSchool=()=>{const d=readJson(localStorage,'siapguru_school_info_v1');return {
-    namaSekolah:d.namaSekolah||'',
-    kepalaNama:d.kepalaNama||'',
-    kepalaNip:d.kepalaNip||'',
-    kepalaJabatan:d.kepalaJabatan||'Kepala Sekolah'
-  }};
+  const getSchool=()=>{
+    const keys=['siapguru_school_info_v1','siapguru_school_info','siapguru_satuan_pendidikan'];
+    for(const key of keys){const d=readJson(localStorage,key);if(d&&(d.kepalaNama||d.namaKepala||d.kepalaSekolah||d.kepalaNip||d.nipKepala||d.namaSekolah))return {
+      namaSekolah:d.namaSekolah||d.school||d.satuanPendidikan||'',
+      kepalaNama:d.kepalaNama||d.namaKepala||d.kepalaSekolah||d.namaKepalaSekolah||'',
+      kepalaNip:d.kepalaNip||d.nipKepala||d.nipKepalaSekolah||'',
+      kepalaJabatan:d.kepalaJabatan||d.jabatanKepala||'Kepala Sekolah'
+    }}
+    return {namaSekolah:'',kepalaNama:'',kepalaNip:'',kepalaJabatan:'Kepala Sekolah'};
+  };
   const getTeacher=()=>{
-    try{
-      if(window.SiapGuruSchoolInfo&&typeof window.SiapGuruSchoolInfo.getTeacher==='function'){
-        const t=window.SiapGuruSchoolInfo.getTeacher()||{};
-        if(t.nama||t.nip)return t;
-      }
-    }catch{}
     const u=getUser();
-    return {nama:u.nama||u.name||u.namaGuru||u.fullName||'',nip:u.nip||u.username||u.nipGuru||''};
+    const domName=document.getElementById('teacherName')?.textContent?.trim()||document.getElementById('userNameTop')?.textContent?.trim()||'';
+    return {
+      nama:u.nama||u.name||u.namaGuru||u.fullName||domName||'',
+      nip:u.nip||u.username||u.nipGuru||u.nipUser||''
+    };
   };
   const render=room=>{
     if(!room)return;
