@@ -33,8 +33,9 @@
       document.head.appendChild(s);
     }
   };
-  const scan=()=>{const room=document.querySelector('.sg-prosem-matrix-room');if(room)render(room)};
+  const scan=room=>{const target=room||document.querySelector('.sg-prosem-matrix-room');if(target)render(target)};
+  window.__sgRenderProsemSigning=scan;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scan,{once:true});else scan();
-  const obs=new MutationObserver(scan);obs.observe(document.body,{childList:true,subtree:true});
-  window.addEventListener('siapguru:school-info-updated',scan);
+  const obs=new MutationObserver(()=>scan());obs.observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('siapguru:school-info-updated',()=>scan());
 })();
