@@ -18,6 +18,7 @@
       load('assets/js/siap-guru-tp-topic-dropdown-v1.js?v=1','tpTopicDropdownV1');
       load('assets/js/siap-guru-tp-topic-smart-v2.js?v=2','tpTopicSmartV2');
       load('assets/js/siap-guru-tp-atp-import-sync-v1.js?v=1','tpAtpImportSyncV1');
+      load('assets/js/siap-guru-tp-annual-v1.js?v=1','tpAnnualV1');
     }
   },true);
 })();
