@@ -6,14 +6,30 @@ const clean=v=>String(v??'').replace(/\s+/g,' ').trim();
 const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}};
 const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_) {}};
 const topic=room=>clean(room?.querySelector('#sgPaTopic')?.value);
-const polish=v=>{
-  let s=clean(v);
+const escRe=s=>String(s||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const stripContext=(s,t)=>clean(s)
+  .replace(new RegExp(`\\s+pada\\s+${escRe(t)}(?=\\s*[,;.]|\\s*$)`,'gi'),'')
+  .replace(/\s+dalam pembelajaran\s+.*?\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'')
+  .replace(/\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'')
+  .replace(/\s{2,}/g,' ')
+  .replace(/\s+([,.;])/g,'$1');
+const polishDiff=(v,t)=>{
+  let s=stripContext(v,t);
   if(!s)return '';
-  const before=s;
-  s=s.replace(/\s+dalam pembelajaran\s+.*?\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'');
-  s=s.replace(/\s+Fase\s+[A-C]\s+Kelas\s+[^,.;]+/gi,'');
-  s=s.replace(/\s{2,}/g,' ').replace(/\s+([,.;])/g,'$1');
-  return s===before?before:s;
+  const m=s.match(/^(Diferensiasi\\s+[^:]+:\s*konten difokuskan pada\\s+)(.*?)(;\\s*proses\\s+)/i);
+  if(!m)return s;
+  const focus=clean(m[2]).replace(/\\s+pada\\s+$/i,'');
+  return `${m[1]}${focus}; proses untuk peserta didik yang memerlukan dukungan menggunakan contoh konkret, pemodelan, pertanyaan penuntun, dan langkah bertahap pada fokus tersebut, sedangkan peserta didik yang sudah mencapai tujuan mendapat tantangan untuk memperluas atau menerapkan fokus pada konteks baru; produk dapat berupa teks/hasil tulisan dan presentasi lisan sesuai tingkat kesiapan, disesuaikan dengan kesiapan tanpa mengubah tujuan inti.`;
+};
+const polishFollow=(v,t)=>{
+  let s=stripContext(v,t);
+  if(!s)return '';
+  const m=s.match(/^Remedial dan pengayaan\\s+[^:]+:\s*remedial mengulang dan memperkuat\\s+(.*?)(?:,\\s*contoh konkret|\\s+melalui\\s+penjelasan ulang|;\\s*pengayaan memperluas)\\s*(.*)$/i);
+  if(m){
+    let focus=clean(m[1]).replace(/\\s+pada\\s+$/i,'');
+    return `Remedial dan pengayaan ${t}: remedial mengulang dan memperkuat ${focus} melalui penjelasan ulang, contoh konkret, latihan terbimbing, umpan balik, dan perbaikan hasil kerja sampai tujuan inti tercapai; pengayaan memperluas ${focus} melalui konteks baru, tugas yang lebih kompleks, pengembangan teks/hasil tulisan dan presentasi lisan sesuai tingkat kesiapan, atau presentasi/penjelasan mandiri.`;
+  }
+  return s;
 };
 const sync=room=>{
   const t=topic(room);
@@ -21,8 +37,8 @@ const sync=room=>{
   const df=room.querySelector('#sgPaDifferentiation'),ff=room.querySelector('#sgPaFollowup');
   if(!df&&!ff)return;
   let changed=false;
-  if(df){const n=polish(df.value);if(n!==df.value){df.value=n;df.dispatchEvent(new Event('input',{bubbles:true}));changed=true}}
-  if(ff){const n=polish(ff.value);if(n!==ff.value){ff.value=n;ff.dispatchEvent(new Event('input',{bubbles:true}));changed=true}}
+  if(df){const n=polishDiff(df.value,t);if(n!==df.value){df.value=n;df.dispatchEvent(new Event('input',{bubbles:true}));changed=true}}
+  if(ff){const n=polishFollow(ff.value,t);if(n!==ff.value){ff.value=n;ff.dispatchEvent(new Event('input',{bubbles:true}));changed=true}}
   if(!changed)return;
   const draft=read(DRAFT);
   if(draft&&typeof draft==='object'){
@@ -39,8 +55,8 @@ const sync=room=>{
   write(CTX,db);
 };
 const boot=()=>{
-  if(window.__sgPerangkatPolishV1)return;
-  window.__sgPerangkatPolishV1=1;
+  if(window.__sgPerangkatPolishV2)return;
+  window.__sgPerangkatPolishV2=1;
   const run=()=>{const room=document.querySelector(ROOM);if(room)sync(room)};
   new MutationObserver(run).observe(document.body,{childList:true,subtree:true,characterData:true});
   document.addEventListener('input',e=>{if(e.target?.id==='sgPaDifferentiation'||e.target?.id==='sgPaFollowup')run()},true);
