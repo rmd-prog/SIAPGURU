@@ -45,9 +45,9 @@ jobs:
           rpm='<script src="assets/js/siap-guru-rpm-topic-sync-v1.js?v=2" defer></script>'
           ensure('siap-guru-rpm-context-v4.js',rpm,'2')
           rpm='<script src="assets/js/siap-guru-rpm-context-v4.js?v=2" defer></script>'
-          ensure('siap-guru-rpm-meeting-engine-v1.js',rpm,'1')
+          ensure('siap-guru-rpm-meeting-engine-v1.js',rpm,'2')
           preview='<script src="assets/js/siap-guru-preview-actions-v1.js?v=3" defer></script>'
-          ensure('siap-guru-rpm-preview-final-v1.js',preview,'1')
+          ensure('siap-guru-rpm-preview-final-v1.js',preview,'2')
           p.write_text(state[0],encoding='utf-8')
       - name: Commit
         run: |
