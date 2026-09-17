@@ -8,6 +8,8 @@ on:
       - 'assets/js/siap-guru-rpm-author-sync-v1.js'
       - 'assets/js/siap-guru-master-bab-v1.js'
       - 'assets/js/siap-guru-rpm-context-v4.js'
+      - 'assets/js/siap-guru-rpm-context-v5.js'
+      - 'assets/js/siap-guru-rpm-period-engine-v1.js'
       - 'assets/js/siap-guru-rpm-meeting-engine-v1.js'
       - 'assets/js/siap-guru-rpm-preview-final-v1.js'
       - 'index.html'
@@ -45,9 +47,13 @@ jobs:
           rpm='<script src="assets/js/siap-guru-rpm-topic-sync-v1.js?v=2" defer></script>'
           ensure('siap-guru-rpm-context-v4.js',rpm,'2')
           rpm='<script src="assets/js/siap-guru-rpm-context-v4.js?v=2" defer></script>'
-          ensure('siap-guru-rpm-meeting-engine-v1.js',rpm,'2')
+          ensure('siap-guru-rpm-period-engine-v1.js',rpm,'2')
+          rpm='<script src="assets/js/siap-guru-rpm-period-engine-v1.js?v=2" defer></script>'
+          ensure('siap-guru-rpm-meeting-engine-v1.js',rpm,'4')
+          rpm='<script src="assets/js/siap-guru-rpm-meeting-engine-v1.js?v=4" defer></script>'
+          ensure('siap-guru-rpm-context-v5.js',rpm,'1')
           preview='<script src="assets/js/siap-guru-preview-actions-v1.js?v=3" defer></script>'
-          ensure('siap-guru-rpm-preview-final-v1.js',preview,'2')
+          ensure('siap-guru-rpm-preview-final-v1.js',preview,'3')
           p.write_text(state[0],encoding='utf-8')
       - name: Commit
         run: |
@@ -55,5 +61,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'fix: load universal RPM meeting and final preview'
+          git commit -m 'fix: load universal RPM daily context engine'
           git push
