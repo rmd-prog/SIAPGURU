@@ -1,0 +1,15 @@
+(()=>{'use strict';
+if(window.__SG_RPM_PERIOD_ENGINE_V1__)return;window.__SG_RPM_PERIOD_ENGINE_V1__=1;
+const C=s=>String(s??'').replace(/\s+/g,' ').trim(),N=s=>C(s).toLowerCase();
+const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch(_){return d}},write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}return v};
+const topic=()=>{try{return JSON.parse(sessionStorage.getItem('siapguru_selected_topic')||'null')||{}}catch(_){return{}}};
+const cls=d=>Number(String(d.kelas??d.class??'').match(/[1-6]/)?.[0]||0);
+function master(d){try{const a=window.SiapGuruMasterBab?.getAll?.()||[];return a.find(x=>N(x.bab)===N(d.bab)&&N(x.mapel)===N(d.mapel)&&Number(x.kelas)===cls(d))||d}catch(_){return d}}
+function num(x){return Number(x?.jp??x?.JP??x?.alokasiJP??x?.alokasi??x?.jam??0)||0}
+function normalize(arr){if(!Array.isArray(arr))return[];return arr.map((x,i)=>{if(typeof x==='string')return{no:i+1,material:C(x),jp:0,tp:'',start:null,end:null};return{no:Number(x.no??x.urutan??x.order??i+1)||i+1,material:C(x.material??x.materi??x.name??x.label??x.topik??x.bab??`Periode ${i+1}`),jp:num(x),tp:C(x.tp??x.TP??x.tujuan??''),start:x.startMeeting??x.meetingStart??null,end:x.endMeeting??x.meetingEnd??null}}).filter(x=>x.material)}
+function explicitPeriods(d){const t=master(d);for(const k of ['periods','periode','blocks','periodBlocks','alokasiPeriode','subtopik']){const a=normalize(t?.[k]);if(a.some(x=>x.jp>0))return{source:`Master BAB:${k}`,blocks:a}}return null}
+function prosem(d){const p=read('siapguru_prosem_draft',null)||read('siapguru_prosem_data',null);const items=Array.isArray(p?.items)?p.items:[];if(!items.length)return null;const hit=items.filter(x=>{const b=N(x.bab||x.chapter||'');const m=N(x.mapel||x.subject||p.subject||'');return (!b||b===N(d.bab)||b.includes(N(d.bab))||N(d.bab).includes(b))&&(!m||m===N(d.mapel))});const blocks=normalize(hit);return blocks.some(x=>x.jp>0)?{source:'PROSEM',blocks}:null}
+function build(d){d=master(d);const e=explicitPeriods(d)||prosem(d);if(e){const total=e.blocks.reduce((s,x)=>s+x.jp,0);return{version:'RPM-PERIOD-V1',source:e.source,verified:true,bab:d.bab||'',mapel:d.mapel||'',kelas:d.kelas||d.class||'',totalJP:total,blocks:e.blocks}}const total=num(d)||num(topic())||0;return{version:'RPM-PERIOD-V1',source:'TOTAL BAB — distribusi otomatis berdasarkan jadwal efektif',verified:false,bab:d.bab||'',mapel:d.mapel||'',kelas:d.kelas||d.class||'',totalJP:total,blocks:[{no:1,material:C(d.subtopik?.[0]||d.bab||'Materi terpilih'),jp:total,tp:''}]}}
+window.SiapGuruRPMPeriod={version:'RPM-PERIOD-V1',build,normalize,refresh:()=>build(topic())};
+document.addEventListener('sg:rpm-topic-changed',()=>document.dispatchEvent(new CustomEvent('sg:rpm-period-ready',{detail:build(topic())})));setTimeout(()=>{const d=topic();if(d.bab)document.dispatchEvent(new CustomEvent('sg:rpm-period-ready',{detail:build(d)}))},900);
+})();
