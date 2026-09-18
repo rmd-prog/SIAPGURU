@@ -34,10 +34,27 @@ const draft=(keys,c)=>{
 const tp=(c)=>{
  const d=draft(['siapguru_tp_v11_draft','siapguru_tp_draft'],c);
  if(Array.isArray(d?.items)&&d.items.length)return d.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));
+ const topic=String(c.title||'').toLowerCase();
+ const patterns=c.mapel==='IPAS'&&/cahaya|bunyi|mendengar/.test(topic)?[
+  'mengidentifikasi sumber dan sifat cahaya atau bunyi yang ditemukan pada '+c.title,
+  'menjelaskan hubungan antara sumber cahaya atau bunyi dengan peristiwa yang diamati',
+  'melakukan percobaan sederhana untuk mengamati sifat cahaya atau bunyi',
+  'menganalisis hasil pengamatan tentang cahaya atau bunyi berdasarkan bukti',
+  'menyajikan hasil percobaan tentang cahaya atau bunyi secara lisan, tulisan, atau visual',
+  'merefleksikan manfaat pemahaman tentang cahaya atau bunyi dalam kehidupan sehari-hari'
+ ]:c.mapel==='IPAS'&&/harmoni|ekosistem/.test(topic)?[
+  'mengidentifikasi komponen biotik dan abiotik serta perannya dalam ekosistem',
+  'menjelaskan hubungan antarmakhluk hidup dan lingkungannya dalam menjaga keseimbangan ekosistem',
+  'menganalisis contoh rantai atau jaring-jaring makanan berdasarkan hubungan antarmakhluk hidup',
+  'menganalisis perubahan pada salah satu komponen ekosistem dan memprediksi dampaknya terhadap keseimbangan ekosistem',
+  'menyajikan hasil pengamatan tentang hubungan antarkomponen ekosistem serta upaya menjaga keseimbangannya',
+  'merefleksikan tindakan yang dapat dilakukan untuk menjaga keseimbangan ekosistem di lingkungan sekitar'
+ ]:null;
+ if(patterns)return patterns.map((text,i)=>({id:c.chapterId+':tp:auto:'+String(i+1),chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1,text:'Peserta didik mampu '+text+'.',element:'Pemahaman IPAS',cp:'',jp:null,jpSource:'TP_AUTO_FINAL_V4_CONTEXTUAL_NOT_CANONICAL',semester:String(c.semester||'')}));
  const e=window.SiapGuruTPEngineV11;
  if(e?.build){
   const r=e.build({kelas:c.kelas,mapel:c.mapel,no:c.no},{count:5});
-  if(r?.ok&&Array.isArray(r.items))return r.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));
+  if(r?.ok&&Array.isArray(r.items))return r.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1,jpSource:'TP_ENGINE_FALLBACK_NOT_CANONICAL'}));
  }
  return [];
 };
