@@ -58,6 +58,7 @@ const tp=(c)=>{
  }
  return [];
 };
+const canonicalCP=c=>{const t=String(c.title||'').toLowerCase();if(c.mapel==='IPAS'&&/cahaya|bunyi|mendengar/.test(t))return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'IPAS_BAB1_BOOK_CP',statement:'Berdasarkan pemahamannya terhadap konsep gelombang (bunyi dan cahaya), peserta didik mendemonstrasikan bagaimana penerapannya dalam kehidupan sehari-hari.'};if(c.mapel==='IPAS'&&/harmoni|ekosistem/.test(t))return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'IPAS_EKOSISTEM_CONTEXT',statement:'Peserta didik menganalisis hubungan antarkomponen dalam ekosistem dan mengevaluasi dampak aktivitas manusia terhadap keseimbangan ekosistem.'};return null};
 const materials=(c,t)=>{
  const rows=JP()?.getCanonicalMaterials?.(c.kelas,c.mapel,c.no)||[];
  if(rows.length)return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'MASTER_JP_CANONICAL_MATERIALS',materials:rows};
@@ -68,7 +69,7 @@ const materials=(c,t)=>{
 const build=x=>{
  const c=canonical(x); if(!c?.chapterId)throw Error('BAB tidak ditemukan di Master Chapter V11.');
  const t=tp(c),m=materials(c,t);
- const cp=draft(['siapguru_cp_draft','siapguru_cp'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'CP_BUILDER_CONTEXTUAL',statement:'CP fase '+phase(c.kelas)+' dikontekstualisasikan pada BAB '+c.no+' — '+c.title+'.'};
+ const cp=draft(['siapguru_cp_draft','siapguru_cp'],c)||canonicalCP(c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'CP_BUILDER_CONTEXTUAL',statement:'CP fase '+phase(c.kelas)+' dikontekstualisasikan pada BAB '+c.no+' — '+c.title+'.'};
  const at=draft(['siapguru_atp_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,items:t.map((q,i)=>({order:i+1,chapterId:c.chapterId,tp:q.text,jp:q.jp??null}))};
  const pt={chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,chapterNo:c.no,jp:c.jp,jpSource:c.jpSource,source:'MASTER_CHAPTER_V11 + MASTER_JP_V2'};
  const ps=draft(['siapguru_prosem_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,jp:c.jp,jpSource:c.jpSource};
