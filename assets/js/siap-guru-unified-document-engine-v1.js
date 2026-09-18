@@ -1,1 +1,70 @@
-(()=>{const K='siapguru_unified_document_v2',R=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}},W=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),ID=x=>String(x.id||x.chapterId||[x.mapel,x.kelas,x.no].join('-')),OK=(v,x)=>v&&(!v.chapterId||String(v.chapterId)===ID(x)),S=(ks,x)=>{for(const k of ks){const v=R(k);if(OK(v,x))return v}},PH=x=>x.fase||(x.kelas<=2?'A':x.kelas<=4?'B':'C'),CP=x=>S(['siapguru_cp_draft','siapguru_cp'],x)||{chapterId:ID(x),source:'Master Chapter Bank V11 + CP Builder',fase:PH(x),mapel:x.mapel,kelas:x.kelas,statement:'Capaian pembelajaran fase '+PH(x)+' pada '+x.mapel+' dikontekstualisasikan pada BAB '+x.no+' — '+x.bab+'.'},TP=x=>{const v=S(['siapguru_tp_draft'],x);if(Array.isArray(v?.items)&&v.items.length)return v.items.map((q,i)=>({...q,chapterId:ID(x),order:i+1}));const t='BAB '+x.no+' — '+x.bab;return[{text:'Peserta didik mampu memahami konsep dan informasi utama dalam '+t+'.',element:'Memahami',chapterId:ID(x),order:1},{text:'Peserta didik mampu menerapkan pengetahuan tentang '+t+' melalui aktivitas yang sesuai konteks.',element:'Mengaplikasi',chapterId:ID(x),order:2},{text:'Peserta didik mampu mengomunikasikan hasil belajar tentang '+t+' dan merefleksikan prosesnya.',element:'Merefleksi',chapterId:ID(x),order:3}].map(q=>({...q,jp:Math.max(1,Math.round(Number(x.jp||8)/3))}))},build=x=>{if(!x?.kelas||!x?.mapel||!x?.bab)throw Error('Konteks BAB tidak lengkap.');const c=ID(x),t=TP(x),m=S(['siapguru_materi_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,bab:x.bab,focus:'Konsep inti BAB '+x.no+' — '+x.bab,concepts:t.map(q=>q.text),examples:['Contoh kontekstual terkait '+x.bab+'.']},p=S(['siapguru_perangkat_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,bab:x.bab,jp:x.jp,model:'Pembelajaran Mendalam',method:'Eksplorasi, diskusi, praktik, presentasi, refleksi',steps:['Orientasi BAB '+x.no,'Eksplorasi konsep','Aktivitas berdasarkan TP','Komunikasi hasil','Refleksi'],tp:t},l=S(['siapguru_lkpd_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,bab:x.bab,instructions:'Kerjakan aktivitas BAB '+x.no+' — '+x.bab+'.',activity:'Amati, diskusikan, praktikkan, dan sajikan hasil.',questions:t.map((q,i)=>(i+1)+'. '+q.text),reflection:'Apa yang dipahami dan perlu diperbaiki?'},a=S(['siapguru_asesmen_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,bab:x.bab,formative:t.map(q=>({tp:q.text,evidence:'Bukti belajar terkait TP'})),summative:{type:'Akhir BAB',basis:'TP BAB '+x.no},criteria:['Pemahaman','Penerapan','Komunikasi','Refleksi']},r=S(['siapguru_rpm_deep_learning_v11','siapguru_rpm_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,semester:x.semester,jp:x.jp,bab:x.bab,understand:'Membangun pemahaman melalui '+x.bab+'.',apply:'Menerapkan konsep melalui aktivitas kontekstual.',reflect:'Merefleksikan proses dan hasil belajar.',tp:t,materials:m.focus},at=S(['siapguru_atp_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,semester:x.semester,bab:x.bab,jp:x.jp,items:t.map((q,i)=>({order:i+1,chapterId:c,tp:q.text,jp:q.jp||1}))},pt=S(['siapguru_prota_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,semester:x.semester,bab:x.bab,jp:x.jp},ps=S(['siapguru_prosem_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,semester:x.semester,bab:x.bab,jp:x.jp},ai=S(['siapguru_ai_super_draft'],x)||{chapterId:c,mapel:x.mapel,kelas:x.kelas,bab:x.bab,source:'Unified Canonical Builder V2',inputs:{tp:true,materi:true,perangkat:true,lkpd:true,asesmen:true,rpm:true},status:'Siap diproses AI SUPER'},b={version:'UNIFIED-CANONICAL-V2',chapterId:c,kelas:Number(x.kelas),mapel:x.mapel,fase:PH(x),semester:Number(x.semester)||1,no:x.no,bab:x.bab,jp:Number(x.jp)||8,source:'Master Chapter Bank V11 → Unified Canonical Builder',sections:{CP:CP(x),TP:t,ATP:at,PROTA:pt,PROSEM:ps,Materi:m,Perangkat:p,LKPD:l,Asesmen:a,RPM:r,AI:ai}};b.validation={required:Object.keys(b.sections),missing:Object.keys(b.sections).filter(k=>!b.sections[k]),complete:Object.keys(b.sections).every(k=>!!b.sections[k])};W(K,b);W('siapguru_unified_document_current',b);return b},get=x=>{const b=R('siapguru_unified_document_current')||R(K);return b&&String(b.chapterId)===ID(x)?b:null};window.SiapGuruUnifiedEngine={version:'2',build,get,key:ID}})();
+/* SIAP GURU — UNIFIED CANONICAL DOCUMENT ENGINE V3
+   Master Chapter V11 -> Master JP V2 -> chapter-scoped content.
+   No generic annual draft is allowed to masquerade as a selected BAB.
+*/
+(()=>{'use strict';
+const KEY='siapguru_unified_document_v3';
+const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(_){return null}};
+const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}};
+const M=()=>window.SiapGuruMasterChapterBankV11||null;
+const JP=()=>window.SiapGuruMasterJPV1||null;
+const E=()=>window.SiapGuruChapterEngineV11||null;
+const phase=k=>Number(k)<=2?'A':Number(k)<=4?'B':'C';
+const slug=s=>String(s??'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const canonical=x=>{
+ const k=Number(x?.kelas||x?.class||0),m=x?.mapel||x?.subject||'',n=Number(x?.no||x?.chapterNo||0);
+ const ch=M()?.getChapter?.(k,m,n)||E()?.resolve?.({kelas:k,mapel:m,no:n})||null;
+ if(!ch)return null;
+ const j=JP()?.getChapterJp?.(k,m,n)||null;
+ return {...ch,kelas:k,mapel:ch.mapel||m,no:n,chapterNo:n,chapterId:ch.chapterId||ch.id||`ch-${k}-${slug(m)}-${n}`,bab:ch.title||ch.bab||'',title:ch.title||ch.bab||'',semester:j?.semester==null?null:Number(j.semester),jp:j?.configured?Number(j.jp):null,jpConfigured:!!j?.configured,jpSource:j?.configured?'MASTER_JP_CHAPTER':'MASTER_JP_NOT_CONFIGURED'};
+};
+const same=(v,c)=>!!(v&&c&&String(v.chapterId||'')===String(c.chapterId||''));
+const draft=(keys,c)=>{
+ for(const k of keys){
+  const v=read(k);
+  if(!v)continue;
+  if(same(v,c))return v;
+  if(Array.isArray(v.items)){
+   const items=v.items.filter(q=>q&&String(q.chapterId||'')===String(c.chapterId));
+   if(items.length)return {...v,chapterId:c.chapterId,chapterNo:c.no,items};
+  }
+ }
+ return null;
+};
+const tp=(c)=>{
+ const d=draft(['siapguru_tp_v11_draft','siapguru_tp_draft'],c);
+ if(Array.isArray(d?.items)&&d.items.length)return d.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));
+ const e=window.SiapGuruTPEngineV11;
+ if(e?.build){
+  const r=e.build({kelas:c.kelas,mapel:c.mapel,no:c.no},{count:5});
+  if(r?.ok&&Array.isArray(r.items))return r.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));
+ }
+ return [];
+};
+const materials=(c,t)=>{
+ const rows=JP()?.getCanonicalMaterials?.(c.kelas,c.mapel,c.no)||[];
+ if(rows.length)return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'MASTER_JP_CANONICAL_MATERIALS',materials:rows};
+ const d=draft(['siapguru_materi_draft'],c);
+ if(d)return d;
+ return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'CANONICAL_MATERIALS_NOT_CONFIGURED',materials:[],focus:'Materi canonical belum tersedia untuk BAB ini.'};
+};
+const build=x=>{
+ const c=canonical(x); if(!c?.chapterId)throw Error('BAB tidak ditemukan di Master Chapter V11.');
+ const t=tp(c),m=materials(c,t);
+ const cp=draft(['siapguru_cp_draft','siapguru_cp'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'CP_BUILDER_CONTEXTUAL',statement:'CP fase '+phase(c.kelas)+' dikontekstualisasikan pada BAB '+c.no+' — '+c.title+'.'};
+ const at=draft(['siapguru_atp_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,items:t.map((q,i)=>({order:i+1,chapterId:c.chapterId,tp:q.text,jp:q.jp??null}))};
+ const pt={chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,chapterNo:c.no,jp:c.jp,jpSource:c.jpSource,source:'MASTER_CHAPTER_V11 + MASTER_JP_V2'};
+ const ps=draft(['siapguru_prosem_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,jp:c.jp,jpSource:c.jpSource};
+ const p=draft(['siapguru_perangkat_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,jp:c.jp,model:'Pembelajaran Mendalam',tp:t};
+ const l=draft(['siapguru_lkpd_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,instructions:'Aktivitas untuk BAB '+c.no+' — '+c.title+'.',questions:t.map((q,i)=>(i+1)+'. '+q.text)};
+ const a=draft(['siapguru_asesmen_draft','siapguru_penilaian_bab_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,formative:t.map(q=>({tp:q.text})),summative:{type:'Akhir BAB',basis:'TP BAB '+c.no}};
+ const r=draft(['siapguru_rpm_deep_learning_v11','siapguru_rpm_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,bab:c.title,tp:t,canonicalJp:c.jp};
+ const ai=draft(['siapguru_ai_super_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'Unified Canonical Builder V3',inputs:{tp:!!t.length,materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',perangkat:true,lkpd:true,asesmen:true,rpm:true},status:'Siap diproses AI SUPER'};
+ const sections={CP:cp,TP:t,ATP:at,PROTA:pt,PROSEM:ps,Materi:m,Perangkat:p,LKPD:l,Asesmen:a,RPM:r,AI:ai};
+ const canonicalFlags={CP:!!cp?.chapterId,TP:t.every(q=>q?.chapterId===c.chapterId),ATP:!!at?.chapterId,PROTA:pt.jp!=null,PROSEM:ps?.jp==null||ps?.chapterId===c.chapterId,Materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',Perangkat:!!p?.chapterId,LKPD:!!l?.chapterId,Asesmen:!!a?.chapterId,RPM:!!r?.chapterId,AI:!!ai?.chapterId};
+ const b={version:'UNIFIED-CANONICAL-V3',chapterId:c.chapterId,kelas:c.kelas,mapel:c.mapel,fase:phase(c.kelas),semester:c.semester,no:c.no,bab:c.title,jp:c.jp,jpSource:c.jpSource,source:'Master Chapter V11 → Master JP V2 → Chapter-scoped bundle',sections,validation:{required:Object.keys(sections),missing:Object.keys(sections).filter(k=>sections[k]==null),canonicalFlags,canonicalReady:Object.values(canonicalFlags).every(Boolean)}};
+ write(KEY,b);write('siapguru_unified_document_current',b);return b;
+};
+const get=x=>{const b=read('siapguru_unified_document_current')||read(KEY),c=canonical(x);return b&&c&&String(b.chapterId)===String(c.chapterId)?b:null};
+window.SiapGuruUnifiedEngine={version:'3',build,get,key:x=>canonical(x)?.chapterId||String(x?.id||'')};
+})();
