@@ -67,7 +67,7 @@ const tp=(c)=>{
  }
  return [];
 };
-const canonicalCP=c=>{const t=String(c.title||'').toLowerCase();if(c.mapel==='Matematika')return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),element:'Bilangan',source:'CP_MATEMATIKA_FASE_C',statement:'Pada akhir Fase C, murid memiliki pemahaman dan intuisi bilangan (number sense) pada bilangan cacah sampai 1.000.000; membaca, menulis, menentukan nilai tempat, membandingkan, mengurutkan, melakukan komposisi dan dekomposisi bilangan; menyelesaikan masalah yang berkaitan dengan uang; melakukan operasi penjumlahan, pengurangan, perkalian, dan pembagian bilangan cacah sampai 100.000; serta menyelesaikan masalah yang berkaitan dengan KPK dan FPB.'};if(c.mapel==='IPAS'&&/cahaya|bunyi|mendengar/.test(t))return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'IPAS_BAB1_BOOK_CP',statement:'Berdasarkan pemahamannya terhadap konsep gelombang (bunyi dan cahaya), peserta didik mendemonstrasikan bagaimana penerapannya dalam kehidupan sehari-hari.'};if(c.mapel==='IPAS'&&/harmoni|ekosistem/.test(t))return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'IPAS_EKOSISTEM_CONTEXT',statement:'Peserta didik menganalisis hubungan antarkomponen dalam ekosistem dan mengevaluasi dampak aktivitas manusia terhadap keseimbangan ekosistem.'};return null};
+const canonicalCP=c=>{const phaseKey=phase(c.kelas),mapel=String(c.mapel||'').trim();const rel=window.SiapGuruCanonicalCPReligion?.[mapel]?.[phaseKey]||null;const gen=window.SiapGuruCanonicalCPGeneral?.[mapel]?.[phaseKey]||null;if(rel||gen){const rows=rel||gen;return {chapterId:c.chapterId,mapel,kelas:c.kelas,fase:phaseKey,source:rel?'CP_RELIGION_CANONICAL':'CP_GENERAL_CANONICAL',items:rows.map((r,i)=>({element:r[0],statement:r[1],order:i+1}))};}if(mapel==='Koding dan Kecerdasan Artifisial'&&Number(c.kelas)===5)return {chapterId:c.chapterId,mapel,kelas:c.kelas,fase:phaseKey,source:'CP_KODING_AI_CANONICAL',items:[{element:'Berpikir Komputasional',statement:'Mengembangkan cara berpikir sistematis untuk memecahkan masalah dan merancang solusi menggunakan konsep komputasional.'},{element:'Literasi Digital dan Kecerdasan Artifisial',statement:'Memahami penggunaan teknologi digital dan kecerdasan artifisial secara bijak, aman, kreatif, dan bertanggung jawab.'}]};return null};
 const materials=(c,t)=>{
  const rows=JP()?.getCanonicalMaterials?.(c.kelas,c.mapel,c.no)||[];
  if(rows.length)return {chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'MASTER_JP_CANONICAL_MATERIALS',materials:rows};
@@ -77,7 +77,7 @@ const materials=(c,t)=>{
 };
 const build=x=>{
  const c=canonical(x); if(!c?.chapterId)throw Error('BAB tidak ditemukan di Master Chapter V11.');
- const t=tp(c),m=materials(c,t);
+ const t=tp(c).map(q=>{const z={...q};delete z.cp;return z;}),m=materials(c,t);
  const cpRaw=draft(['siapguru_cp_draft','siapguru_cp'],c);const cp=(!hasGeneric(cpRaw)?cpRaw:null)||canonicalCP(c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'CANONICAL_CP_NOT_CONFIGURED',statement:'Data CP canonical belum tersedia untuk BAB ini.'};
  const atDraft=draft(['siapguru_atp_draft'],c);const at=(!hasGeneric(atDraft)?atDraft:null)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,items:t.map((q,i)=>({order:i+1,chapterId:c.chapterId,tp:q.text,jp:q.jp??null}))};
  const pt={chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,chapterNo:c.no,jp:c.jp,jpSource:c.jpSource,source:'MASTER_CHAPTER_V11 + MASTER_JP_V2'};
@@ -89,9 +89,9 @@ const build=x=>{
  const ai=draft(['siapguru_ai_super_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'Unified Canonical Builder V3',inputs:{tp:!!t.length,materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',perangkat:true,lkpd:true,asesmen:true,rpm:true},status:'Siap diproses AI SUPER'};
  const sections={CP:cp,TP:t,ATP:at,PROTA:pt,PROSEM:ps,Materi:m,Perangkat:p,LKPD:l,Asesmen:a,RPM:r,AI:ai};
  const canonicalFlags={CP:!!cp?.chapterId,TP:Array.isArray(t)&&t.length>0&&t.every(q=>q?.chapterId===c.chapterId&&!isGenericText(q?.text)),ATP:!!at?.chapterId,PROTA:pt.jp!=null,PROSEM:ps?.jp==null||ps?.chapterId===c.chapterId,Materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',Perangkat:!!p?.chapterId,LKPD:!!l?.chapterId,Asesmen:!!a?.chapterId,RPM:!!r?.chapterId,AI:!!ai?.chapterId};
- const b={version:'UNIFIED-CANONICAL-V4',chapterId:c.chapterId,kelas:c.kelas,mapel:c.mapel,fase:phase(c.kelas),semester:c.semester,no:c.no,bab:c.title,jp:c.jp,jpSource:c.jpSource,source:'Master Chapter V11 → Master JP V2 → Chapter-scoped bundle',sections,validation:{required:Object.keys(sections),missing:Object.keys(sections).filter(k=>sections[k]==null),canonicalFlags,canonicalReady:Object.values(canonicalFlags).every(Boolean)}};
+ const b={version:'UNIFIED-CANONICAL-V5',chapterId:c.chapterId,kelas:c.kelas,mapel:c.mapel,fase:phase(c.kelas),semester:c.semester,no:c.no,bab:c.title,jp:c.jp,jpSource:c.jpSource,source:'Master Chapter V11 → Master JP V2 → Chapter-scoped bundle',sections,validation:{required:Object.keys(sections),missing:Object.keys(sections).filter(k=>sections[k]==null),canonicalFlags,canonicalReady:Object.values(canonicalFlags).every(Boolean)}};
  write(KEY,b);write('siapguru_unified_document_current',b);return b;
 };
 const get=x=>{const b=read('siapguru_unified_document_current')||read(KEY),c=canonical(x);return b&&c&&String(b.chapterId)===String(c.chapterId)?b:null};
-window.SiapGuruUnifiedEngine={version:'4',build,get,key:x=>canonical(x)?.chapterId||String(x?.id||'')};
+window.SiapGuruUnifiedEngine={version:'5',build,get,key:x=>canonical(x)?.chapterId||String(x?.id||'')};
 })();
