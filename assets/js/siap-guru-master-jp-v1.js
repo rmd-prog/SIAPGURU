@@ -284,7 +284,7 @@ const chapterRows=(kelas,mapel)=>{
    const no=i+1,ch=M?.getChapter?.(kelas,mapel,no),id=ch?.chapterId||`ch-${kelas}-${subjectKey(mapel).replace(/[^a-z0-9]+/g,'-')}-${no}`;
    const x=c?.chapters?.[id]||c?.chapters?.[String(no)]||null;
    return {kelas:Number(kelas),mapel:s.mapel,chapterNo:no,chapterId:id,chapter:title,
-     jp:x?.jp==null?null:Number(x.jp),semester:x?.semester==null?null:Number(x.semester),
+     jp:x?.jp==null?null:Number(x.jp),semester:x?.semester==null?(no<=Math.ceil(s.chapters.length/2)?1:2):Number(x.semester),
      configured:!!x,weight:x?.weight==null?null:Number(x.weight),materials:x?.materials||{}};
  });
 };
