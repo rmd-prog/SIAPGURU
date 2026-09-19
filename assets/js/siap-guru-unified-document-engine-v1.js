@@ -32,7 +32,7 @@ const draft=(keys,c)=>{
  return null;
 };
 const tp=(c)=>{
- const d=draft(['siapguru_tp_v11_draft','siapguru_tp_draft'],c);
+ const d=c.mapel==='Matematika'?null:draft(['siapguru_tp_v11_draft','siapguru_tp_draft'],c);
  if(Array.isArray(d?.items)&&d.items.length)return d.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));
  const topic=String(c.title||'').toLowerCase();
  const math={
