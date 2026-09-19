@@ -19,6 +19,17 @@ const canonical=x=>{
  return {...ch,kelas:k,mapel:ch.mapel||m,no:n,chapterNo:n,chapterId:ch.chapterId||ch.id||`ch-${k}-${slug(m)}-${n}`,bab:ch.title||ch.bab||'',title:ch.title||ch.bab||'',semester:j?.semester==null?null:Number(j.semester),jp:j?.configured?Number(j.jp):null,jpConfigured:!!j?.configured,jpSource:j?.configured?'MASTER_JP_CHAPTER':'MASTER_JP_NOT_CONFIGURED'};
 };
 const same=(v,c)=>!!(v&&c&&String(v.chapterId||'')===String(c.chapterId||''));
+const GENERIC_PATTERNS=[
+ /dalam pembelajaran .* peserta didik mampu menjelaskan konsep utama .* secara runtut dengan istilah yang tepat/i,
+ /peserta didik mampu mengidentifikasi informasi, unsur, atau langkah penting/i,
+ /peserta didik mampu menghubungkan .* dengan contoh atau situasi yang dekat dengan kehidupan/i,
+ /peserta didik mampu menerapkan pemahaman .* melalui latihan, karya, atau unjuk kerja/i,
+ /peserta didik mampu menyajikan dan merefleksikan hasil belajar .* berdasarkan umpan balik/i,
+ /cp fase [abc] .* dikontekstualisasikan pada bab/i,
+ /source\\s*[:=]\\s*(cp_|tp_|book_|master_|canonical_|explicit_|unified_)/i
+];
+const isGenericText=v=>{if(typeof v!=='string')return false;const x=v.replace(/\\s+/g,' ').trim();return GENERIC_PATTERNS.some(r=>r.test(x));};
+const hasGeneric=v=>{if(isGenericText(v))return true;if(Array.isArray(v))return v.some(hasGeneric);if(v&&typeof v==='object')return Object.values(v).some(hasGeneric);return false;};
 const draft=(keys,c)=>{
  for(const k of keys){
   const v=read(k);
@@ -33,7 +44,7 @@ const draft=(keys,c)=>{
 };
 const tp=(c)=>{
  const d=c.mapel==='Matematika'?null:draft(['siapguru_tp_v11_draft','siapguru_tp_draft'],c);
- if(Array.isArray(d?.items)&&d.items.length)return d.items.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));
+ if(Array.isArray(d?.items)){const clean=d.items.filter(q=>q&&q.text&&!isGenericText(q.text));if(clean.length)return clean.map((q,i)=>({...q,chapterId:c.chapterId,chapterNo:c.no,chapterTitle:c.title,bab:c.title,order:i+1}));}
  const topic=String(c.title||'').toLowerCase();
  const math={
   1:['membaca dan menuliskan bilangan cacah sampai 100.000 serta menentukan nilai tempat setiap angka','membandingkan dan mengurutkan bilangan cacah sampai 100.000 dengan menggunakan nilai tempat','menyusun komposisi dan menguraikan dekomposisi bilangan cacah sampai 100.000','melakukan operasi penjumlahan, pengurangan, perkalian, dan pembagian bilangan cacah sampai 100.000','menyelesaikan masalah sehari-hari yang melibatkan bilangan cacah sampai 100.000 serta menjelaskan strategi penyelesaiannya'],
@@ -67,8 +78,8 @@ const materials=(c,t)=>{
 const build=x=>{
  const c=canonical(x); if(!c?.chapterId)throw Error('BAB tidak ditemukan di Master Chapter V11.');
  const t=tp(c),m=materials(c,t);
- const cp=draft(['siapguru_cp_draft','siapguru_cp'],c)||canonicalCP(c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'CP_BUILDER_CONTEXTUAL',statement:'CP fase '+phase(c.kelas)+' dikontekstualisasikan pada BAB '+c.no+' — '+c.title+'.'};
- const at=draft(['siapguru_atp_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,items:t.map((q,i)=>({order:i+1,chapterId:c.chapterId,tp:q.text,jp:q.jp??null}))};
+ const cpRaw=draft(['siapguru_cp_draft','siapguru_cp'],c);const cp=(!hasGeneric(cpRaw)?cpRaw:null)||canonicalCP(c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,fase:phase(c.kelas),source:'CANONICAL_CP_NOT_CONFIGURED',statement:'Data CP canonical belum tersedia untuk BAB ini.'};
+ const atDraft=draft(['siapguru_atp_draft'],c);const at=(!hasGeneric(atDraft)?atDraft:null)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,items:t.map((q,i)=>({order:i+1,chapterId:c.chapterId,tp:q.text,jp:q.jp??null}))};
  const pt={chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,chapterNo:c.no,jp:c.jp,jpSource:c.jpSource,source:'MASTER_CHAPTER_V11 + MASTER_JP_V2'};
  const ps=draft(['siapguru_prosem_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,bab:c.title,jp:c.jp,jpSource:c.jpSource};
  const p=draft(['siapguru_perangkat_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,jp:c.jp,model:'Pembelajaran Mendalam',tp:t};
@@ -77,10 +88,10 @@ const build=x=>{
  const r=draft(['siapguru_rpm_deep_learning_v11','siapguru_rpm_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,semester:c.semester,jp:c.jp,bab:c.title,tp:t,canonicalJp:c.jp};
  const ai=draft(['siapguru_ai_super_draft'],c)||{chapterId:c.chapterId,mapel:c.mapel,kelas:c.kelas,bab:c.title,source:'Unified Canonical Builder V3',inputs:{tp:!!t.length,materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',perangkat:true,lkpd:true,asesmen:true,rpm:true},status:'Siap diproses AI SUPER'};
  const sections={CP:cp,TP:t,ATP:at,PROTA:pt,PROSEM:ps,Materi:m,Perangkat:p,LKPD:l,Asesmen:a,RPM:r,AI:ai};
- const canonicalFlags={CP:!!cp?.chapterId,TP:t.every(q=>q?.chapterId===c.chapterId),ATP:!!at?.chapterId,PROTA:pt.jp!=null,PROSEM:ps?.jp==null||ps?.chapterId===c.chapterId,Materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',Perangkat:!!p?.chapterId,LKPD:!!l?.chapterId,Asesmen:!!a?.chapterId,RPM:!!r?.chapterId,AI:!!ai?.chapterId};
- const b={version:'UNIFIED-CANONICAL-V3',chapterId:c.chapterId,kelas:c.kelas,mapel:c.mapel,fase:phase(c.kelas),semester:c.semester,no:c.no,bab:c.title,jp:c.jp,jpSource:c.jpSource,source:'Master Chapter V11 → Master JP V2 → Chapter-scoped bundle',sections,validation:{required:Object.keys(sections),missing:Object.keys(sections).filter(k=>sections[k]==null),canonicalFlags,canonicalReady:Object.values(canonicalFlags).every(Boolean)}};
+ const canonicalFlags={CP:!!cp?.chapterId,TP:Array.isArray(t)&&t.length>0&&t.every(q=>q?.chapterId===c.chapterId&&!isGenericText(q?.text)),ATP:!!at?.chapterId,PROTA:pt.jp!=null,PROSEM:ps?.jp==null||ps?.chapterId===c.chapterId,Materi:m.source==='MASTER_JP_CANONICAL_MATERIALS',Perangkat:!!p?.chapterId,LKPD:!!l?.chapterId,Asesmen:!!a?.chapterId,RPM:!!r?.chapterId,AI:!!ai?.chapterId};
+ const b={version:'UNIFIED-CANONICAL-V4',chapterId:c.chapterId,kelas:c.kelas,mapel:c.mapel,fase:phase(c.kelas),semester:c.semester,no:c.no,bab:c.title,jp:c.jp,jpSource:c.jpSource,source:'Master Chapter V11 → Master JP V2 → Chapter-scoped bundle',sections,validation:{required:Object.keys(sections),missing:Object.keys(sections).filter(k=>sections[k]==null),canonicalFlags,canonicalReady:Object.values(canonicalFlags).every(Boolean)}};
  write(KEY,b);write('siapguru_unified_document_current',b);return b;
 };
 const get=x=>{const b=read('siapguru_unified_document_current')||read(KEY),c=canonical(x);return b&&c&&String(b.chapterId)===String(c.chapterId)?b:null};
-window.SiapGuruUnifiedEngine={version:'3',build,get,key:x=>canonical(x)?.chapterId||String(x?.id||'')};
+window.SiapGuruUnifiedEngine={version:'4',build,get,key:x=>canonical(x)?.chapterId||String(x?.id||'')};
 })();
